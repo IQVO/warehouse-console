@@ -1,7 +1,10 @@
 import type { ReactElement } from "react";
+import { Link } from "react-router-dom";
 import { LaunchTile, useFetch } from "@warehouse/ui-kit";
+import type { LaunchTileProps } from "@warehouse/ui-kit";
 import { SERVICE_BASE_URL } from "../../config";
 import { useDocumentTitle } from "../../shell/useDocumentTitle";
+import { REPORT_ROUTES } from "../context-reports/registry";
 
 interface QueueDepth {
   taskType: string;
@@ -15,6 +18,40 @@ interface Site {
 }
 
 const POLL_MS = 30_000;
+
+/**
+ * Wraps a LaunchTile with a "View metrics report" link when that context
+ * has one in the shared REPORT_ROUTES registry (see
+ * features/context-reports/registry.ts). Rendered as a SIBLING footer
+ * below the tile, not nested inside it -- LaunchTile is itself an anchor,
+ * and nesting an interactive link inside another is invalid HTML and
+ * makes the inner link unreachable by click in most browsers.
+ *
+ * The report screens are shell-owned cross-cutting infrastructure (same
+ * reasoning as Order Lifecycle/WMS/WES dashboards above), not remote
+ * business UI, so this link stays local to ContextsScreen rather than
+ * something a remote would ever need to render for itself.
+ */
+function ContextTile(props: LaunchTileProps): ReactElement {
+  const report = REPORT_ROUTES.find((r) => r.path === props.context);
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "var(--wh-space-2)" }}>
+      <LaunchTile {...props} />
+      {report && (
+        <Link
+          to={`/reports/${report.path}`}
+          style={{
+            fontSize: "var(--wh-font-size-xs)",
+            color: "var(--wh-color-accent)",
+            textDecoration: "none",
+          }}
+        >
+          View metrics report →
+        </Link>
+      )}
+    </div>
+  );
+}
 
 /**
  * The launchpad, on its own route.
@@ -74,38 +111,38 @@ export function ContextsScreen(): ReactElement {
           description="When & in what order — planning, fulfillment and labor throughput."
           href="/wes-dashboard"
         />
-        <LaunchTile
+        <ContextTile
           context="order-management"
           title="Orders"
           description="Intake, allocation state, ship-complete policy."
           href="/order-management"
         />
-        <LaunchTile
+        <ContextTile
           context="inventory-storage"
           title="Inventory"
           description="Usable-inventory lookup, chaotic stow, revocable reservations."
           href="/inventory"
         />
-        <LaunchTile
+        <ContextTile
           context="wes-work-planning"
           title="Planning"
           description="Continuous release, flow balancing, work-pool telemetry."
           href="/planning"
         />
-        <LaunchTile
+        <ContextTile
           context="fulfillment-execution"
           title="Fulfillment"
           description="Pick/pack/SLAM task lifecycle, queue depth, station leases."
           badge={pick.data ? `${pick.data.depth} in PICK` : undefined}
           href="/fulfillment"
         />
-        <LaunchTile
+        <ContextTile
           context="workforce-management"
           title="Workforce"
           description="Staffing gap by path -- planned vs active headcount."
           href="/workforce"
         />
-        <LaunchTile
+        <ContextTile
           context="facility-layout"
           title="Facility"
           description="Sites, zones, aisles & coded storage slots."
@@ -116,17 +153,23 @@ export function ContextsScreen(): ReactElement {
           }
           href="/facility"
         />
-        <LaunchTile
+        <ContextTile
           context="process-path-management"
           title="Process Paths"
           description="The fleet's declared process-path catalogue -- define, revise, deactivate."
           href="/process-path"
         />
-        <LaunchTile
+        <ContextTile
           context="labor-performance"
           title="Labor Performance"
           description="Engineered labor standards, associate scorecards, fleet-wide task-type performance."
           href="/labor"
+        />
+        <ContextTile
+          context="network-fulfillment"
+          title="Network Fulfillment"
+          description="ACL to an external retail fulfillment network -- inventory advertising, order acknowledgement, shipment confirmation. Observation-only from this console."
+          href="/network-fulfillment"
         />
       </div>
     </div>

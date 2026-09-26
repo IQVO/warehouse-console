@@ -77,6 +77,11 @@ export default defineConfig({
           name: "labor_mfe",
           entry: remoteEntry("labor-performance", 5187),
         },
+        network_fulfillment_mfe: {
+          type: "module",
+          name: "netfulfil_mfe",
+          entry: remoteEntry("network-fulfillment", 5188),
+        },
       },
       shared: {
         react: { singleton: true, requiredVersion: "^19.2.8" },
