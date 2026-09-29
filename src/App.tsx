@@ -7,6 +7,7 @@ import { OrderLifecycleScreen } from "./features/order-lifecycle/OrderLifecycleS
 import { WmsDashboardScreen } from "./features/wms-dashboard/WmsDashboardScreen";
 import { WesDashboardScreen } from "./features/wes-dashboard/WesDashboardScreen";
 import { NotFoundScreen } from "./features/not-found/NotFoundScreen";
+import { ContextReportRouteScreen } from "./features/context-reports/ContextReportRouteScreen";
 import { RemoteBoundary } from "./shell/RemoteBoundary";
 import { RouterLink } from "./shell/RouterLink";
 
@@ -40,6 +41,7 @@ const REMOTE_PREFIXES = [
   "/facility",
   "/process-path",
   "/labor",
+  "/network-fulfillment",
 ];
 
 // Each lazy() call MUST run exactly once, at module load, not inside a
@@ -64,6 +66,8 @@ const FacilityRemote = lazy(() => import("facility_mfe/App"));
 const ProcessPathRemote = lazy(() => import("process_path_mfe/App"));
 // @ts-expect-error -- remote module resolved at runtime by Module Federation
 const LaborRemote = lazy(() => import("labor_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const NetworkFulfillmentRemote = lazy(() => import("network_fulfillment_mfe/App"));
 /* eslint-enable react-refresh/only-export-components */
 
 /** Anchored prefix match: a bare startsWith would light up "Inventory"
@@ -80,8 +84,10 @@ function Shell() {
       item.href === "/"
         ? location.pathname === "/"
         : item.id === "contexts"
-          ? // Contexts owns the eight remote routes as well as its own.
+          ? // Contexts owns the eight remote routes as well as its own,
+            // plus every per-context /reports/<context> detail screen.
             location.pathname.startsWith("/contexts") ||
+            location.pathname.startsWith("/reports") ||
             REMOTE_PREFIXES.some((p) => isUnder(location.pathname, p))
           : isUnder(location.pathname, item.href),
   }));
@@ -126,6 +132,16 @@ function Shell() {
           path="/labor/*"
           element={<RemoteBoundary label="Labor Performance" component={LaborRemote} />}
         />
+        <Route
+          path="/network-fulfillment/*"
+          element={
+            <RemoteBoundary
+              label="Network Fulfillment"
+              component={NetworkFulfillmentRemote}
+            />
+          }
+        />
+        <Route path="/reports/:context" element={<ContextReportRouteScreen />} />
         {/* Unmatched URLs used to render the chrome around an empty
             <main> -- a blank page with a working nav and no explanation. */}
         <Route path="*" element={<NotFoundScreen />} />

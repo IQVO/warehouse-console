@@ -22,7 +22,8 @@ shaped this way):
   fulfillment throughput, labor management and labor performance.
 - **Contexts** (`/contexts`) — the launchpad grid into every bounded context, following
   established enterprise WMS/ops-dashboard conventions (SAP Fiori's app-tile launchpad). It
-  lights up as active for its own route and for any of the eight remote routes below.
+  lights up as active for its own route, for any of the nine remote routes below, and for the
+  per-context `/reports/<context>` Bounded Context Report screens described below.
 
 Both dashboards read one section-oriented envelope from the console-bff
 (`GET /console/reports/{wms,wes}?from=&to=`, default trailing 24h) and render each section
@@ -33,11 +34,49 @@ arrives as `available: false` and renders as a single "data unavailable" card; t
 the dashboard still shows its real numbers. Only a whole-request failure produces a
 dashboard-level error state.
 
+### Bounded Context Report screens (`/reports/<context>`)
+
+Each of the nine bounded contexts also gets its own **Bounded Context Report** screen,
+reachable from a "View metrics report" link on its Contexts tile. Unlike the WMS/WES
+dashboards above, these read that context's OWN `GET /reports/...` REST endpoint DIRECTLY —
+never through console-bff/warehouse-ops-agent — because they render the unaggregated,
+context-specific analytical projection each service's own reports reader already serves, not
+a cross-service rollup. This is still shell-owned infrastructure, not remote business logic:
+a generic read-only analytics envelope, following the same "shell owns cross-cutting
+screens" reasoning as Floor/Order-Lifecycle/WMS/WES above.
+
+Every context's report DTO is genuinely different — different domain, different metric
+names, different bucket dimensions (see `src/features/context-reports/*.config.tsx` for the
+real endpoint path and field names read directly from each context's own
+`reports_handler.go`) — so there is deliberately no single shared row/column schema. One
+reusable presentational shell, `ContextReportScreen`
+(`src/features/context-reports/ContextReportScreen.tsx`), owns the three degradation states
+(loading / populated / whole-request error) and the `FreshnessBadge` reading that context's
+sibling `/reports/.../freshness` endpoint; each context's own config object is the only place
+that maps its real DTO onto the shared `@warehouse/ui-kit` primitives (`Card`, `DataTable`,
+`BarChart`, `LineChart`, `FunnelChart`).
+
+Two things every one of these nine screens needs that do not exist in this cluster yet, both
+called out explicitly rather than silently assumed (see `src/config.ts`'s own doc comments for
+the full detail):
+
+- **Kong routing gap.** Every analytics-enabled chart stands up a separate `<context>-reports`
+  Service, but no Kong `Ingress`/`HTTPRoute` rule points `/api/<context>/reports` at it yet —
+  today that Service is reachable only in-cluster (console-bff, each context's own MCP server).
+  This shell is wired to the CORRECT eventual path/shape; a follow-up infra PR still needs to
+  add that route for any of the nine screens to resolve against a live kind cluster.
+- **network-fulfillment's whole reports endpoint is unmerged.** Its `/reports/...` REST
+  endpoint, `reports_handler.go` and DTO are still open work on a parallel branch as of this PR
+  (verified directly against that branch's tree, not assumed) — see
+  `src/features/context-reports/networkFulfillment.config.tsx`'s header comment for the
+  endpoint path and field names this screen guesses at today, flagged there as unverified and
+  needing reconciliation the moment that PR lands.
+
 Everything else (`/order-management`, `/inventory`, `/planning`, `/fulfillment`, `/workforce`,
-`/facility`, `/process-path`, `/labor`) is a Module Federation remote owned by that bounded
-context's own repo, reachable from the Contexts launchpad — this shell only lazy-loads and
-hosts them; it never contains their business logic. An unmatched URL renders the shell's own
-client-side "Page not found" screen rather than a server 404.
+`/facility`, `/process-path`, `/labor`, `/network-fulfillment`) is a Module Federation remote owned
+by that bounded context's own repo, reachable from the Contexts launchpad — this shell only
+lazy-loads and hosts them; it never contains their business logic. An unmatched URL renders
+the shell's own client-side "Page not found" screen rather than a server 404.
 
 This repo owns no OpenAPI or AsyncAPI spec of its own: this shell has no
 domain model to describe (no aggregates, no endpoints it publishes), so there is nothing to
@@ -77,6 +116,7 @@ built at least once) and each remote's own dev server running on its assigned po
 | facility-mfe | 5186 | facility-layout |
 | labor-mfe | 5187 | labor-performance |
 | process-path-mfe | 5189 | process-path-management |
+| network-fulfillment-mfe | 5188 | network-fulfillment |
 
 ```bash
 # one-time: build the sibling ui-kit
