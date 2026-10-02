@@ -83,6 +83,16 @@ export default defineConfig({
           entry: remoteEntry("network-fulfillment", 5188),
         },
       },
+      // The shell must win the React singleton negotiation. With the
+      // default "version-first", every remote's remoteEntry is preloaded
+      // and the highest semver react is picked; once a remote ships a newer
+      // react than the shell (order-management / network-fulfillment
+      // moved to 19.3.0) the shell's react-dom renders against another
+      // bundle's react instance, whose dispatcher is null:
+      // "Cannot read properties of null (reading 'useRef')" and a blank
+      // console. "loaded-first" keeps the already-loaded host copy for
+      // every singleton, so ONE React instance serves shell + all remotes.
+      shareStrategy: "loaded-first",
       shared: {
         react: { singleton: true, requiredVersion: "^19.2.8" },
         "react-dom": { singleton: true, requiredVersion: "^19.2.8" },
