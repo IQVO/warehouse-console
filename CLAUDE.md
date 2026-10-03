@@ -1,168 +1,108 @@
 # Project: Warehouse Console (the shell — not a bounded context)
 
 The React SPA shell for the `warehouse-systems` micro-frontend fleet. It owns
-routing, top navigation, the shared design system consumption, and the four
-screens that no single bounded context owns because they are cross-cutting:
-Floor (`/`, built on `warehouse-ops-agent`'s `GET /daily-brief`), Order
-Lifecycle (`/order-lifecycle`), and the WMS/WES report dashboards
-(`/wms-dashboard`, `/wes-dashboard`). The primary nav's fifth destination,
-Contexts (`/contexts`), is the launchpad into the eight bounded-context
-remotes rather than a cross-cutting screen of its own — see ADR-0001 in
-`docs/docs/adr/`. Everything else (`/order-management`, `/inventory`,
-`/planning`, `/fulfillment`, `/workforce`, `/facility`, `/process-path`,
-`/labor`) is a Module Federation **remote** owned and deployed by that
-bounded context's own repo — this shell only lazy-loads and hosts them; it
-never contains their business logic.
+routing, top navigation, the shared design-system consumption, and the screens no
+single bounded context owns: Floor (`/`, built on `warehouse-ops-agent`'s
+`GET /daily-brief`), Order Lifecycle (`/order-lifecycle`), the WMS/WES report
+dashboards (`/wms-dashboard`, `/wes-dashboard`) and per-context report screens
+(`/reports/<context>`). The fifth nav destination, Contexts (`/contexts`), is the
+launchpad into the nine bounded-context **remotes** (`/order-management`,
+`/inventory`, `/planning`, `/fulfillment`, `/workforce`, `/facility`,
+`/process-path`, `/labor`, `/network-fulfillment`). Each remote is owned and
+deployed by its own repo; this shell only lazy-loads and hosts them. See ADR-0001
+in `docs/docs/adr/`.
 
-Source of truth for the domain model: `/Users/claudioed/docs/amazon-fulfillment-ddd.md`
-and `/Users/claudioed/warehouse-systems-ddd.md`. This repo does not itself
-model a bounded context — it is presentation/composition infrastructure that
-sits in front of the eight that do.
+Domain model source of truth: `/Users/claudioed/docs/amazon-fulfillment-ddd.md` and
+`/Users/claudioed/warehouse-systems-ddd.md`. This repo models no bounded context:
+no aggregates, no domain events, no persistence.
 
-## Strategic classification (read this before writing any code)
+## Strategic classification (read before writing code)
 
-This is **not** a Generic/Core/Supporting subdomain in the DDD sense — it has
-no aggregates, no domain events, no persistence. It is the fleet's **shared
-composition root**: a Module Federation **host** that assembles eight
-independently-built remotes into one navigable product, plus a thin
-BFF-consuming read layer for the two cross-cutting concerns (Order Lifecycle,
-WMS/WES dashboards) that no single remote can answer on its own.
-
-**Relationship to the rest of the system**: every bounded-context service is
-upstream of this shell for its own remote (`facility-mfe`, `order_mgmt_mfe`,
-`process_path_mfe`, `labor_mfe`, etc.) — this repo has zero business logic of
-theirs, only the routing/hosting glue. For the two cross-cutting screens,
-this shell is a **downstream Conformist** to `warehouse-ops-agent`'s
-`console-bff` (Order Lifecycle trace, `GET /console/reports/{wms,wes}`) — it
-renders whatever shape the BFF publishes and does not reinterpret domain
-meaning. **No shared database, ever**: every cross-service view goes through
-a REST API, never a DB.
+This is the fleet's **shared composition root**: a Module Federation **host** plus a
+thin read layer for the cross-cutting concerns no single remote can answer. For
+Order Lifecycle and the WMS/WES dashboards it is a **downstream Conformist** to
+`warehouse-ops-agent`'s `console-bff`: it renders whatever shape the BFF publishes
+and does not reinterpret domain meaning. **No shared database, ever**: every
+cross-service view goes through a REST API.
 
 ## Architecture (NON-NEGOTIABLE)
 
 ```
 src/
-  shell/            AppShell composition, RemoteBoundary (lazy+Suspense+error
-                     boundary for remotes), RouterLink, useDocumentTitle
-  features/
-    floor/           Floor: monitor-surface screen ("/"), reads GET /daily-brief
-    order-lifecycle/ Cross-service order trace (calls console-bff)
-    wms-dashboard/    WMS report dashboard (envelope from console-bff)
-    wes-dashboard/    WES report dashboard (envelope from console-bff)
-    reports/          Shared report-dashboard rendering (ReportDashboard,
-                       envelope types) used by both wms/wes dashboards
-    contexts/         Launchpad into the eight bounded-context remotes
-    not-found/        Client-rendered 404 (SPA fallback lands here, not a
-                       server 404 — see nginx.conf)
-  runtime-config.ts  Fetches + validates /config.json ({ apiOrigin }) BEFORE
-                       the app mounts; publishes window.__WAREHOUSE_CONFIG__,
-                       which every remote also reads
-  config.ts          Resolves every API base as <apiOrigin>/api/<context>
-                       (Kong); dev-port fallback only when not a production
-                       build; a production build without apiOrigin throws
-  main.tsx           Boot: loadRuntimeConfig() then a DYNAMIC import of
-                       ./App (a static import would read an empty config)
-  test/              MSW mocks + test setup
+  shell/            RemoteBoundary (lazy+Suspense+error boundary), RouterLink, useDocumentTitle
+  features/         floor/ order-lifecycle/ wms-dashboard/ wes-dashboard/ reports/
+                    contexts/ context-reports/ not-found/
+  runtime-config.ts Fetches + validates /config.json ({ apiOrigin }) BEFORE the app mounts
+  config.ts         Every API base = <apiOrigin>/api/<context> (Kong)
+  main.tsx          loadRuntimeConfig() then a DYNAMIC import of ./App
+  test/             MSW server + test setup
 ```
 
-No remote's business logic may live here. `lazy()` calls for each remote
-MUST be created once at module scope in `App.tsx`, never inside a render
-function — see `RemoteBoundary.tsx`'s doc comment for why (remounting a
-remote inside a render re-triggers its Module Federation fetch and loses its
-internal state).
+- No remote's business logic may live here, and no direct DB access.
+- `lazy()` for each remote MUST be created once at module scope in `src/App.tsx`,
+  never inside a render function (remounting re-fetches the remote and loses its
+  state), and rendered through `RemoteBoundary`.
+- Keep `vite.config.ts` in object form (never the callback form): `vitest.config.ts`
+  merges it and a callback export kills the whole test suite.
+- `src/main.tsx` MUST import `./App` dynamically after the runtime config loads.
+- Shared singletons `react`, `react-dom`, `react-router-dom`, `@warehouse/ui-kit`
+  (with `shareStrategy: "loaded-first"`): do not change casually.
+- `@warehouse/ui-kit` (`file:../warehouse-ui-kit`, a sibling checkout) for every
+  design-token/component need; never hand-roll a component the kit provides.
+- Alarms and thresholds come from the backend, never from the shell. Show staleness
+  (`FreshnessBadge`) and a missing reading as "—", never a calm zero.
 
-## Module Federation (this app is the host)
+Details load automatically when you touch the matching files:
+`.claude/rules/mfe-remotes.md` (federation host contract, remote pitfalls),
+`.claude/rules/runtime-config-and-edge.md` (config.json, nginx, Docker, Helm, the
+two gateways) and `.claude/rules/cross-cutting-screens.md` (the screens' rules).
 
-`@module-federation/vite` wires eight remotes (`order_mgmt_mfe`,
-`inventory_mfe`, `planning_mfe`, `fulfillment_mfe`, `workforce_mfe`,
-`facility_mfe`, `process_path_mfe`, `labor_mfe`), each built and deployed
-independently by its own repo. `vite.config.ts` loads them from their dev
-ports (5181–5187 and 5189, see README's port table) under `npm run dev`, and
-from `/mfes/<context>/remoteEntry.js` in a production build — the path the
-Nginx web gateway on `http://localhost` serves each remote at. Keep
-`vite.config.ts` in object form (see `.claude/rules/mfe-remotes.md`). Shared singletons: `react`, `react-dom`,
-`react-router-dom`, `@warehouse/ui-kit` — so a version mismatch on any of
-these fails loudly rather than double-loading React.
+## Runtime configuration and the edge (summary)
 
-## Cross-cutting screens (the reason this shell exists beyond hosting)
+One image serves any environment: `apiOrigin` (Helm `runtimeConfig.apiOrigin`,
+default `http://localhost:8000` = Kong) is mounted as `/config.json` and fetched
+before mount; validation is fail-fast. No `config.json` is committed: for
+`npm run dev` create an untracked `public/config.json` or the shell refuses to
+start. Nginx (`http://localhost`) serves the shell and remotes at `/mfes/<context>/`;
+Kong (`http://localhost:8000`) serves every API; neither proxies to the other, and
+`apiOrigin` must be the Kong origin.
 
-- **Order Lifecycle**: traces one order across the four services that touch
-  it (order-management → inventory-storage → wes-work-planning →
-  fulfillment-execution) via `console-bff` (hosted inside
-  `warehouse-ops-agent` — see that repo's ADR-0002 and ADR-0003 for why the
-  BFF lives there rather than as its own service, and for the report
-  envelope shape).
-- **WMS/WES dashboards**: read one section-oriented envelope per dashboard
-  (`GET /console/reports/{wms,wes}?from=&to=`, default trailing 24h) and
-  render each section with the ui-kit's chart primitives keyed by the
-  section's own `chartKind`. These are eventually-consistent analytical
-  projections, not live reads — every card carries a `FreshnessBadge`
-  (staleness is shown, never hidden). A degraded section arrives as
-  `available: false` and renders as one "data unavailable" card without
-  taking down the rest of the dashboard; only a whole-request failure
-  produces a dashboard-level error state.
+## Tech and commands
 
-## Tech & standards
+React 19, TypeScript (strict, `verbatimModuleSyntax`), Vite 8, `react-router-dom` v7
+(client-side only), oxlint, vitest + Testing Library + MSW, Playwright for the smoke
+scripts. Packaging: `Dockerfile` (Node build, `nginx-unprivileged` on 8080) and
+`charts/warehouse-console/` (Helm).
 
-- React 19, TypeScript (strict, `verbatimModuleSyntax`), Vite 8.
-- Remote-hosting pitfalls (vite config form, tiny relative `remoteEntry.js`,
-  selector collisions, the two-edge topology): `.claude/rules/mfe-remotes.md`.
-- `react-router-dom` v7 (client-side only — see `RouterLink.tsx` /
-  `useDocumentTitle.ts`; no full-page reload on navigation, no server-side
-  routing logic).
-- `@warehouse/ui-kit` (`file:../warehouse-ui-kit` sibling dependency — not a
-  registry package yet) for every design-tokens/component need; never
-  hand-roll a component the ui-kit already provides.
-- `oxlint` (lint), `tsc -b` (typecheck), `vitest` + Testing Library + MSW
-  (unit/component tests), Playwright (`scripts/verify-all-routes.cjs`,
-  `scripts/verify-dashboards.cjs` — headless smoke checks, not part of the
-  Docker/CI build).
-- Packaging: `Dockerfile` (Node build → `nginx-unprivileged` runtime on
-  8080, SPA fallback to `index.html` via `nginx.conf`) and
-  `charts/warehouse-console/` (Helm), matching the fleet's Go-service
-  Dockerfile/chart conventions where they translate to a static SPA —
-  no database/Kafka/OTel blocks, `readOnlyRootFilesystem: true`.
+| Command | What it does |
+|---|---|
+| `make check-fast` | oxlint + `tsc -b --noEmit` (the agent Stop-hook gate) |
+| `make check-all` | lint, typecheck, test, build (the CI sensors) |
+| `npm test` | vitest; run whenever you touch `src/` |
+| `npm run dev` | shell on :5173 (needs `public/config.json`) |
+| `npm run verify:dashboards` | Playwright; only the shell dev server, BFF calls stubbed |
+| `npm run verify:routes` | Playwright; shell + remote dev servers + reachable backends |
+| `make guide-lint` | lint these agent guides (blocking in CI) |
 
-## Runtime configuration and the localhost edge
+## Skills (`.claude/skills/`)
 
-One image serves any environment: the chart's `runtimeConfig.apiOrigin`
-(default `http://localhost:8000`, i.e. Kong) is mounted as `/config.json`
-and fetched before the app mounts. Validation is fail-fast — a missing,
-non-JSON or path-carrying origin stops the console with an explicit error.
-The fetch also happens under `npm run dev`, and no `config.json` is
-committed: create an untracked `public/config.json` locally or the dev
-server's HTML fallback makes the shell refuse to start. Nginx
-(`http://localhost`) serves the shell and remotes; Kong
-(`http://localhost:8000`) serves every API at `/api/<context>`; neither
-proxies to the other.
+- `register-console-remote`: add or rename a remote (vite.config.ts, App.tsx route,
+  Contexts tile, verify script, README/docs).
+- `run-console-locally`: ui-kit sibling, `config.json`, ports, backends,
+  verify:routes / verify:dashboards.
+- `add-console-screen`: build or change a shell-owned screen or report screen with
+  the ui-kit and MSW tests.
 
 ## Definition of done
 
-- `npm run lint` (oxlint), `npm run typecheck` (`tsc -b --noEmit`), and
-  `npm run build` (`tsc -b && vite build`) all green.
-- `npm test` (vitest) green; new screens/behavior get a component test using
-  Testing Library + MSW, following the existing pattern in
+- `make check-fast`, `npm test` and `npm run build` are green.
+- New screens/behaviour get a component test (Testing Library + MSW) following
   `src/features/*/*.test.tsx`.
-- `npm run verify:routes` passes with the dev server + all 8 remote dev
-  servers + all 8 backend services + `console-bff` running (full-fleet smoke
-  check — not required for every change, but required before claiming a
-  navigation/routing change works end-to-end).
-- No remote's business logic leaks into this repo; no direct DB access, ever.
-- README.md stays accurate: run steps, the remote port table, and the
-  `verify:*` scripts' preconditions.
-
-## Local quality gate (run before every commit)
-
-- `npm run lint && npm run typecheck && npm run build` — the fast
-  self-correction loop; the same sensors CI's `lint`/`typecheck`/`build`
-  jobs run. Fix whatever it reports and re-run until green *before* you
-  commit.
-- `npm test` — run whenever you touch `src/`.
-- Before claiming a routing/navigation/remote-hosting change works, run the
-  full-fleet `npm run verify:routes` (or at minimum manually exercise it in
-  a browser) rather than relying on unit tests alone — Module Federation and
-  client-side routing failures often only show up integrated, not in
-  isolation.
+- Before claiming a navigation/routing/remote-hosting change works end to end, run
+  `npm run verify:routes` (or exercise it in a browser): Module Federation and
+  routing failures often only show up integrated, never in unit tests.
+- `README.md` stays accurate: run steps, the remote port table, `verify:*`
+  preconditions.
 
 <!-- harness:scoped-rules:start (generated by tools/migrate_v3.py in warehouse-harness-template; do not hand-edit) -->
 ## Scoped rules and harness

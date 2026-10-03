@@ -1,8 +1,45 @@
-# Micro-frontend remote pitfalls (console-side)
+---
+paths:
+  - "vite.config.ts"
+  - "vitest.config.ts"
+  - "src/App.tsx"
+  - "src/shell/**"
+  - "scripts/verify-all-routes.cjs"
+---
+# Module Federation host rules and remote pitfalls (console-side)
 
-Companion to CLAUDE.md's Module Federation section — these are pitfalls
-this shell has already hit that belong to the remote-hosting side of the
-contract, not covered elsewhere in this repo's docs yet.
+## Host contract (this app is the Module Federation host)
+
+`@module-federation/vite` wires nine remotes in `vite.config.ts`
+(`order_mgmt_mfe`, `inventory_mfe`, `planning_mfe`, `fulfillment_mfe`,
+`workforce_mfe`, `facility_mfe`, `process_path_mfe`, `labor_mfe`,
+`network_fulfillment_mfe`), each built and deployed independently by its own
+repo. Under `npm run dev` they load from their dev ports (5181-5189, see the
+README port table); in a production build from `/mfes/<context>/remoteEntry.js`,
+the path the Nginx web gateway on `http://localhost` serves each remote at.
+
+- Keep `vite.config.ts` in object form (section 1 below). It reads `process.argv`
+  for the build flag instead of using the callback form.
+- Shared singletons: `react`, `react-dom`, `react-router-dom`,
+  `@warehouse/ui-kit`, so a version mismatch fails loudly rather than
+  double-loading React. `shareStrategy: "loaded-first"` is deliberate: with the
+  default version-first a remote shipping a newer react than the shell makes the
+  shell's react-dom render against another bundle's react (null dispatcher,
+  blank console). Do not change it casually.
+- The `lazy()` for each remote MUST be created once at module scope in
+  `src/App.tsx`, never inside a render function: remounting a remote re-triggers
+  its Module Federation fetch and loses its state (see the doc comment in
+  `src/shell/RemoteBoundary.tsx`). Always render a remote through
+  `RemoteBoundary`.
+- No remote's business logic may live in this repo.
+- To add or rename a remote follow the `register-console-remote` skill; a new
+  route also goes into `scripts/verify-all-routes.cjs`.
+
+## Remote-side pitfalls
+
+These are pitfalls this shell has already hit that belong to the
+remote-hosting side of the contract, not covered elsewhere in this repo's
+docs yet.
 
 ## 1. `vite.config.ts` in a remote must stay in object form
 

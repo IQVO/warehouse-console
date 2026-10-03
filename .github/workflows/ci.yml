@@ -37,11 +37,11 @@ jobs:
         working-directory: warehouse-console
 
   # Agent-guide sensor (harness-template v3): skills load, references resolve, context budget.
-  # ADVISORY (continue-on-error) until the guides are clean; then flip to blocking.
+  # BLOCKING: guides are clean (guide-lint exits 0), so a stale path, ADR number or
+  # broken skill now fails the PR. Do not re-add continue-on-error.
   guide-lint:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    continue-on-error: true
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - run: python3 scripts/harness/guide_lint.py
