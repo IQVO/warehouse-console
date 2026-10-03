@@ -58,7 +58,10 @@ FROM nginxinc/nginx-unprivileged:1.31-alpine@sha256:19c132c9ab02d3b783f478743daf
 # base image was last rebuilt (openssl, libxml2, etc.), matching the fleet's
 # Go-service runtime stages. Root is only needed for this one step.
 USER root
-RUN apk upgrade --no-cache
+# pcre2>=10.49-r0 is pinned explicitly (CVE-2026-103111, HIGH). Without a
+# change to this line the build cache re-used an older `apk upgrade` layer
+# that predates the fix, and the trivy-scan gate kept failing.
+RUN apk upgrade --no-cache && apk add --no-cache 'pcre2>=10.49-r0'
 USER nginx
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build --chown=nginx:nginx /workspace/warehouse-console/dist /usr/share/nginx/html
