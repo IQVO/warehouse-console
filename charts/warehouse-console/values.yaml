@@ -3,7 +3,7 @@
 replicaCount: 1
 
 image:
-  repository: claudioed/warehouse-console
+  repository: iqvo/warehouse-console
   pullPolicy: IfNotPresent
   tag: ""
 
