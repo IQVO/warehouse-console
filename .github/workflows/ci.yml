@@ -36,6 +36,18 @@ jobs:
       - run: npm run lint
         working-directory: warehouse-console
 
+  # Agent-guide sensor (harness-template v3): skills load, references resolve, context budget.
+  # BLOCKING: guides are clean (guide-lint exits 0), so a stale path, ADR number or
+  # broken skill now fails the PR. Do not re-add continue-on-error.
+  guide-lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - run: python3 scripts/harness/guide_lint.py
+      - run: python3 scripts/harness/test_hook.py
+
+
   test:
     runs-on: ubuntu-latest
     steps:
