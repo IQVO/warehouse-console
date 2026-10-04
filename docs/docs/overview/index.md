@@ -48,5 +48,4 @@ software and has no support guarantees.
   wiring works and the rules for lazy-loading a remote safely.
 - [Cross-cutting screens](../architecture/cross-cutting-screens.md) — how Floor,
   Order Lifecycle and the WMS/WES dashboards read from `warehouse-ops-agent`.
-- [Context map](../ecosystem/context-map.md) — how this shell fits among the eight
-  bounded-context services and `warehouse-ops-agent`.
+- [Context map](../ecosystem/context-map.md) — how this shell fits among the bounded-context services and `warehouse-ops-agent`.

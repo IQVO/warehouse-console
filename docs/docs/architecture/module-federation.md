@@ -7,7 +7,7 @@ sidebar_label: Module Federation
 # Module Federation
 
 This app is the federation **host** (`@module-federation/vite`); each of the
-eight remotes is built and deployed independently by its own bounded-context
+ten remotes is built and deployed independently by its own bounded-context
 repo. The ports in the diagram are the remotes' **dev-server** ports, used by
 `npm run dev`.
 
@@ -21,7 +21,9 @@ graph LR
   Workforce["workforce_mfe :5185"]
   Facility["facility_mfe :5186"]
   Labor["labor_mfe :5187"]
+  NetFulfil["network_fulfillment_mfe :5188"]
   ProcessPath["process_path_mfe :5189"]
+  Capacity["capacity_mfe :5190"]
 
   Console --> Orders
   Console --> Inventory
@@ -30,7 +32,9 @@ graph LR
   Console --> Workforce
   Console --> Facility
   Console --> Labor
+  Console --> NetFulfil
   Console --> ProcessPath
+  Console --> Capacity
 ```
 
 ## Where a remote is loaded from
@@ -46,9 +50,16 @@ In the kind cluster the Nginx web gateway on `http://localhost` serves this
 shell at `/` and each remote at `/mfes/<context>/` — `order-management`,
 `inventory-storage`, `wes-work-planning`, `fulfillment-execution`,
 `workforce-management`, `facility-layout`, `process-path-management`,
-`labor-performance`. The entry path is same-origin with the shell, so no
+`labor-performance`, `network-fulfillment`, `warehouse-planning`. The entry path is same-origin with the shell, so no
 remote needs a CORS policy for its assets. Kong on `http://localhost:8000`
 serves only the APIs and never handles HTML, JavaScript or CSS.
+
+`capacity_mfe` (warehouse-planning) differs from its siblings in one way
+worth knowing: it renders its own `<Routes>` with relative routes (overview,
+`paths`, `plans`), so the host mounts it on the splat route `/capacity/*`.
+Its API calls (`GET`, `POST` and `PUT` with a JSON `Content-Type`) go
+cross-origin to `<apiOrigin>/api/warehouse-planning` on Kong, so Kong's CORS
+policy for the console origin must allow `PUT`.
 
 `vite.config.ts` stays in object form (it reads `process.argv` for the build
 flag) rather than the `({ command }) => ({...})` callback form, because

@@ -28,7 +28,7 @@ mkdir -p public && echo '{ "apiOrigin": "http://localhost:8000" }' > public/conf
 npm run dev        # shell on :5173 (strictPort: it fails rather than picking another port)
 ```
 
-Remote dev servers are started from each remote's own repo (`web/`, `npm run dev`) on the ports in `vite.config.ts` and the README table: 5181 order-management, 5182 inventory-storage, 5183 wes-work-planning, 5184 fulfillment-execution, 5185 workforce-management, 5186 facility-layout, 5187 labor-performance, 5188 network-fulfillment, 5189 process-path-management. Start only the ones you need; an absent remote just shows its inline "unavailable" card.
+Remote dev servers are started from each remote's own repo (`web/`, `npm run dev`) on the ports in `vite.config.ts` and the README table: 5181 order-management, 5182 inventory-storage, 5183 wes-work-planning, 5184 fulfillment-execution, 5185 workforce-management, 5186 facility-layout, 5187 labor-performance, 5188 network-fulfillment, 5189 process-path-management, 5190 warehouse-planning (capacity_mfe). Start only the ones you need; an absent remote just shows its inline "unavailable" card.
 
 Never trust `ps` alone. `npm run dev` also spawns Module Federation DTS helper workers that survive their parent and look like a running server. Prove each port answers:
 
