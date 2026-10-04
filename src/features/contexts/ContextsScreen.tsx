@@ -171,6 +171,12 @@ export function ContextsScreen(): ReactElement {
           description="ACL to an external retail fulfillment network -- inventory advertising, order acknowledgement, shipment confirmation. Observation-only from this console."
           href="/network-fulfillment"
         />
+        <ContextTile
+          context="warehouse-planning"
+          title="Capacity Planning"
+          description="Storage positions, station standards, process-path capacity and capacity plans."
+          href="/capacity"
+        />
       </div>
     </div>
   );
