@@ -2,7 +2,7 @@
 id: context-map
 title: Context map
 sidebar_label: Context map
-description: Where warehouse-console sits among the eight bounded-context services and warehouse-ops-agent.
+description: Where warehouse-console sits among the bounded-context services and warehouse-ops-agent.
 ---
 
 # Context map
@@ -23,6 +23,7 @@ graph TD
   FL["facility-layout<br/><i>Generic</i>"]
   PP["process-path-management<br/><i>Generic</i>"]
   LP["labor-performance<br/><i>Supporting</i>"]
+  CP["warehouse-planning<br/><i>capacity planning</i>"]
   OA["warehouse-ops-agent<br/>(console-bff)"]
 
   Console -->|"hosts order_mgmt_mfe"| OM
@@ -33,6 +34,7 @@ graph TD
   Console -->|"hosts facility_mfe"| FL
   Console -->|"hosts process_path_mfe"| PP
   Console -->|"hosts labor_mfe"| LP
+  Console -->|"hosts capacity_mfe"| CP
   Console -->|"Floor, Order Lifecycle, WMS/WES reports"| OA
   Console -.->|"Contexts badge: GET /queues/PICK/depth"| FE
   Console -.->|"Contexts badge: GET /sites"| FL
@@ -45,7 +47,7 @@ console screen, so it does not appear here.
 
 ## Relationship to each remote
 
-For the eight bounded-context remotes, the relationship is **hosting**:
+For the bounded-context remotes, the relationship is **hosting**:
 this shell lazy-loads each remote's independently-built bundle and gives it a
 route. The one exception is the Contexts launchpad, which polls two read
 endpoints directly for its tile badges: fulfillment-execution's
