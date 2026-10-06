@@ -25,6 +25,8 @@ remote from `/mfes/<context>/remoteEntry.js` on the web gateway instead.
 | facility-mfe | 5186 | facility-layout |
 | labor-mfe | 5187 | labor-performance |
 | process-path-mfe | 5189 | process-path-management |
+| network-fulfillment-mfe | 5188 | network-fulfillment |
+| capacity-mfe | 5190 | warehouse-planning |
 
 ## Run it
 
@@ -42,8 +44,9 @@ npm run build
 ## Verify
 
 ```bash
-# with the shell + all 8 remote dev servers running, and the 8 backend
-# services + BFF reachable at config.json's apiOrigin (Kong):
+# with the shell + every remote dev server the route list covers (including
+# capacity_mfe on :5190) running, and the backend services + BFF reachable
+# at config.json's apiOrigin (Kong):
 npm run verify:routes
 
 # needs only the shell's own dev server -- stubs the console-bff report calls:

@@ -82,6 +82,13 @@ export default defineConfig({
           name: "netfulfil_mfe",
           entry: remoteEntry("network-fulfillment", 5188),
         },
+        // warehouse-planning's remote: container `capacity_mfe` (NOT
+        // `planning_mfe`, which is wes-work-planning's), exposes ./App only.
+        capacity_mfe: {
+          type: "module",
+          name: "capacity_mfe",
+          entry: remoteEntry("warehouse-planning", 5190),
+        },
       },
       // The shell must win the React singleton negotiation. With the
       // default "version-first", every remote's remoteEntry is preloaded
