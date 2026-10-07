@@ -177,6 +177,12 @@ export function ContextsScreen(): ReactElement {
           description="Storage positions, station standards, process-path capacity and capacity plans."
           href="/capacity"
         />
+        <ContextTile
+          context="product-master"
+          title="Product Master"
+          description="What each SKU is: handling classification and declared vs measured physical profile."
+          href="/product-master"
+        />
       </div>
     </div>
   );

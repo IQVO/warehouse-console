@@ -43,6 +43,7 @@ const REMOTE_PREFIXES = [
   "/labor",
   "/network-fulfillment",
   "/capacity",
+  "/product-master",
 ];
 
 // Each lazy() call MUST run exactly once, at module load, not inside a
@@ -71,6 +72,8 @@ const LaborRemote = lazy(() => import("labor_mfe/App"));
 const NetworkFulfillmentRemote = lazy(() => import("network_fulfillment_mfe/App"));
 // @ts-expect-error -- remote module resolved at runtime by Module Federation
 const CapacityRemote = lazy(() => import("capacity_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const ProductMasterRemote = lazy(() => import("productmaster_mfe/App"));
 /* eslint-enable react-refresh/only-export-components */
 
 /** Anchored prefix match: a bare startsWith would light up "Inventory"
@@ -147,6 +150,10 @@ function Shell() {
         <Route
           path="/capacity/*"
           element={<RemoteBoundary label="Capacity Planning" component={CapacityRemote} />}
+        />
+        <Route
+          path="/product-master/*"
+          element={<RemoteBoundary label="Product Master" component={ProductMasterRemote} />}
         />
         <Route path="/reports/:context" element={<ContextReportRouteScreen />} />
         {/* Unmatched URLs used to render the chrome around an empty
