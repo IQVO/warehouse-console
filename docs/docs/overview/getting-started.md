@@ -27,6 +27,7 @@ remote from `/mfes/<context>/remoteEntry.js` on the web gateway instead.
 | process-path-mfe | 5189 | process-path-management |
 | network-fulfillment-mfe | 5188 | network-fulfillment |
 | capacity-mfe | 5190 | warehouse-planning |
+| productmaster-mfe | 5191 | product-master |
 
 ## Run it
 

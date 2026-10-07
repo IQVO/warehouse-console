@@ -89,6 +89,15 @@ export default defineConfig({
           name: "capacity_mfe",
           entry: remoteEntry("warehouse-planning", 5190),
         },
+        // product-master's remote: container `productmaster_mfe`, exposes
+        // ./App only (no props, relative routes), mounted on /product-master/*.
+        // Pinned with IQVO/product-master web/vite.config.ts: gateway path
+        // /mfes/product-master/, dev port 5191.
+        productmaster_mfe: {
+          type: "module",
+          name: "productmaster_mfe",
+          entry: remoteEntry("product-master", 5191),
+        },
       },
       // The shell must win the React singleton negotiation. With the
       // default "version-first", every remote's remoteEntry is preloaded

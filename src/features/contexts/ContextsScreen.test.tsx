@@ -25,4 +25,22 @@ describe("ContextsScreen launchpad", () => {
     const tile = screen.getByRole("link", { name: /Capacity Planning/ });
     expect(tile).toHaveAttribute("href", "/capacity");
   });
+
+  it("lists a Product Master tile that links to the product-master remote", () => {
+    server.use(
+      http.get(`${SERVICE_BASE_URL.fulfillmentExecution}/queues/PICK/depth`, () =>
+        HttpResponse.json({ taskType: "PICK", depth: 3 }),
+      ),
+      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json([])),
+    );
+    render(
+      <MemoryRouter>
+        <ContextsScreen />
+      </MemoryRouter>,
+    );
+
+    const tile = screen.getByRole("link", { name: /Product Master/ });
+    expect(tile).toHaveAttribute("href", "/product-master");
+    expect(tile).toHaveTextContent("product-master");
+  });
 });

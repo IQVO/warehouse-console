@@ -57,3 +57,48 @@ describe("capacity_mfe route (/capacity/*)", () => {
     expect(await screen.findByText(/Page not found/i)).toBeInTheDocument();
   });
 });
+
+describe("productmaster_mfe route (/product-master/*)", () => {
+  afterEach(() => {
+    window.history.pushState({}, "", "/");
+  });
+
+  function stubBadges() {
+    server.use(
+      http.get(`${SERVICE_BASE_URL.fulfillmentExecution}/queues/PICK/depth`, () =>
+        HttpResponse.json({ taskType: "PICK", depth: 0 }),
+      ),
+      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json([])),
+    );
+  }
+
+  it.each(["/product-master", "/product-master/register", "/product-master/products/SKU-1"])(
+    "%s is a shell route that falls back to the unavailable card when the remote is down",
+    async (path) => {
+      stubBadges();
+      window.history.pushState({}, "", path);
+      render(<App />);
+
+      expect(await screen.findByText(/This module is unavailable right now/)).toBeInTheDocument();
+      expect(screen.getByText("Product Master")).toBeInTheDocument();
+      expect(screen.queryByText(/Page not found/i)).not.toBeInTheDocument();
+    },
+  );
+
+  it("keeps the Contexts nav item active while /product-master is open", async () => {
+    stubBadges();
+    window.history.pushState({}, "", "/product-master");
+    render(<App />);
+
+    await screen.findByText(/This module is unavailable right now/);
+    const contexts = screen.getByRole("link", { name: "Contexts" });
+    expect(contexts).toHaveAttribute("aria-current", "page");
+  });
+
+  it("does not capture a look-alike prefix", async () => {
+    window.history.pushState({}, "", "/product-master-audit");
+    render(<App />);
+
+    expect(await screen.findByText(/Page not found/i)).toBeInTheDocument();
+  });
+});
