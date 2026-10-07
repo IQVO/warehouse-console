@@ -73,7 +73,7 @@ the full detail):
   needing reconciliation the moment that PR lands.
 
 Everything else (`/order-management`, `/inventory`, `/planning`, `/fulfillment`, `/workforce`,
-`/facility`, `/process-path`, `/labor`, `/network-fulfillment`, `/capacity`, `/product-master`) is a Module Federation remote owned
+`/facility`, `/process-path`, `/labor`, `/network-fulfillment`, `/capacity`, `/product-master`, `/network-inventory`) is a Module Federation remote owned
 by that bounded context's own repo, reachable from the Contexts launchpad — this shell only
 lazy-loads and hosts them; it never contains their business logic. `/capacity` is the
 warehouse-planning remote (federation container `capacity_mfe`; the shell mounts its default
@@ -83,7 +83,10 @@ read side for warehouse-planning is being built separately, and this shell adds 
 screen only once that endpoint is merged. `/product-master` is the product-master remote
 (federation container `productmaster_mfe`, served at `/mfes/product-master/`, dev port 5191),
 mounted the same way under the `/product-master/*` splat route for its own relative sub-routes
-(`register`, `products/:sku`). An unmatched URL renders
+(`register`, `products/:sku`). `/network-inventory` is the network-inventory-planning remote
+(federation container `nip_mfe`, served at `/mfes/network-inventory-planning/`, dev port 5192),
+mounted under the `/network-inventory/*` splat route for its relative sub-routes (`simulation`,
+`rebalance-runs`, `transfers/:id`). An unmatched URL renders
 the shell's own client-side "Page not found" screen rather than a server 404.
 
 This repo owns no OpenAPI or AsyncAPI spec of its own: this shell has no
@@ -127,6 +130,7 @@ built at least once) and each remote's own dev server running on its assigned po
 | network-fulfillment-mfe | 5188 | network-fulfillment |
 | capacity-mfe | 5190 | warehouse-planning |
 | productmaster-mfe | 5191 | product-master |
+| nip-mfe | 5192 | network-inventory-planning |
 
 ```bash
 # one-time: build the sibling ui-kit

@@ -25,6 +25,7 @@ graph LR
   ProcessPath["process_path_mfe :5189"]
   Capacity["capacity_mfe :5190"]
   ProductMaster["productmaster_mfe :5191"]
+  Nip["nip_mfe :5192"]
 
   Console --> Orders
   Console --> Inventory
@@ -37,6 +38,7 @@ graph LR
   Console --> ProcessPath
   Console --> Capacity
   Console --> ProductMaster
+  Console --> Nip
 ```
 
 ## Where a remote is loaded from
@@ -52,7 +54,8 @@ In the kind cluster the Nginx web gateway on `http://localhost` serves this
 shell at `/` and each remote at `/mfes/<context>/` — `order-management`,
 `inventory-storage`, `wes-work-planning`, `fulfillment-execution`,
 `workforce-management`, `facility-layout`, `process-path-management`,
-`labor-performance`, `network-fulfillment`, `warehouse-planning`, `product-master`. The entry path is same-origin with the shell, so no
+`labor-performance`, `network-fulfillment`, `warehouse-planning`, `product-master`,
+`network-inventory-planning`. The entry path is same-origin with the shell, so no
 remote needs a CORS policy for its assets. Kong on `http://localhost:8000`
 serves only the APIs and never handles HTML, JavaScript or CSS.
 
@@ -68,6 +71,16 @@ relative routes (product list, `register`, `products/:sku`), mounted on the
 splat route `/product-master/*`. Every write it makes is a `PUT` with a JSON
 `Content-Type` to `<apiOrigin>/api/product-master`, so the same Kong CORS
 requirement applies.
+
+`nip_mfe` (network-inventory-planning) also exposes `./App` with no props and
+relative routes (transfers, `transfers/:id`, `simulation`, `rebalance-runs`),
+mounted on the splat route `/network-inventory/*`. Its only write is
+`POST /v1/transfers:approve` with a JSON `Content-Type` **and an
+`Idempotency-Key` header** to `<apiOrigin>/api/network-inventory-planning`, so
+Kong's CORS policy for the console origin must also allow the
+`Idempotency-Key` request header (it allows `Accept`, `Content-Type` and
+`Origin` today); without it the browser's preflight rejects the Approve action
+while the read screens keep working.
 
 `vite.config.ts` stays in object form (it reads `process.argv` for the build
 flag) rather than the `({ command }) => ({...})` callback form, because
