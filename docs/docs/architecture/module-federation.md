@@ -7,7 +7,7 @@ sidebar_label: Module Federation
 # Module Federation
 
 This app is the federation **host** (`@module-federation/vite`); each of the
-twelve remotes is built and deployed independently by its own bounded-context
+thirteen remotes is built and deployed independently by its own bounded-context
 repo. The ports in the diagram are the remotes' **dev-server** ports, used by
 `npm run dev`.
 
@@ -26,6 +26,7 @@ graph LR
   Capacity["capacity_mfe :5190"]
   ProductMaster["productmaster_mfe :5191"]
   Nip["nip_mfe :5192"]
+  Inbound["inbound_mfe :5193"]
 
   Console --> Orders
   Console --> Inventory
@@ -39,6 +40,7 @@ graph LR
   Console --> Capacity
   Console --> ProductMaster
   Console --> Nip
+  Console --> Inbound
 ```
 
 ## Where a remote is loaded from
@@ -55,7 +57,7 @@ shell at `/` and each remote at `/mfes/<context>/` — `order-management`,
 `inventory-storage`, `wes-work-planning`, `fulfillment-execution`,
 `workforce-management`, `facility-layout`, `process-path-management`,
 `labor-performance`, `network-fulfillment`, `warehouse-planning`, `product-master`,
-`network-inventory-planning`. The entry path is same-origin with the shell, so no
+`network-inventory-planning`, `inbound-receiving`. The entry path is same-origin with the shell, so no
 remote needs a CORS policy for its assets. Kong on `http://localhost:8000`
 serves only the APIs and never handles HTML, JavaScript or CSS.
 
@@ -81,6 +83,16 @@ Kong's CORS policy for the console origin must also allow the
 `Idempotency-Key` request header (it allows `Accept`, `Content-Type` and
 `Origin` today); without it the browser's preflight rejects the Approve action
 while the read screens keep working.
+
+`inbound_mfe` (inbound-receiving) exposes `./App` with no props and relative
+routes (`asns`, `asns/register`, `asns/:asnNumber`, `appointments`, `receipts`,
+`receipts/:receiptId`), mounted on the splat route `/inbound-receiving/*`. Every
+create `POST` it makes (`/asns`, `/appointments`, `/receipts`,
+`/receipts/{id}/lines`) carries a JSON `Content-Type` **and an `Idempotency-Key`
+header** to `<apiOrigin>/api/inbound-receiving`; the action `POST`s (`cancel`,
+`check-in`, `close`) send the header too, so Kong's CORS policy for the console
+origin must allow `Idempotency-Key` (and `If-Match`, which the remote does not
+send today) as request headers.
 
 `vite.config.ts` stays in object form (it reads `process.argv` for the build
 flag) rather than the `({ command }) => ({...})` callback form, because

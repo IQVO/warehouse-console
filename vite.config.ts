@@ -108,6 +108,16 @@ export default defineConfig({
           name: "nip_mfe",
           entry: remoteEntry("network-inventory-planning", 5192),
         },
+        // inbound-receiving's remote: container `inbound_mfe`, exposes
+        // ./App only (no props, relative routes), mounted on
+        // /inbound-receiving/*. Pinned with IQVO/inbound-receiving
+        // web/vite.config.ts: gateway path /mfes/inbound-receiving/, dev
+        // port 5193.
+        inbound_mfe: {
+          type: "module",
+          name: "inbound_mfe",
+          entry: remoteEntry("inbound-receiving", 5193),
+        },
       },
       // The shell must win the React singleton negotiation. With the
       // default "version-first", every remote's remoteEntry is preloaded
