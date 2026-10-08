@@ -33,7 +33,7 @@ The remote must expose `./App` and set its production `base` to `/mfes/<context>
 3. **`src/features/contexts/ContextsScreen.tsx`** - add a `ContextTile` (`context=` is the repo name, `href=` is `/<slug>`). A tile gets a "View metrics report" link automatically only if the context is in `REPORT_ROUTES` (`src/features/context-reports/registry.ts`).
 4. **`scripts/verify-all-routes.cjs`** - add `{ path: "/<slug>", label: ..., expect: /\S/ }` to `routes`. Check this on every registration: the list is not kept in sync automatically (`/network-fulfillment` is not in it today).
 5. **`README.md`** - the remote port table under "Local development". Update the SAME PR.
-6. **`docs/docs/architecture/module-federation.md`** - the diagram, the gateway-path list and the remote count. These counts drift (keep the doc's count equal to the remotes in `vite.config.ts`, twelve today); fix what you touch.
+6. **`docs/docs/architecture/module-federation.md`** - the diagram, the gateway-path list and the remote count. These counts drift (keep the doc's count equal to the remotes in `vite.config.ts`, thirteen today); fix what you touch.
 
 If the remote also gets a Bounded Context Report screen, that is a separate shell-owned feature: see the `add-console-screen` skill.
 

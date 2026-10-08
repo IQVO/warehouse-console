@@ -61,4 +61,22 @@ describe("ContextsScreen launchpad", () => {
     expect(tile).toHaveAttribute("href", "/network-inventory");
     expect(tile).toHaveTextContent("network-inventory-planning");
   });
+
+  it("lists an Inbound Receiving tile that links to the inbound-receiving remote", () => {
+    server.use(
+      http.get(`${SERVICE_BASE_URL.fulfillmentExecution}/queues/PICK/depth`, () =>
+        HttpResponse.json({ taskType: "PICK", depth: 3 }),
+      ),
+      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json([])),
+    );
+    render(
+      <MemoryRouter>
+        <ContextsScreen />
+      </MemoryRouter>,
+    );
+
+    const tile = screen.getByRole("link", { name: /Inbound Receiving/ });
+    expect(tile).toHaveAttribute("href", "/inbound-receiving");
+    expect(tile).toHaveTextContent("inbound-receiving");
+  });
 });

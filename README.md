@@ -22,7 +22,7 @@ shaped this way):
   fulfillment throughput, labor management and labor performance.
 - **Contexts** (`/contexts`) — the launchpad grid into every bounded context, following
   established enterprise WMS/ops-dashboard conventions (SAP Fiori's app-tile launchpad). It
-  lights up as active for its own route, for any of the twelve remote routes below, and for the
+  lights up as active for its own route, for any of the thirteen remote routes below, and for the
   per-context `/reports/<context>` Bounded Context Report screens described below.
 
 Both dashboards read one section-oriented envelope from the console-bff
@@ -73,7 +73,7 @@ the full detail):
   needing reconciliation the moment that PR lands.
 
 Everything else (`/order-management`, `/inventory`, `/planning`, `/fulfillment`, `/workforce`,
-`/facility`, `/process-path`, `/labor`, `/network-fulfillment`, `/capacity`, `/product-master`, `/network-inventory`) is a Module Federation remote owned
+`/facility`, `/process-path`, `/labor`, `/network-fulfillment`, `/capacity`, `/product-master`, `/network-inventory`, `/inbound-receiving`) is a Module Federation remote owned
 by that bounded context's own repo, reachable from the Contexts launchpad — this shell only
 lazy-loads and hosts them; it never contains their business logic. `/capacity` is the
 warehouse-planning remote (federation container `capacity_mfe`; the shell mounts its default
@@ -90,7 +90,12 @@ cluster, but its Kong route `/api/product-master/reports/*` currently answers 40
 `/api/product-master` route shadows it. `/network-inventory` is the network-inventory-planning remote
 (federation container `nip_mfe`, served at `/mfes/network-inventory-planning/`, dev port 5192),
 mounted under the `/network-inventory/*` splat route for its relative sub-routes (`simulation`,
-`rebalance-runs`, `transfers/:id`). An unmatched URL renders
+`rebalance-runs`, `transfers/:id`). `/inbound-receiving` is the inbound-receiving remote
+(federation container `inbound_mfe`, served at `/mfes/inbound-receiving/`, dev port 5193),
+mounted under the `/inbound-receiving/*` splat route for its relative sub-routes (`asns`,
+`asns/register`, `asns/:asnNumber`, `appointments`, `receipts`, `receipts/:receiptId`); its
+Contexts tile is "Inbound Receiving" and the remote calls `/api/inbound-receiving` on Kong, sending
+an `Idempotency-Key` header on every create `POST`. An unmatched URL renders
 the shell's own client-side "Page not found" screen rather than a server 404.
 
 This repo owns no OpenAPI or AsyncAPI spec of its own: this shell has no
@@ -135,6 +140,7 @@ built at least once) and each remote's own dev server running on its assigned po
 | capacity-mfe | 5190 | warehouse-planning |
 | productmaster-mfe | 5191 | product-master |
 | nip-mfe | 5192 | network-inventory-planning |
+| inbound-mfe | 5193 | inbound-receiving |
 
 ```bash
 # one-time: build the sibling ui-kit
