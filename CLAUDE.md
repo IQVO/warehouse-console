@@ -6,9 +6,9 @@ single bounded context owns: Floor (`/`, built on `warehouse-ops-agent`'s
 `GET /daily-brief`), Order Lifecycle (`/order-lifecycle`), the WMS/WES report
 dashboards (`/wms-dashboard`, `/wes-dashboard`) and per-context report screens
 (`/reports/<context>`). The fifth nav destination, Contexts (`/contexts`), is the
-launchpad into the nine bounded-context **remotes** (`/order-management`,
+launchpad into the twelve bounded-context **remotes** (`/order-management`,
 `/inventory`, `/planning`, `/fulfillment`, `/workforce`, `/facility`,
-`/process-path`, `/labor`, `/network-fulfillment`). Each remote is owned and
+`/process-path`, `/labor`, `/network-fulfillment`, `/capacity`, `/product-master`, `/network-inventory`). Each remote is owned and
 deployed by its own repo; this shell only lazy-loads and hosts them. See ADR-0001
 in `docs/docs/adr/`.
 
