@@ -22,7 +22,7 @@ shaped this way):
   fulfillment throughput, labor management and labor performance.
 - **Contexts** (`/contexts`) — the launchpad grid into every bounded context, following
   established enterprise WMS/ops-dashboard conventions (SAP Fiori's app-tile launchpad). It
-  lights up as active for its own route, for any of the ten remote routes below, and for the
+  lights up as active for its own route, for any of the twelve remote routes below, and for the
   per-context `/reports/<context>` Bounded Context Report screens described below.
 
 Both dashboards read one section-oriented envelope from the console-bff
@@ -83,7 +83,11 @@ read side for warehouse-planning is being built separately, and this shell adds 
 screen only once that endpoint is merged. `/product-master` is the product-master remote
 (federation container `productmaster_mfe`, served at `/mfes/product-master/`, dev port 5191),
 mounted the same way under the `/product-master/*` splat route for its own relative sub-routes
-(`register`, `products/:sku`). `/network-inventory` is the network-inventory-planning remote
+(`register`, `products/:sku`); its Contexts tile is "Product Master" and the remote calls
+`/api/product-master` on Kong. product-master has no Bounded Context Report screen here: its
+`product-reports` service (master data quality, product-master ADR 0006) runs in the kind
+cluster, but its Kong route `/api/product-master/reports/*` currently answers 404 because the
+`/api/product-master` route shadows it. `/network-inventory` is the network-inventory-planning remote
 (federation container `nip_mfe`, served at `/mfes/network-inventory-planning/`, dev port 5192),
 mounted under the `/network-inventory/*` splat route for its relative sub-routes (`simulation`,
 `rebalance-runs`, `transfers/:id`). An unmatched URL renders
@@ -142,8 +146,8 @@ npm run typecheck    # tsc -b --noEmit
 npm run lint         # oxlint
 npm run build
 
-# with the shell + all 8 remote dev servers running, and the 8 backend
-# services + BFF reachable at config.json's apiOrigin (Kong):
+# with the shell + every remote dev server in the table above running, and the
+# backend services + BFF reachable at config.json's apiOrigin (Kong):
 npm run verify:routes   # headless Playwright smoke check of every route
 
 # needs only the shell's own dev server -- stubs the console-bff report calls:
