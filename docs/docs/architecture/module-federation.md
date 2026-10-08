@@ -7,7 +7,7 @@ sidebar_label: Module Federation
 # Module Federation
 
 This app is the federation **host** (`@module-federation/vite`); each of the
-eleven remotes is built and deployed independently by its own bounded-context
+twelve remotes is built and deployed independently by its own bounded-context
 repo. The ports in the diagram are the remotes' **dev-server** ports, used by
 `npm run dev`.
 
