@@ -7,7 +7,7 @@ sidebar_label: Module Federation
 # Module Federation
 
 This app is the federation **host** (`@module-federation/vite`); each of the
-ten remotes is built and deployed independently by its own bounded-context
+thirteen remotes is built and deployed independently by its own bounded-context
 repo. The ports in the diagram are the remotes' **dev-server** ports, used by
 `npm run dev`.
 
@@ -24,6 +24,9 @@ graph LR
   NetFulfil["network_fulfillment_mfe :5188"]
   ProcessPath["process_path_mfe :5189"]
   Capacity["capacity_mfe :5190"]
+  ProductMaster["productmaster_mfe :5191"]
+  Nip["nip_mfe :5192"]
+  Inbound["inbound_mfe :5193"]
 
   Console --> Orders
   Console --> Inventory
@@ -35,6 +38,9 @@ graph LR
   Console --> NetFulfil
   Console --> ProcessPath
   Console --> Capacity
+  Console --> ProductMaster
+  Console --> Nip
+  Console --> Inbound
 ```
 
 ## Where a remote is loaded from
@@ -50,7 +56,8 @@ In the kind cluster the Nginx web gateway on `http://localhost` serves this
 shell at `/` and each remote at `/mfes/<context>/` — `order-management`,
 `inventory-storage`, `wes-work-planning`, `fulfillment-execution`,
 `workforce-management`, `facility-layout`, `process-path-management`,
-`labor-performance`, `network-fulfillment`, `warehouse-planning`. The entry path is same-origin with the shell, so no
+`labor-performance`, `network-fulfillment`, `warehouse-planning`, `product-master`,
+`network-inventory-planning`, `inbound-receiving`. The entry path is same-origin with the shell, so no
 remote needs a CORS policy for its assets. Kong on `http://localhost:8000`
 serves only the APIs and never handles HTML, JavaScript or CSS.
 
@@ -60,6 +67,32 @@ worth knowing: it renders its own `<Routes>` with relative routes (overview,
 Its API calls (`GET`, `POST` and `PUT` with a JSON `Content-Type`) go
 cross-origin to `<apiOrigin>/api/warehouse-planning` on Kong, so Kong's CORS
 policy for the console origin must allow `PUT`.
+
+`productmaster_mfe` (product-master) follows the same shape: no props,
+relative routes (product list, `register`, `products/:sku`), mounted on the
+splat route `/product-master/*`. Every write it makes is a `PUT` with a JSON
+`Content-Type` to `<apiOrigin>/api/product-master`, so the same Kong CORS
+requirement applies.
+
+`nip_mfe` (network-inventory-planning) also exposes `./App` with no props and
+relative routes (transfers, `transfers/:id`, `simulation`, `rebalance-runs`),
+mounted on the splat route `/network-inventory/*`. Its only write is
+`POST /v1/transfers:approve` with a JSON `Content-Type` **and an
+`Idempotency-Key` header** to `<apiOrigin>/api/network-inventory-planning`, so
+Kong's CORS policy for the console origin must also allow the
+`Idempotency-Key` request header (it allows `Accept`, `Content-Type` and
+`Origin` today); without it the browser's preflight rejects the Approve action
+while the read screens keep working.
+
+`inbound_mfe` (inbound-receiving) exposes `./App` with no props and relative
+routes (`asns`, `asns/register`, `asns/:asnNumber`, `appointments`, `receipts`,
+`receipts/:receiptId`), mounted on the splat route `/inbound-receiving/*`. Every
+create `POST` it makes (`/asns`, `/appointments`, `/receipts`,
+`/receipts/{id}/lines`) carries a JSON `Content-Type` **and an `Idempotency-Key`
+header** to `<apiOrigin>/api/inbound-receiving`; the action `POST`s (`cancel`,
+`check-in`, `close`) send the header too, so Kong's CORS policy for the console
+origin must allow `Idempotency-Key` (and `If-Match`, which the remote does not
+send today) as request headers.
 
 `vite.config.ts` stays in object form (it reads `process.argv` for the build
 flag) rather than the `({ command }) => ({...})` callback form, because

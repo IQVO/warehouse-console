@@ -15,7 +15,7 @@ a Module Federation host plus a thin read layer over `console-bff`.
 graph TD
   Console["<b>warehouse-console</b><br/><i>SPA shell — no domain model</i>"]
 
-  OM["order-management<br/><i>Core</i>"]
+  OM["order-management<br/><i>Generic/Supporting</i>"]
   IS["inventory-storage<br/><i>WMS · Core</i>"]
   WP["wes-work-planning<br/><i>WES · Core</i>"]
   FE["fulfillment-execution<br/><i>Core</i>"]
@@ -24,6 +24,10 @@ graph TD
   PP["process-path-management<br/><i>Generic</i>"]
   LP["labor-performance<br/><i>Supporting</i>"]
   CP["warehouse-planning<br/><i>capacity planning</i>"]
+  PM["product-master<br/><i>WMS · Supporting</i>"]
+  NF["network-fulfillment<br/><i>Supporting</i>"]
+  NIP["network-inventory-planning<br/><i>network inventory balancing</i>"]
+  IR["inbound-receiving<br/><i>WMS · Supporting</i>"]
   OA["warehouse-ops-agent<br/>(console-bff)"]
 
   Console -->|"hosts order_mgmt_mfe"| OM
@@ -35,6 +39,10 @@ graph TD
   Console -->|"hosts process_path_mfe"| PP
   Console -->|"hosts labor_mfe"| LP
   Console -->|"hosts capacity_mfe"| CP
+  Console -->|"hosts productmaster_mfe"| PM
+  Console -->|"hosts network_fulfillment_mfe"| NF
+  Console -->|"hosts nip_mfe"| NIP
+  Console -->|"hosts inbound_mfe"| IR
   Console -->|"Floor, Order Lifecycle, WMS/WES reports"| OA
   Console -.->|"Contexts badge: GET /queues/PICK/depth"| FE
   Console -.->|"Contexts badge: GET /sites"| FL
@@ -42,8 +50,12 @@ graph TD
 
 Solid "hosts" edges are Module Federation hosting; the dotted edges are the
 only two REST reads the shell makes to a bounded context directly (the
-Contexts launchpad's live badges). network-fulfillment has no remote and no
-console screen, so it does not appear here.
+Contexts launchpad's live badges). Each hosted remote calls its own
+context's REST API through Kong; for example `productmaster_mfe` (owned by
+IQVO/product-master, `web/`) reads and writes `/api/product-master`, behind
+the Product Master tile on the Contexts launchpad. The Bounded Context Report
+screens (`/reports/<context>`, `src/features/context-reports/`) read their
+contexts' `*-reports` services and are omitted from the diagram.
 
 ## Relationship to each remote
 

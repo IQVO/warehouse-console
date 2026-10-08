@@ -61,7 +61,10 @@ USER root
 # pcre2>=10.49-r0 is pinned explicitly (CVE-2026-103111, HIGH). Without a
 # change to this line the build cache re-used an older `apk upgrade` layer
 # that predates the fix, and the trivy-scan gate kept failing.
-RUN apk upgrade --no-cache && apk add --no-cache 'pcre2>=10.49-r0'
+# tiff>=4.7.2-r0 is pinned the same way (CVE-2026-4775, HIGH): the latest
+# nginx-unprivileged:1.31-alpine still ships 4.7.1-r0, and the pin also busts
+# the cached `apk upgrade` layer.
+RUN apk upgrade --no-cache && apk add --no-cache 'pcre2>=10.49-r0' 'tiff>=4.7.2-r0'
 USER nginx
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build --chown=nginx:nginx /workspace/warehouse-console/dist /usr/share/nginx/html

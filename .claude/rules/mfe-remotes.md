@@ -10,11 +10,11 @@ paths:
 
 ## Host contract (this app is the Module Federation host)
 
-`@module-federation/vite` wires ten remotes in `vite.config.ts`
+`@module-federation/vite` wires thirteen remotes in `vite.config.ts`
 (`order_mgmt_mfe`, `inventory_mfe`, `planning_mfe`, `fulfillment_mfe`,
 `workforce_mfe`, `facility_mfe`, `process_path_mfe`, `labor_mfe`,
-`network_fulfillment_mfe`, `capacity_mfe`), each built and deployed independently by its own
-repo. Under `npm run dev` they load from their dev ports (5181-5190, see the
+`network_fulfillment_mfe`, `capacity_mfe`, `productmaster_mfe`, `nip_mfe`, `inbound_mfe`), each built and deployed independently by its own
+repo. Under `npm run dev` they load from their dev ports (5181-5193, see the
 README port table); in a production build from `/mfes/<context>/remoteEntry.js`,
 the path the Nginx web gateway on `http://localhost` serves each remote at.
 

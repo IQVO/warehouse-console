@@ -29,6 +29,9 @@ const routes = [
   { path: "/process-path", label: "process-path", expect: /\S/ },
   { path: "/labor", label: "labor", expect: /\S/ },
   { path: "/capacity", label: "capacity", expect: /\S/ },
+  { path: "/product-master", label: "product-master", expect: /\S/ },
+  { path: "/network-inventory", label: "network-inventory", expect: /\S/ },
+  { path: "/inbound-receiving", label: "inbound-receiving", expect: /\S/ },
   // An unmatched URL must explain itself, not render empty chrome.
   { path: "/no-such-screen", label: "404", expect: /Page not found/i },
 ];
