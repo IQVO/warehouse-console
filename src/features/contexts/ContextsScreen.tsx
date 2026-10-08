@@ -183,6 +183,12 @@ export function ContextsScreen(): ReactElement {
           description="What each SKU is: handling classification and declared vs measured physical profile."
           href="/product-master"
         />
+        <ContextTile
+          context="network-inventory-planning"
+          title="Network Inventory"
+          description="Inter-warehouse transfers and their audit trail, the network simulation and transfer approval, scheduled rebalance runs."
+          href="/network-inventory"
+        />
       </div>
     </div>
   );

@@ -28,6 +28,7 @@ remote from `/mfes/<context>/remoteEntry.js` on the web gateway instead.
 | network-fulfillment-mfe | 5188 | network-fulfillment |
 | capacity-mfe | 5190 | warehouse-planning |
 | productmaster-mfe | 5191 | product-master |
+| nip-mfe | 5192 | network-inventory-planning |
 
 ## Run it
 

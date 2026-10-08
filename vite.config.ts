@@ -98,6 +98,16 @@ export default defineConfig({
           name: "productmaster_mfe",
           entry: remoteEntry("product-master", 5191),
         },
+        // network-inventory-planning's remote: container `nip_mfe`, exposes
+        // ./App only (no props, relative routes), mounted on
+        // /network-inventory/*. Pinned with IQVO/network-inventory-planning
+        // web/vite.config.ts: gateway path /mfes/network-inventory-planning/,
+        // dev port 5192.
+        nip_mfe: {
+          type: "module",
+          name: "nip_mfe",
+          entry: remoteEntry("network-inventory-planning", 5192),
+        },
       },
       // The shell must win the React singleton negotiation. With the
       // default "version-first", every remote's remoteEntry is preloaded

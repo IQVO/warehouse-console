@@ -43,4 +43,22 @@ describe("ContextsScreen launchpad", () => {
     expect(tile).toHaveAttribute("href", "/product-master");
     expect(tile).toHaveTextContent("product-master");
   });
+
+  it("lists a Network Inventory tile that links to the network-inventory-planning remote", () => {
+    server.use(
+      http.get(`${SERVICE_BASE_URL.fulfillmentExecution}/queues/PICK/depth`, () =>
+        HttpResponse.json({ taskType: "PICK", depth: 3 }),
+      ),
+      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json([])),
+    );
+    render(
+      <MemoryRouter>
+        <ContextsScreen />
+      </MemoryRouter>,
+    );
+
+    const tile = screen.getByRole("link", { name: /Network Inventory/ });
+    expect(tile).toHaveAttribute("href", "/network-inventory");
+    expect(tile).toHaveTextContent("network-inventory-planning");
+  });
 });

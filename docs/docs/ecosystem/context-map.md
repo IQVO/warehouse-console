@@ -25,6 +25,7 @@ graph TD
   LP["labor-performance<br/><i>Supporting</i>"]
   CP["warehouse-planning<br/><i>capacity planning</i>"]
   PM["product-master<br/><i>product master data</i>"]
+  NIP["network-inventory-planning<br/><i>network inventory balancing</i>"]
   OA["warehouse-ops-agent<br/>(console-bff)"]
 
   Console -->|"hosts order_mgmt_mfe"| OM
@@ -37,6 +38,7 @@ graph TD
   Console -->|"hosts labor_mfe"| LP
   Console -->|"hosts capacity_mfe"| CP
   Console -->|"hosts productmaster_mfe"| PM
+  Console -->|"hosts nip_mfe"| NIP
   Console -->|"Floor, Order Lifecycle, WMS/WES reports"| OA
   Console -.->|"Contexts badge: GET /queues/PICK/depth"| FE
   Console -.->|"Contexts badge: GET /sites"| FL
