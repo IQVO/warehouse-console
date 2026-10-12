@@ -22,7 +22,24 @@ const sidebars: SidebarsConfig = {
       items: [
         'architecture/module-federation',
         'architecture/cross-cutting-screens',
+        'architecture/features',
       ],
+    },
+    {
+      type: 'category',
+      label: 'Operations',
+      collapsed: false,
+      items: [
+        'operations/configuration',
+        'operations/runbook',
+        'operations/troubleshooting',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Development',
+      collapsed: false,
+      items: ['development/testing'],
     },
     {
       type: 'category',
