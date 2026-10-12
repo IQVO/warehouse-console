@@ -179,6 +179,10 @@ own DTO onto ui-kit `Card` / `DataTable` / chart primitives.
 | `labor-performance` | `laborPerformance.config.tsx` | Labor: Performance | `/reports/performance` | trailing 24 h |
 | `network-fulfillment` | `networkFulfillment.config.tsx` | Network Fulfillment: Order Flow | `/reports/network-orders` | trailing 24 h |
 
+Every path above except network-fulfillment's matches the `GET /reports/...`
+route (and its `/freshness` sibling) registered by that context's reports
+router on its `develop` branch.
+
 `reportWindow.ts` builds the window (`trailingHours`, `trailingDays`) and
 appends it as RFC 3339 `from`/`to` query parameters (`withWindow`). Each
 config computes its `WINDOW` **once at module load**, so the window ends at
@@ -191,9 +195,12 @@ warehouse-infra `develop` has since added that second route per
 analytics-enabled context (`terraform/services.tf`, and
 `terraform/network-fulfillment.tf` for network-fulfillment), so whether a
 screen resolves depends on that context's reports deployment, not on the
-console. And the network-fulfillment config's endpoint and field names are
-flagged in its own header comment as unverified against a merged
-implementation.
+console. And the network-fulfillment config calls `/reports/network-orders`,
+a guess its own header comment flags as unverified; the endpoint merged on
+network-fulfillment `develop` is `/reports/acknowledgement` (plus
+`/reports/acknowledgement/freshness`, in that repo's
+`internal/adapters/inbound/http/reports_handler.go`), so that one screen
+renders its error card until the config is reconciled.
 
 ## `not-found`
 
