@@ -17,11 +17,11 @@ features share lives in `src/shell/`.
 | `src/features/floor` | `/` | `FloorScreen` | `GET <BFF>/daily-brief`, polled every 15 s | `FloorScreen.test.tsx` |
 | `src/features/contexts` | `/contexts` | `ContextsScreen` | `GET <fulfillment-execution>/queues/PICK/depth` and `GET <facility-layout>/sites`, polled every 30 s | `ContextsScreen.test.tsx` |
 | `src/features/order-lifecycle` | `/order-lifecycle` | `OrderLifecycleScreen` | `GET <BFF>/console/orders/<orderId>/lifecycle`, once per search | `toTimelineSteps.test.ts` |
-| `src/features/wms-dashboard` | `/wms-dashboard` | `WmsDashboardScreen` | `GET <BFF>/console/reports/wms` | via `App.test.tsx` routing only |
-| `src/features/wes-dashboard` | `/wes-dashboard` | `WesDashboardScreen` | `GET <BFF>/console/reports/wes` | via `App.test.tsx` routing only |
-| `src/features/reports` | — (shared body) | `ReportDashboard` | the URL its caller passes | covered through the dashboards and `npm run verify:dashboards` |
+| `src/features/wms-dashboard` | `/wms-dashboard` | `WmsDashboardScreen` | `GET <BFF>/console/reports/wms` | no unit test; `npm run verify:dashboards` |
+| `src/features/wes-dashboard` | `/wes-dashboard` | `WesDashboardScreen` | `GET <BFF>/console/reports/wes` | no unit test; `npm run verify:dashboards` |
+| `src/features/reports` | — (shared body) | `ReportDashboard` | the URL its caller passes | no unit test; `npm run verify:dashboards` |
 | `src/features/context-reports` | `/reports/:context` | `ContextReportRouteScreen` → `ContextReportScreen` | `GET <context>/reports/<name>?from=&to=` plus `GET <context>/reports/<name>/freshness` | `ContextReportScreen.test.tsx`, `facilityLayout.config.test.tsx`, `fulfillmentExecution.config.test.tsx` |
-| `src/features/not-found` | `*` and unknown `/reports/:context` slugs | `NotFoundScreen` | nothing | `App.test.tsx` |
+| `src/features/not-found` | `*` and unknown `/reports/:context` slugs | `NotFoundScreen` | nothing | no unit test; `npm run verify:routes` (`/no-such-screen`) |
 
 `<BFF>` is `<apiOrigin>/api/warehouse-ops-agent` and `<context>` is
 `<apiOrigin>/api/<context>` (see [Configuration](../operations/configuration.md#urls-derived-from-apiorigin)).
