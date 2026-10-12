@@ -177,11 +177,20 @@ own DTO onto ui-kit `Card` / `DataTable` / chart primitives.
 | `facility-layout` | `facilityLayout.config.tsx` | Facility: Catalog Growth | `/reports/catalog-growth` | trailing 30 d |
 | `process-path-management` | `processPathManagement.config.tsx` | Process Paths: Catalogue Growth | `/reports/catalogue-growth` | trailing 30 d |
 | `labor-performance` | `laborPerformance.config.tsx` | Labor: Performance | `/reports/performance` | trailing 24 h |
-| `network-fulfillment` | `networkFulfillment.config.tsx` | Network Fulfillment: Order Flow | `/reports/network-orders` | trailing 24 h |
+| `network-fulfillment` | `networkFulfillment.config.tsx` | Network Fulfillment: Acknowledgement & Translation | `/reports/acknowledgement` | trailing 30 d |
 
-Every path above except network-fulfillment's matches the `GET /reports/...`
-route (and its `/freshness` sibling) registered by that context's reports
-router on its `develop` branch.
+Every path above matches the `GET /reports/...` route (and its `/freshness`
+sibling) registered by that context's reports router on its `develop`
+branch.
+
+The network-fulfillment screen renders every field of that context's
+`acknowledgementRowDTO` (`internal/adapters/inbound/http/reports_handler.go`,
+`AcknowledgementReportRow` in its `apis/openapi.yaml`): `dayBucket`,
+`ordersReceived`, `ordersAcknowledged`, the four rejection causes
+(`ordersRejectedUntranslatableSku`, `ordersRejectedDomain`,
+`acknowledgementDeadlinesMissed`, `ordersRejectedSubmissionFailed`) and
+`avgAcknowledgementLatencySeconds` (shown as a duration). The report is
+day-bucketed (`granularity=day` is its only value), hence the 30-day window.
 
 `reportWindow.ts` builds the window (`trailingHours`, `trailingDays`) and
 appends it as RFC 3339 `from`/`to` query parameters (`withWindow`). Each
@@ -189,18 +198,11 @@ config computes its `WINDOW` **once at module load**, so the window ends at
 the moment the bundle was loaded, not at the moment the screen is opened;
 reload the page to move it forward.
 
-Two caveats. `src/config.ts` (and the README) still say Kong has no route
-from `/api/<context>/reports` to the separate `<context>-reports` Service;
-warehouse-infra `develop` has since added that second route per
-analytics-enabled context (`terraform/services.tf`, and
-`terraform/network-fulfillment.tf` for network-fulfillment), so whether a
-screen resolves depends on that context's reports deployment, not on the
-console. And the network-fulfillment config calls `/reports/network-orders`,
-a guess its own header comment flags as unverified; the endpoint merged on
-network-fulfillment `develop` is `/reports/acknowledgement` (plus
-`/reports/acknowledgement/freshness`, in that repo's
-`internal/adapters/inbound/http/reports_handler.go`), so that one screen
-renders its error card until the config is reconciled.
+Kong routes `/api/<context>/reports` to the separate `<context>-reports`
+Service (warehouse-infra `terraform/services.tf`, and
+`terraform/network-fulfillment.tf` for network-fulfillment), stripping the
+prefix so the reader sees `/reports/...`. Whether a screen resolves therefore
+depends on that context's reports deployment, not on the console.
 
 ## `not-found`
 

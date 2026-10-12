@@ -57,7 +57,7 @@ state. Build URLs from the same constants the code uses
 (`SERVICE_BASE_URL`, `BFF_BASE_URL`, `REPORTS_BASE_URL`) — under Vitest they
 resolve to the developer-port fallbacks, since no `config.json` is loaded.
 
-### What is covered (95 tests in 11 files, all passing on this branch)
+### What is covered (100 tests in 12 files, all passing on this branch)
 
 | File | Tests | What it pins |
 |---|---|---|
@@ -72,10 +72,11 @@ resolve to the developer-port fallbacks, since no `config.json` is loaded.
 | `src/features/context-reports/ContextReportScreen.test.tsx` | 4 | loading, populated + freshness badge, whole-request error, freshness-only failure |
 | `src/features/context-reports/facilityLayout.config.test.tsx` | 4 | loading, populated, error, empty table |
 | `src/features/context-reports/fulfillmentExecution.config.test.tsx` | 4 | loading, populated, error, empty table |
+| `src/features/context-reports/networkFulfillment.config.test.tsx` | 5 | calls `/reports/acknowledgement` + `/freshness` with a window longer than a day, loading, every `acknowledgementRowDTO` field rendered, error, empty table |
 
 Not covered by unit tests: `WmsDashboardScreen`, `WesDashboardScreen`,
 `ReportDashboard`, `OrderLifecycleScreen` (only its mapping function),
-`NotFoundScreen`, `RemoteBoundary` in isolation, and seven of the nine
+`NotFoundScreen`, `RemoteBoundary` in isolation, and six of the nine
 context-report configs. The `App.test.tsx` "remote down" stderr output
 (`Error: remote unavailable (unit test stub)` … "React will try to recreate
 this component tree … RemoteErrorBoundary") is expected noise from the stub,
