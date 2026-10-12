@@ -52,7 +52,7 @@ kubectl port-forward pod/<oltp-pod> 8081:8080
 ```
 
 - Without a `config.json` apiOrigin, `src/config.ts` falls back to per-service developer ports (8081-8086, reports 8101-8109, BFF 8096) only in a non-production build. That mode is for standalone service dev; the documented path is `apiOrigin` via Kong.
-- Per-context report screens call `/api/<context>/reports/...`, which 404s on the cluster until Kong routes it (documented in `src/config.ts`); do not "fix" that in the shell.
+- Per-context report screens call `/api/<context>/reports/...`, which Kong routes to that context's `<context>-reports` Service (created by warehouse-infra's Terraform services file). A 404 there means the reports binary is not deployed or the path differs from the context's `reports_handler.go`.
 
 ## 4. The two verification scripts
 

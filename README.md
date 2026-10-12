@@ -60,17 +60,19 @@ Two things every one of these nine screens needs that do not exist in this clust
 called out explicitly rather than silently assumed (see `src/config.ts`'s own doc comments for
 the full detail):
 
-- **Kong routing gap.** Every analytics-enabled chart stands up a separate `<context>-reports`
-  Service, but no Kong `Ingress`/`HTTPRoute` rule points `/api/<context>/reports` at it yet —
-  today that Service is reachable only in-cluster (console-bff, each context's own MCP server).
-  This shell is wired to the CORRECT eventual path/shape; a follow-up infra PR still needs to
-  add that route for any of the nine screens to resolve against a live kind cluster.
-- **network-fulfillment's whole reports endpoint is unmerged.** Its `/reports/...` REST
-  endpoint, `reports_handler.go` and DTO are still open work on a parallel branch as of this PR
-  (verified directly against that branch's tree, not assumed) — see
-  `src/features/context-reports/networkFulfillment.config.tsx`'s header comment for the
-  endpoint path and field names this screen guesses at today, flagged there as unverified and
-  needing reconciliation the moment that PR lands.
+- **Kong routing for the reports readers.** Every analytics-enabled chart stands up a separate
+  `<context>-reports` Service. `src/config.ts` still describes this as a gap, but
+  warehouse-infra `develop` now renders a second Kong route per analytics-enabled context,
+  `/api/<context>/reports` → `<context>-reports` (stripped to `/reports/...`), in
+  `terraform/services.tf` (and `terraform/network-fulfillment.tf`,
+  `terraform/network-inventory-planning.tf`), so a report screen resolves wherever that
+  context's reports binary is deployed.
+- **network-fulfillment's report path does not match its merged endpoint.** This screen calls
+  `/reports/network-orders` (and `/reports/network-orders/freshness`), the guess recorded in
+  `src/features/context-reports/networkFulfillment.config.tsx`'s header comment. The endpoint
+  that has since merged on network-fulfillment `develop` is `GET /reports/acknowledgement` and
+  `GET /reports/acknowledgement/freshness` (`internal/adapters/inbound/http/reports_handler.go`),
+  so this one screen shows its error card until the config is reconciled.
 
 Everything else (`/order-management`, `/inventory`, `/planning`, `/fulfillment`, `/workforce`,
 `/facility`, `/process-path`, `/labor`, `/network-fulfillment`, `/capacity`, `/product-master`, `/network-inventory`, `/inbound-receiving`) is a Module Federation remote owned
@@ -110,6 +112,27 @@ console-only read layer, not a public API.
 This repository, and every other repository in the `warehouse-systems` set, is a personal
 study project exploring Domain-Driven Design, hexagonal architecture, and micro-frontend
 composition patterns. It is not production software and has no support guarantees.
+
+## Documentation
+
+The full documentation site is published at <https://iqvo.github.io/warehouse-console/>
+(built from `docs/` on every push to `main`). Pages:
+
+- Overview: [introduction](docs/docs/overview/index.md),
+  [getting started](docs/docs/overview/getting-started.md)
+- Architecture: [Module Federation](docs/docs/architecture/module-federation.md),
+  [cross-cutting screens](docs/docs/architecture/cross-cutting-screens.md),
+  [feature modules](docs/docs/architecture/features.md) (every `src/features/*` module)
+- Operations: [configuration](docs/docs/operations/configuration.md) (`/config.json`,
+  remotes, nginx, Helm values), [runbook](docs/docs/operations/runbook.md),
+  [troubleshooting](docs/docs/operations/troubleshooting.md)
+- Development: [testing](docs/docs/development/testing.md) (Vitest, Playwright smoke
+  scripts, CI jobs)
+- Ecosystem: [context map](docs/docs/ecosystem/context-map.md),
+  [consuming the fleet](docs/docs/ecosystem/consuming-the-fleet.md)
+- Decisions: [ADR index](docs/docs/adr/index.md)
+
+Run the site locally with `npm ci && npm run start` in `docs/`.
 
 ## Architecture
 

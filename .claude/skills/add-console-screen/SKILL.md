@@ -30,7 +30,7 @@ First decide whether the screen belongs HERE. The shell owns only cross-cutting 
 2. Add `{ path: "<repo-name>", config }` to `REPORT_ROUTES` in `src/features/context-reports/registry.ts`. That ONE list drives both the single `/reports/:context` route (`ContextReportRouteScreen.tsx`) and the "View metrics report" link on the Contexts tile; do not add per-context routes.
 3. Add a `REPORTS_BASE_URL` entry in `src/config.ts` if the context is new (path map + dev-port map + the `ReportsBaseUrls` interface).
 4. Test it through `ContextReportScreen` like `facilityLayout.config.test.tsx`; loading/error/empty states are already covered once in `ContextReportScreen.test.tsx`.
-5. Know the open gap: the reports Service has no Kong route yet, so these screens 404 on a live cluster until warehouse-infra adds one (documented in `src/config.ts`). A green unit test does not prove they work end-to-end.
+5. Kong routes `/api/<context>/reports` to each analytics-enabled context's `<context>-reports` Service (created by warehouse-infra's Terraform services file); the doc comment in `src/config.ts` predates that. Check the report path against the context's own `reports_handler.go` on develop. A green unit test does not prove a screen works end-to-end.
 
 ## Before you say done
 
