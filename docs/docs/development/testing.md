@@ -141,9 +141,11 @@ So on a PR into `develop`, `helm-lint`, `trivy-scan`, `docker-publish` and
 `release` show as skipped by design.
 
 Other workflows: `codeql.yml` (push/PR on `main` and `develop`),
-`scorecard.yml` (push to `develop` and a schedule), `docs.yml` (builds and
-deploys GitHub Pages on push to `main` touching `docs/**`; it has no
-`pull_request` trigger, which is why `ci.yml`'s `docs` job exists), and
+`scorecard.yml` (push to `develop` and a schedule), `docs.yml` (builds the
+site on every pull request touching `docs/**` or the workflow, build only;
+on push to `main` touching `docs/**` it also uploads the Pages artifact and
+deploys; the PR build runs in its own `docs-pr-<ref>` concurrency group, never
+the `pages` one, under the check name `docs-site-build`), and
 `ai-review.yml` (PRs into `develop` touching `internal/domain/**`,
 `internal/application/**`, `apis/**` or `charts/**`; only `charts/` exists in
 this repo, and it is a no-op without the `ANTHROPIC_API_KEY` secret).
