@@ -185,11 +185,15 @@ config computes its `WINDOW` **once at module load**, so the window ends at
 the moment the bundle was loaded, not at the moment the screen is opened;
 reload the page to move it forward.
 
-Two caveats from `src/config.ts` and the configs themselves: Kong has no
-route yet from `/api/<context>/reports` to the separate `<context>-reports`
-Service, so these screens 404 against today's cluster; and the
-network-fulfillment config's endpoint and field names are flagged in its own
-header comment as unverified against a merged implementation.
+Two caveats. `src/config.ts` (and the README) still say Kong has no route
+from `/api/<context>/reports` to the separate `<context>-reports` Service;
+warehouse-infra `develop` has since added that second route per
+analytics-enabled context (`terraform/services.tf`, and
+`terraform/network-fulfillment.tf` for network-fulfillment), so whether a
+screen resolves depends on that context's reports deployment, not on the
+console. And the network-fulfillment config's endpoint and field names are
+flagged in its own header comment as unverified against a merged
+implementation.
 
 ## `not-found`
 

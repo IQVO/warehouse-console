@@ -80,9 +80,10 @@ mounted on the splat route `/network-inventory/*`. Its only write is
 `POST /v1/transfers:approve` with a JSON `Content-Type` **and an
 `Idempotency-Key` header** to `<apiOrigin>/api/network-inventory-planning`, so
 Kong's CORS policy for the console origin must also allow the
-`Idempotency-Key` request header (it allows `Accept`, `Content-Type` and
-`Origin` today); without it the browser's preflight rejects the Approve action
-while the read screens keep working.
+`Idempotency-Key` request header; warehouse-infra's `warehouse-cors` plugin
+(`terraform/kong-cors.tf`) allows `Accept`, `Content-Type`, `Origin` and
+`Idempotency-Key`. Without that header in the list the browser's preflight
+rejects the Approve action while the read screens keep working.
 
 `inbound_mfe` (inbound-receiving) exposes `./App` with no props and relative
 routes (`asns`, `asns/register`, `asns/:asnNumber`, `appointments`, `receipts`,
