@@ -11,9 +11,12 @@ const read = (rel: string) => readFileSync(resolve(__dirname, "..", rel), "utf8"
 
 describe("Helm chart image default", () => {
   it("pulls the repository CI publishes", () => {
-    const published = [
-      ...read(".github/workflows/ci.yml").matchAll(/(ghcr\.io\/iqvo\/warehouse-console):/g),
-    ].map((m) => m[1]);
+    // Plain token parsing, no URL-shaped regex: every whitespace-separated
+    // token that starts with the org's GHCR prefix, minus its :tag/@digest.
+    const published = read(".github/workflows/ci.yml")
+      .split(/\s+/)
+      .filter((token) => token.startsWith("ghcr.io/iqvo/"))
+      .map((token) => token.split("@")[0].split(":")[0]);
     expect(published.length).toBeGreaterThan(0);
     const values = read("charts/warehouse-console/values.yaml");
     const repository = values.match(/^image:\n(?:\s+#.*\n)*\s+repository:\s*(\S+)$/m)?.[1];
@@ -31,7 +34,9 @@ describe("Dockerfile", () => {
     expect(fromImages.size).toBe(1);
     const [builder] = [...fromImages];
     // The numbered rationale comment names the builder base explicitly.
-    expect(dockerfile).toMatch(new RegExp(`^# 1\\. ${builder.replace(/[.]/g, "\\.")},`, "m"));
+    const rationale = dockerfile.split("\n").filter((line) => line.startsWith("# 1. "));
+    expect(rationale).toHaveLength(1);
+    expect(rationale[0].startsWith(`# 1. ${builder},`)).toBe(true);
   });
 });
 
