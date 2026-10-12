@@ -57,13 +57,14 @@ state. Build URLs from the same constants the code uses
 (`SERVICE_BASE_URL`, `BFF_BASE_URL`, `REPORTS_BASE_URL`) — under Vitest they
 resolve to the developer-port fallbacks, since no `config.json` is loaded.
 
-### What is covered (100 tests in 12 files, all passing on this branch)
+### What is covered (106 tests in 13 files, all passing on this branch)
 
 | File | Tests | What it pins |
 |---|---|---|
 | `src/runtime-config.test.ts` | 15 | `validateRuntimeConfig` accepts http/https origins and rejects non-objects, missing/blank/non-string/relative origins, non-HTTP schemes, paths, credentials and queries; `loadRuntimeConfig` fetches with `no-store`, and never publishes a non-2xx or non-JSON response |
 | `src/config.test.ts` | 5 | URL resolution under an `apiOrigin`, the production "missing origin" error, developer-port fallbacks |
-| `src/remotes-registration.test.ts` | 15 | static checks on `vite.config.ts`, `src/App.tsx` and `scripts/verify-all-routes.cjs` for `capacity_mfe`, `productmaster_mfe`, `nip_mfe`, `inbound_mfe`: container name, gateway path, dev port uniqueness, module-scope `lazy()`, splat route, verify:routes coverage |
+| `src/remotes-registration.test.ts` | 17 | static checks on `vite.config.ts`, `src/App.tsx` and `scripts/verify-all-routes.cjs` for `capacity_mfe`, `productmaster_mfe`, `nip_mfe`, `inbound_mfe`: container name, gateway path, dev port uniqueness, module-scope `lazy()`, splat route, verify:routes coverage; plus verify:routes covers `/network-fulfillment`, every `REPORT_ROUTES` slug and an unknown report slug |
+| `src/packaging.test.ts` | 4 | chart `image.repository` equals what `ci.yml` publishes, the Dockerfile's builder-base comment names the `FROM node:` image it uses, `.gitignore` lists `public/config.json`, `src/config.ts` no longer claims Kong lacks a reports route |
 | `src/App.test.tsx` | 22 | the `/capacity/*`, `/product-master/*`, `/network-inventory/*`, `/inbound-receiving/*` routes render the "unavailable" card when the remote is down, keep "Contexts" active, and do not capture look-alike prefixes |
 | `src/shell/RouterLink.test.tsx` | 5 | client-side navigation for nav items and launch tiles, the skip link, external URLs left to the browser |
 | `src/features/floor/FloorScreen.test.tsx` | 8 | per-path facts, no-signal vs zero, severity ordering, collapsed evidence, backend-flag alarms, retry, last-good data kept on a failed refresh |
@@ -99,13 +100,16 @@ Both exit `1` on any collected error.
 - **`npm run verify:routes`** visits `/`, `/order-lifecycle`, `/contexts`,
   `/wms-dashboard`, `/wes-dashboard`, the remote routes `/order-management`,
   `/inventory`, `/planning`, `/fulfillment`, `/workforce`, `/facility`,
-  `/process-path`, `/labor`, `/capacity`, `/product-master`,
-  `/network-inventory`, `/inbound-receiving`, and `/no-such-screen` (must show
+  `/process-path`, `/labor`, `/network-fulfillment`, `/capacity`,
+  `/product-master`, `/network-inventory`, `/inbound-receiving`, every
+  `/reports/<slug>` in `REPORT_ROUTES` (each must show its own report
+  heading), `/reports/no-such-context` and `/no-such-screen` (both must show
   "Page not found"). On each it asserts the expected text, that the nav still
   renders, and records page errors and failed requests. It then clicks the
   Contexts nav link and fails on a full document navigation. It needs every
-  listed remote's dev server and the APIs at `apiOrigin`. `/network-fulfillment`
-  and `/reports/:context` are not in its list.
+  listed remote's dev server and the APIs (including each `<context>-reports`
+  reader) at `apiOrigin`. `src/remotes-registration.test.ts` fails when a
+  registered report slug or `/network-fulfillment` is missing from its list.
 - **`npm run verify:dashboards`** needs only the shell's dev server: it
   intercepts `**/console/reports/wms*` and `**/console/reports/wes*` and
   checks three states — all sections available (charts draw real geometry),

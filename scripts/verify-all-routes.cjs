@@ -1,7 +1,8 @@
 /**
  * Dev-only smoke check: loads every route in a real headless browser and
  * confirms each one renders without page errors or failed requests.
- * Requires the shell (npm run dev, :5173) and all 6 remotes' dev servers
+ * Requires the shell (npm run dev, :5173), every remote's dev server and the
+ * APIs at config.json's apiOrigin (including each <context>-reports reader)
  * to already be running -- this does not start them for you.
  *
  * Usage: npm run verify:routes
@@ -28,10 +29,26 @@ const routes = [
   { path: "/facility", label: "facility", expect: /\S/ },
   { path: "/process-path", label: "process-path", expect: /\S/ },
   { path: "/labor", label: "labor", expect: /\S/ },
+  { path: "/network-fulfillment", label: "network-fulfillment", expect: /\S/ },
   { path: "/capacity", label: "capacity", expect: /\S/ },
   { path: "/product-master", label: "product-master", expect: /\S/ },
   { path: "/network-inventory", label: "network-inventory", expect: /\S/ },
   { path: "/inbound-receiving", label: "inbound-receiving", expect: /\S/ },
+  // /reports/:context -- one Bounded Context Report screen per slug in
+  // src/features/context-reports/registry.ts (src/remotes-registration.test.ts
+  // fails when a registered slug is missing here). Each must render its own
+  // heading whether the reports reader answers or the error card shows.
+  { path: "/reports/order-management", label: "report:order-management", expect: /Orders: Funnel/i },
+  { path: "/reports/inventory-storage", label: "report:inventory-storage", expect: /Inventory: Flow/i },
+  { path: "/reports/wes-work-planning", label: "report:wes-work-planning", expect: /Planning: Release/i },
+  { path: "/reports/fulfillment-execution", label: "report:fulfillment-execution", expect: /Fulfillment: Throughput/i },
+  { path: "/reports/workforce-management", label: "report:workforce-management", expect: /Workforce: Labor/i },
+  { path: "/reports/facility-layout", label: "report:facility-layout", expect: /Facility: Catalog Growth/i },
+  { path: "/reports/process-path-management", label: "report:process-path-management", expect: /Process Paths: Catalogue/i },
+  { path: "/reports/labor-performance", label: "report:labor-performance", expect: /Labor: Performance/i },
+  { path: "/reports/network-fulfillment", label: "report:network-fulfillment", expect: /Network Fulfillment: Acknowledgement/i },
+  // An unknown report slug falls through to the shell's own 404 screen.
+  { path: "/reports/no-such-context", label: "report:404", expect: /Page not found/i },
   // An unmatched URL must explain itself, not render empty chrome.
   { path: "/no-such-screen", label: "404", expect: /Page not found/i },
 ];

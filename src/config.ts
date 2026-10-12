@@ -32,10 +32,8 @@ export interface ServiceBaseUrls {
 }
 
 /**
- * Every bounded context that ships a Bounded Context Report screen --
- * the 8 that already have one plus network-fulfillment, whose own
- * `/reports/...` endpoint is still in an open PR (see ReportsBaseUrls'
- * own doc comment below).
+ * Every bounded context that ships a Bounded Context Report screen (nine,
+ * network-fulfillment included; see features/context-reports/registry.ts).
  */
 export interface ReportsBaseUrls {
   orderManagement: string;
@@ -65,23 +63,16 @@ const API_PATHS: Record<keyof ServiceBaseUrls, string> = {
  * process-path-management, network-fulfillment): the shell never calls
  * their OLTP APIs directly today, only their reports endpoint.
  *
- * IMPORTANT INFRA GAP (verified against warehouse-infra/terraform/services.tf
- * and kong.tf directly, not assumed): today Kong's `ingress`/`gatewayApi`
- * block for each context routes `/api/<context>` to that context's OLTP
- * Service ONLY. Each analytics-enabled chart's `reports-deployment.yaml`
- * stands up a SEPARATE `<context>-reports` Service that nothing in
- * warehouse-infra points a Kong route at yet -- it is reachable only
- * in-cluster (warehouse-ops-agent's console-bff and each context's own
- * mcp-deployment.yaml read it via its `.svc.cluster.local` DNS name, not
- * through Kong). So `${apiOrigin}/api/<context>/reports/...` below is
- * CORRECT SHAPE, wired ahead of the infra that will serve it: it 404s
- * against today's cluster until a follow-up infra PR adds a Kong
- * route/HTTPRoute rule for path `/api/<context>/reports` targeting the
- * `<context>-reports` Service (strip-path leaves exactly `/reports/...`,
- * which is what every reports binary registers). This is the same kind
- * of "wired ahead of its dependency" situation network-fulfillment's
- * report is in twice over -- once for its whole reports endpoint (still
- * an open PR) and once for this Kong route (not yet proposed anywhere).
+ * Kong routing for these (warehouse-infra `terraform/services.tf`
+ * `service_reports` Ingress/HTTPRoute per analytics-enabled context, and
+ * `terraform/network-fulfillment.tf` for network-fulfillment): besides the
+ * main `/api/<context>` route to the OLTP Service, Kong renders a second
+ * route `/api/<context>/reports` to that context's SEPARATE
+ * `<context>-reports` Service, stripping the prefix down to `/reports`, which
+ * is exactly what every reports binary's NewReportsRouter registers. So
+ * `${apiOrigin}/api/<context>/reports/...` reaches the reader wherever that
+ * context's reports Deployment runs; a 404 there means the context has no
+ * reports deployment, not that the console is wired wrong.
  */
 const REPORTS_API_PATHS: Record<keyof ReportsBaseUrls, string> = {
   orderManagement: "/api/order-management",
@@ -116,13 +107,11 @@ const DEV_BASE_URLS: ServiceBaseUrls = {
  * that file's own sequential-assignment convention (each new reports port
  * is simply the next free integer after 8107, not a computed offset --
  * see env.sh's own comment on LABOR_REPORTS_HTTP_PORT) but are NOT
- * actually present in e2e-tests/env.sh today: process-path-management's
- * reports binary has no harness-assigned dev port yet, and
- * network-fulfillment's whole reports endpoint is still an open PR with
- * no port assigned anywhere. Both are placeholders for local standalone
- * dev only, wired ahead of their real assignment so this screen activates
- * the moment each lands -- flagged explicitly in this repo's PR
- * description rather than silently guessed.
+ * present in e2e-tests/env.sh: neither process-path-management's nor
+ * network-fulfillment's reports binary (`netfulfil-reports`, serving
+ * `/reports/acknowledgement`) has a harness-assigned dev port. Both are
+ * placeholders for local standalone dev only; run that binary on the
+ * port listed here, or point `apiOrigin` at Kong instead.
  */
 const DEV_REPORTS_BASE_URLS: ReportsBaseUrls = {
   facilityLayout: "http://localhost:8101",
@@ -189,7 +178,7 @@ export function resolveBffBaseUrl(
 /**
  * Base URL for each context's OWN `/reports/...` reader, read DIRECTLY --
  * never through console-bff/ops-agent. See REPORTS_API_PATHS' doc comment
- * for the Kong-routing gap this still needs on the infra side.
+ * for the Kong route that serves it.
  */
 export function resolveReportsBaseUrls(
   runtimeConfig: Partial<WarehouseConfig>,
