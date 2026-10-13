@@ -28,7 +28,7 @@
 #    means the committed lockfile is never read for resolution nor mutated.
 
 # --- ui-kit build stage (sibling dependency) ---
-FROM node:26-bookworm-slim@sha256:662933cf47f013bc8e4beb31a6116448427a82057ba7c42c97e4c5ba766504c2 AS uikit-build
+FROM node:26-bookworm-slim@sha256:86f07bc9c5dce4578cf37e5a418b7bfc7f817cda25cde66e2b66e95ed86c4567 AS uikit-build
 WORKDIR /uikit
 COPY --from=uikit . .
 # The uikit named context is a sibling CHECKOUT and may carry its own
@@ -40,7 +40,7 @@ RUN --mount=type=cache,target=/root/.npm \
     rm -rf node_modules package-lock.json && npm install --no-save && npm run build
 
 # --- app build stage ---
-FROM node:26-bookworm-slim@sha256:662933cf47f013bc8e4beb31a6116448427a82057ba7c42c97e4c5ba766504c2 AS build
+FROM node:26-bookworm-slim@sha256:86f07bc9c5dce4578cf37e5a418b7bfc7f817cda25cde66e2b66e95ed86c4567 AS build
 WORKDIR /workspace/warehouse-ui-kit
 COPY --from=uikit-build /uikit/package.json ./package.json
 COPY --from=uikit-build /uikit/dist ./dist
