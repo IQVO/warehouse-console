@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
+import { REPORT_ROUTES } from "./features/context-reports/registry";
 
 /**
  * Static guards for the pieces of remote registration that no render test can
@@ -116,5 +117,22 @@ describe("inbound_mfe registration", () => {
 
   it("is covered by verify:routes", () => {
     expect(read("scripts/verify-all-routes.cjs")).toContain('path: "/inbound-receiving"');
+  });
+});
+
+describe("verify:routes coverage of the router", () => {
+  // The list is hand-maintained, so pin the routes it used to miss.
+  it("covers the network-fulfillment remote route", () => {
+    expect(read("src/App.tsx")).toMatch(/path="\/network-fulfillment\/\*"/);
+    expect(read("scripts/verify-all-routes.cjs")).toContain('path: "/network-fulfillment"');
+  });
+
+  it("covers /reports/:context for every registered report slug, plus an unknown slug", () => {
+    expect(read("src/App.tsx")).toMatch(/path="\/reports\/:context"/);
+    const script = read("scripts/verify-all-routes.cjs");
+    for (const { path } of REPORT_ROUTES) {
+      expect(script).toContain(`path: "/reports/${path}"`);
+    }
+    expect(script).toMatch(/path: "\/reports\/no-such-context",[^}]*expect: \/Page not found\/i/);
   });
 });

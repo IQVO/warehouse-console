@@ -26,3 +26,6 @@ dist-ssr
 *.sln
 *.sw?
 .claude/settings.local.json
+
+# Developer-local runtime config for `npm run dev` (see README); never committed.
+public/config.json
