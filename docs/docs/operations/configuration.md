@@ -62,10 +62,10 @@ order they are checked:
 | scheme other than `http:`/`https:` | `Runtime configuration apiOrigin must use HTTP or HTTPS` |
 | carries a username, password, path other than `/`, query or fragment | `Runtime configuration apiOrigin must contain only an origin` |
 
-The repo does not commit a `config.json`, and `.gitignore` does not list
-`public/config.json` either: create it locally (see
+The repo does not commit a `config.json`; `.gitignore` lists
+`public/config.json`, so create it locally (see
 [Getting started](../overview/getting-started.md#runtime-configuration-configjson))
-and take care not to stage it.
+without risk of staging it.
 
 ### URLs derived from `apiOrigin`
 
@@ -149,7 +149,7 @@ serves only the shell and never proxies to a remote or an API.
 | `runtimeConfig.enabled` | `true` | render the `<fullname>-runtime-config` ConfigMap and mount it at `/usr/share/nginx/html/config.json` (`subPath`) |
 | `runtimeConfig.apiOrigin` | `http://localhost:8000` | written into `config.json`; the template fails (`required`) when empty and `enabled` is true |
 | `replicaCount` | `1` | ignored when `autoscaling.enabled` |
-| `image.repository` / `image.tag` / `image.pullPolicy` | `iqvo/warehouse-console` / `""` (falls back to `Chart.appVersion`, `0.1.0`) / `IfNotPresent` | container image |
+| `image.repository` / `image.tag` / `image.pullPolicy` | `ghcr.io/iqvo/warehouse-console` / `""` (falls back to `Chart.appVersion`, `0.1.0`) / `IfNotPresent` | container image |
 | `service.type` / `service.port` / `service.targetPort` | `ClusterIP` / `80` / `8080` | the Service listens on 80 and targets the container's `http` port 8080 |
 | `ingress.enabled` | `false` | optional Ingress (`warehouse-console.local`, path `/`) |
 | `autoscaling.enabled` / `minReplicas` / `maxReplicas` / `targetCPUUtilizationPercentage` | `false` / `1` / `5` / `80` | HPA |
@@ -165,6 +165,7 @@ The Deployment carries a `checksum/runtime-config` annotation computed from
 the ConfigMap template, so changing `apiOrigin` rolls the pods (kubelet does
 not live-update a `subPath` mount).
 
-The image the chart defaults to (`iqvo/warehouse-console`) is not the name CI
-publishes (`ghcr.io/iqvo/warehouse-console`); set `image.repository` to the
-registry you actually pull from. See the [Runbook](./runbook.md).
+The chart defaults `image.repository` to `ghcr.io/iqvo/warehouse-console`,
+the name CI publishes (`src/packaging.test.ts` fails if the two diverge).
+`image.tag` still defaults to `Chart.appVersion`; set it to a published tag
+(`latest`, `<short-sha>` or `vX.Y.Z`). See the [Runbook](./runbook.md).

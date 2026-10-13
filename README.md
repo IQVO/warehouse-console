@@ -56,23 +56,19 @@ sibling `/reports/.../freshness` endpoint; each context's own config object is t
 that maps its real DTO onto the shared `@warehouse/ui-kit` primitives (`Card`, `DataTable`,
 `BarChart`, `LineChart`, `FunnelChart`).
 
-Two things every one of these nine screens needs that do not exist in this cluster yet, both
-called out explicitly rather than silently assumed (see `src/config.ts`'s own doc comments for
-the full detail):
+One thing every one of these nine screens needs from the cluster, called out explicitly rather
+than silently assumed (see `src/config.ts`'s own doc comments for the full detail):
 
 - **Kong routing for the reports readers.** Every analytics-enabled chart stands up a separate
-  `<context>-reports` Service. `src/config.ts` still describes this as a gap, but
-  warehouse-infra `develop` now renders a second Kong route per analytics-enabled context,
-  `/api/<context>/reports` → `<context>-reports` (stripped to `/reports/...`), in
-  `terraform/services.tf` (and `terraform/network-fulfillment.tf`,
+  `<context>-reports` Service. warehouse-infra renders a second Kong route per
+  analytics-enabled context, `/api/<context>/reports` → `<context>-reports` (stripped to
+  `/reports/...`), in `terraform/services.tf` (and `terraform/network-fulfillment.tf`,
   `terraform/network-inventory-planning.tf`), so a report screen resolves wherever that
   context's reports binary is deployed.
-- **network-fulfillment's report path does not match its merged endpoint.** This screen calls
-  `/reports/network-orders` (and `/reports/network-orders/freshness`), the guess recorded in
-  `src/features/context-reports/networkFulfillment.config.tsx`'s header comment. The endpoint
-  that has since merged on network-fulfillment `develop` is `GET /reports/acknowledgement` and
-  `GET /reports/acknowledgement/freshness` (`internal/adapters/inbound/http/reports_handler.go`),
-  so this one screen shows its error card until the config is reconciled.
+
+network-fulfillment's screen calls `GET /reports/acknowledgement` (and
+`GET /reports/acknowledgement/freshness`) and renders the fields of that context's
+`acknowledgementRowDTO` (`internal/adapters/inbound/http/reports_handler.go`).
 
 Everything else (`/order-management`, `/inventory`, `/planning`, `/fulfillment`, `/workforce`,
 `/facility`, `/process-path`, `/labor`, `/network-fulfillment`, `/capacity`, `/product-master`, `/network-inventory`, `/inbound-receiving`) is a Module Federation remote owned

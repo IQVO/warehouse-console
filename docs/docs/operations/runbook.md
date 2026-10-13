@@ -87,13 +87,13 @@ for every value.
 ```bash
 helm upgrade --install warehouse-console oci://ghcr.io/iqvo/warehouse-console \
   --version <X.Y.Z> \
-  --set image.repository=ghcr.io/iqvo/warehouse-console \
   --set image.tag=v<X.Y.Z> \
   --set runtimeConfig.apiOrigin=http://localhost:8000
 ```
 
-The chart's default `image.repository` is `iqvo/warehouse-console` (no
-registry), which is not what CI publishes, so always set it outside kind.
+The chart's default `image.repository` is `ghcr.io/iqvo/warehouse-console`,
+the repository CI publishes; override it only for a locally built image (the
+kind cluster sets `warehouse/warehouse-console-frontend:local-<hash>`, below).
 
 ### In the kind cluster (warehouse-infra)
 
