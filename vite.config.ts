@@ -36,6 +36,16 @@ export default defineConfig({
     react(),
     federation({
       name: "warehouse_console",
+      // No federated type download. The host never consumes remote types:
+      // src/App.tsx imports every remote as `// @ts-expect-error` +
+      // lazy(() => import("<name>/App")), and tsconfig has no @mf-types
+      // paths. With dts on, the dev server tried to fetch each remote's
+      // types archive and printed "Failed to download types archive" for
+      // every remote (none publishes one: the remotes set dts: false since
+      // their fix/mf-dts-type-001 PRs, e.g. fulfillment-execution#210,
+      // facility-layout#192). If typed remotes are ever needed, re-enable
+      // dts here AND in the remotes, then drop the @ts-expect-error lines.
+      dts: false,
       remotes: {
         order_mgmt_mfe: {
           type: "module",
