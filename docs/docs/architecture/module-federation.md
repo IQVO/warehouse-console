@@ -100,6 +100,18 @@ flag) rather than the `({ command }) => ({...})` callback form, because
 `vitest.config.ts` merges it with `mergeConfig`, which throws on a callback
 export.
 
+## No federated type generation
+
+`vite.config.ts` sets `dts: false` on the federation plugin. The host never
+consumes remote types: `src/App.tsx` imports every remote as
+`// @ts-expect-error` plus `lazy(() => import("<name>/App"))`, and `tsconfig`
+has no `@mf-types` paths. With the default settings the dev server tried to
+download a types archive from each remote and printed "Failed to download types
+archive" for every one of them, because no remote publishes one (the remotes
+set `dts: false` too, after the `TYPE-001` build message). If typed remotes are
+ever needed, re-enable `dts` in the host **and** in the remotes, then drop the
+`@ts-expect-error` lines.
+
 ## Shared singletons
 
 `react`, `react-dom`, `react-router-dom`, `@warehouse/ui-kit` are all shared
