@@ -7,7 +7,7 @@ import { ContextReportScreen } from "./ContextReportScreen";
 import type { ContextReportConfig } from "./types";
 
 /**
- * A synthetic config, not one of the nine real ones -- this file tests
+ * A synthetic config, not one of the thirteen real ones -- this file tests
  * ContextReportScreen's OWN three degradation states in isolation, which
  * every real per-context config inherits for free. The per-context
  * configs (facilityLayout.config.test.tsx, fulfillmentExecution.config.test.tsx)
@@ -96,6 +96,36 @@ describe("ContextReportScreen", () => {
     render(<ContextReportScreen config={config} />);
 
     await waitFor(() => expect(screen.getByTestId("widgets-built")).toHaveTextContent("7"));
+    expect(screen.getByText("freshness unknown")).toBeInTheDocument();
+  });
+
+  /**
+   * The four Phase 4.1 readers (warehouse-planning, NIP, product-master,
+   * inbound-receiving) serve a CONTEXT-level /reports/freshness whose wire
+   * shape is snake_case { as_of, lag_seconds }, both nullable -- unlike the
+   * per-report { lagSeconds } the first nine screens read. The shell must
+   * feed either generation's lag into the badge, and treat lag_seconds:
+   * null as "no reading" rather than a fabricated 0.
+   */
+  it("reads the snake_case { as_of, lag_seconds } freshness shape, null meaning no reading", async () => {
+    server.use(
+      stubReport({ widgetsBuilt: 11 }),
+      http.get(FRESHNESS_URL, () =>
+        HttpResponse.json({ as_of: "2026-10-17T09:59:50Z", lag_seconds: 30 }),
+      ),
+    );
+    render(<ContextReportScreen config={config} />);
+    await waitFor(() => expect(screen.getByTestId("widgets-built")).toHaveTextContent("11"));
+    expect(screen.getByText("30s behind")).toBeInTheDocument();
+  });
+
+  it("treats { as_of: null, lag_seconds: null } as freshness unknown, not a zero lag", async () => {
+    server.use(
+      stubReport({ widgetsBuilt: 12 }),
+      http.get(FRESHNESS_URL, () => HttpResponse.json({ as_of: null, lag_seconds: null })),
+    );
+    render(<ContextReportScreen config={config} />);
+    await waitFor(() => expect(screen.getByTestId("widgets-built")).toHaveTextContent("12"));
     expect(screen.getByText("freshness unknown")).toBeInTheDocument();
   });
 });

@@ -8,6 +8,10 @@ import { orderFunnelConfig } from "./orderManagement.config";
 import { processPathCatalogueGrowthConfig } from "./processPathManagement.config";
 import { laborPerformanceConfig } from "./laborPerformance.config";
 import { networkFulfillmentReportConfig } from "./networkFulfillment.config";
+import { warehousePlanningShortageConfig } from "./warehousePlanning.config";
+import { networkInventoryStuckTransfersConfig } from "./networkInventoryPlanning.config";
+import { productMasterDataQualityConfig } from "./productMaster.config";
+import { inboundReceivingPerformanceConfig } from "./inboundReceiving.config";
 
 /**
  * Every bounded context's report, in one place, so App.tsx's route table
@@ -22,7 +26,7 @@ import { networkFulfillmentReportConfig } from "./networkFulfillment.config";
 export interface ReportRouteEntry {
   path: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- a
-  // heterogeneous registry of ContextReportConfig<T> for nine DIFFERENT
+  // heterogeneous registry of ContextReportConfig<T> for thirteen DIFFERENT
   // T's has no sound common instantiation; each entry is only ever read
   // back through its own config object; renderBody in each remains fully
   // typed. Same shape unavoidably shows up in DataTable<T>/Column<T>
@@ -40,4 +44,13 @@ export const REPORT_ROUTES: ReportRouteEntry[] = [
   { path: "process-path-management", config: processPathCatalogueGrowthConfig },
   { path: "labor-performance", config: laborPerformanceConfig },
   { path: "network-fulfillment", config: networkFulfillmentReportConfig },
+  // Phase 4.1 (connect-all): contexts whose reports readers were already
+  // deployed but had no screen. WES tier (capacity planning).
+  { path: "warehouse-planning", config: warehousePlanningShortageConfig },
+  // WMS tier (network inventory movement).
+  { path: "network-inventory-planning", config: networkInventoryStuckTransfersConfig },
+  // WMS tier (product master data).
+  { path: "product-master", config: productMasterDataQualityConfig },
+  // WMS tier (inbound / dock).
+  { path: "inbound-receiving", config: inboundReceivingPerformanceConfig },
 ];
