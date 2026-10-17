@@ -9,6 +9,7 @@ import { processPathCatalogueGrowthConfig } from "./processPathManagement.config
 import { laborPerformanceConfig } from "./laborPerformance.config";
 import { networkFulfillmentReportConfig } from "./networkFulfillment.config";
 import { warehousePlanningShortageConfig } from "./warehousePlanning.config";
+import { networkInventoryStuckTransfersConfig } from "./networkInventoryPlanning.config";
 
 /**
  * Every bounded context's report, in one place, so App.tsx's route table
@@ -44,4 +45,6 @@ export const REPORT_ROUTES: ReportRouteEntry[] = [
   // Phase 4.1 (connect-all): contexts whose reports readers were already
   // deployed but had no screen. WES tier (capacity planning).
   { path: "warehouse-planning", config: warehousePlanningShortageConfig },
+  // WMS tier (network inventory movement).
+  { path: "network-inventory-planning", config: networkInventoryStuckTransfersConfig },
 ];
