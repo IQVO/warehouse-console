@@ -8,7 +8,7 @@ import type { FulfillmentThroughputReportDto } from "./fulfillmentExecution.conf
 
 /**
  * fulfillment-execution's pick/pack/SLAM throughput report -- the second
- * of the "2 of 9" chosen configs, deliberately a different shape from
+ * of the two configs (of the then-nine) chosen for tests, deliberately a different shape from
  * facility-layout's (hour-bucketed task/station rows with lease-expiry
  * and weigh-check-divert exception counts, vs facility's day-bucketed
  * catalog totals).

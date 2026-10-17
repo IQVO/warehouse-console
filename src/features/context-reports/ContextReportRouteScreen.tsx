@@ -7,8 +7,8 @@ import { useDocumentTitle } from "../../shell/useDocumentTitle";
 
 /**
  * Resolves `/reports/:context` to that context's own config via the
- * shared registry, so App.tsx needs one Route for all nine rather than
- * nine near-identical ones. An unmatched slug (typo'd deep link, or a
+ * shared registry, so App.tsx needs one Route for all thirteen rather
+ * than thirteen near-identical ones. An unmatched slug (typo'd deep link, or a
  * context whose report hasn't shipped yet) falls through to the shell's
  * own NotFoundScreen exactly like an unmatched top-level route -- this is
  * still inside the shell's route tree, not a 404 from a remote.

@@ -105,7 +105,10 @@ function renderBody(data: ShortageTrendReportDto): ReactElement {
             {
               key: "site",
               header: "Site",
-              render: (d) => `${d.warehouse_id}/${d.location}` || "—",
+              render: (d) =>
+                d.warehouse_id || d.location
+                  ? `${d.warehouse_id}/${d.location}`
+                  : "—",
             },
             {
               key: "plans_published",
