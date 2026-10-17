@@ -31,7 +31,7 @@ The remote must expose `./App` and set its production `base` to `/mfes/<context>
    - a `<Route path="/<slug>/*" element={<RemoteBoundary label=... component=... />} />` placed BEFORE the `path="*"` NotFound route. The `/*` is required so the remote's own sub-routes resolve.
    - the `/<slug>` prefix in `REMOTE_PREFIXES`, otherwise the "Contexts" nav item does not light up while the remote is open. `isUnder` is an anchored match, so `/inventory` will not capture `/inventory-audit`.
 3. **`src/features/contexts/ContextsScreen.tsx`** - add a `ContextTile` (`context=` is the repo name, `href=` is `/<slug>`). A tile gets a "View metrics report" link automatically only if the context is in `REPORT_ROUTES` (`src/features/context-reports/registry.ts`).
-4. **`scripts/verify-all-routes.cjs`** - add `{ path: "/<slug>", label: ..., expect: /\S/ }` to `routes`. Check this on every registration: the list is not kept in sync automatically (`/network-fulfillment` is not in it today).
+4. **`scripts/verify-all-routes.cjs`** - add `{ path: "/<slug>", label: ..., expect: /\S/ }` to `routes`. Check this on every registration: the list is hand-maintained and `src/remotes-registration.test.ts` pins only some of the remote routes. The advisory `verify-routes` workflow clones each remote by the repo name in `vite.config.ts`, so a renamed repo must keep that name.
 5. **`README.md`** - the remote port table under "Local development". Update the SAME PR.
 6. **`docs/docs/architecture/module-federation.md`** - the diagram, the gateway-path list and the remote count. These counts drift (keep the doc's count equal to the remotes in `vite.config.ts`, thirteen today); fix what you touch.
 
