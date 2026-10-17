@@ -47,6 +47,7 @@ export interface ReportsBaseUrls {
   networkFulfillment: string;
   warehousePlanning: string;
   networkInventoryPlanning: string;
+  productMaster: string;
 }
 
 /** Kong's path prefix for each bounded context. */
@@ -88,6 +89,7 @@ const REPORTS_API_PATHS: Record<keyof ReportsBaseUrls, string> = {
   networkFulfillment: "/api/network-fulfillment",
   warehousePlanning: "/api/warehouse-planning",
   networkInventoryPlanning: "/api/network-inventory-planning",
+  productMaster: "/api/product-master",
 };
 
 /** Standalone dev ports, mirroring e2e-tests/env.sh's HTTP_PORT map. */
@@ -127,6 +129,10 @@ const DEV_BASE_URLS: ServiceBaseUrls = {
  * /reports/transfer-funnel, /reports/state-dwell,
  * /reports/stuck-transfers, /reports/rebalance-runs and
  * /reports/freshness) has no harness-assigned dev port either.
+ *
+ * productMaster (8112) ditto: product-reports (serving
+ * /reports/master-data-quality and /reports/freshness) has no
+ * harness-assigned dev port either.
  */
 const DEV_REPORTS_BASE_URLS: ReportsBaseUrls = {
   facilityLayout: "http://localhost:8101",
@@ -140,6 +146,7 @@ const DEV_REPORTS_BASE_URLS: ReportsBaseUrls = {
   networkFulfillment: "http://localhost:8109",
   warehousePlanning: "http://localhost:8110",
   networkInventoryPlanning: "http://localhost:8111",
+  productMaster: "http://localhost:8112",
 };
 
 const BFF_API_PATH = "/api/warehouse-ops-agent";
@@ -217,6 +224,7 @@ export function resolveReportsBaseUrls(
     networkFulfillment: `${apiOrigin}${REPORTS_API_PATHS.networkFulfillment}`,
     warehousePlanning: `${apiOrigin}${REPORTS_API_PATHS.warehousePlanning}`,
     networkInventoryPlanning: `${apiOrigin}${REPORTS_API_PATHS.networkInventoryPlanning}`,
+    productMaster: `${apiOrigin}${REPORTS_API_PATHS.productMaster}`,
   };
 }
 

@@ -10,6 +10,7 @@ import { laborPerformanceConfig } from "./laborPerformance.config";
 import { networkFulfillmentReportConfig } from "./networkFulfillment.config";
 import { warehousePlanningShortageConfig } from "./warehousePlanning.config";
 import { networkInventoryStuckTransfersConfig } from "./networkInventoryPlanning.config";
+import { productMasterDataQualityConfig } from "./productMaster.config";
 
 /**
  * Every bounded context's report, in one place, so App.tsx's route table
@@ -47,4 +48,6 @@ export const REPORT_ROUTES: ReportRouteEntry[] = [
   { path: "warehouse-planning", config: warehousePlanningShortageConfig },
   // WMS tier (network inventory movement).
   { path: "network-inventory-planning", config: networkInventoryStuckTransfersConfig },
+  // WMS tier (product master data).
+  { path: "product-master", config: productMasterDataQualityConfig },
 ];
