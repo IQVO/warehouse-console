@@ -58,11 +58,12 @@ kubectl port-forward pod/<oltp-pod> 8081:8080
 
 ```bash
 npm run verify:dashboards   # needs ONLY `npm run dev`; the script stubs console-bff report calls
-npm run verify:routes       # needs the shell + remote dev servers + reachable backends
+npm run verify:routes       # needs the shell + all 13 remote dev servers + reachable backends
+VERIFY_STUB_API=1 npm run verify:routes   # same, but the API origin is answered 503 in the browser: no backend, no Kong CORS
 ```
 
 - `scripts/verify-dashboards.cjs` checks all-sections-available, one-section `available: false`, and whole-request failure for `/wms-dashboard` and `/wes-dashboard`; screenshots go to `/tmp/warehouse-console-dashboards` (override with `SHOT_DIR`). Only the existence of `public/config.json` matters, not its values.
-- `scripts/verify-all-routes.cjs` loads each route headlessly, asserts expected text and that `nav a` renders, and asserts nav clicks are client-side (a full page reload means ui-kit links lost the `NavigationProvider` from `src/App.tsx`). It exits non-zero on page errors or failed requests. It hardcodes `http://localhost:5173`, and its route list is maintained by hand.
+- `scripts/verify-all-routes.cjs` loads each route headlessly, asserts expected text and that `nav a` renders, and asserts nav clicks are client-side (a full page reload means ui-kit links lost the `NavigationProvider` from `src/App.tsx`). It exits non-zero on page errors, failed requests (a page cancelling its own fetch, `net::ERR_ABORTED`, is ignored) or the RemoteBoundary fallback card ("This module is unavailable right now"), which a 404 or crashing remote shows without raising a page error. The advisory `verify-routes` workflow runs it in CI with `VERIFY_STUB_API=1` against the `develop` dev servers of all 13 remotes. It hardcodes `http://localhost:5173`, and its route list is maintained by hand.
 - Both need Playwright browsers (`npx playwright install chromium` once).
 - Not every change needs `verify:routes`, but a navigation/routing/remote-hosting change must not be called done on unit tests alone.
 
