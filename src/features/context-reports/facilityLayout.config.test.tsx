@@ -9,7 +9,7 @@ import type { FacilityCatalogReportDto } from "./facilityLayout.config";
 /**
  * facility-layout's catalog-growth report, wired through the real config
  * (facilityLayout.config.tsx) rather than a synthetic DTO -- this is the
- * "chosen 2 of 9" test the task asked for: a day-bucketed, multi-metric
+ * "chosen two of the then-nine configs" test the task asked for: a day-bucketed, multi-metric
  * report whose shape is genuinely different from fulfillment-execution's
  * hour-bucketed throughput report (see that config's own test file).
  */

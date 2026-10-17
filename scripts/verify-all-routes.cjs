@@ -57,6 +57,10 @@ const routes = [
   { path: "/reports/process-path-management", label: "report:process-path-management", expect: /Process Paths: Catalogue/i },
   { path: "/reports/labor-performance", label: "report:labor-performance", expect: /Labor: Performance/i },
   { path: "/reports/network-fulfillment", label: "report:network-fulfillment", expect: /Network Fulfillment: Acknowledgement/i },
+  { path: "/reports/warehouse-planning", label: "report:warehouse-planning", expect: /Capacity Planning: Shortage/i },
+  { path: "/reports/network-inventory-planning", label: "report:network-inventory-planning", expect: /Network Inventory: Stuck/i },
+  { path: "/reports/product-master", label: "report:product-master", expect: /Product Master: Data Quality/i },
+  { path: "/reports/inbound-receiving", label: "report:inbound-receiving", expect: /Inbound: Receiving/i },
   // An unknown report slug falls through to the shell's own 404 screen.
   { path: "/reports/no-such-context", label: "report:404", expect: /Page not found/i },
   // An unmatched URL must explain itself, not render empty chrome.

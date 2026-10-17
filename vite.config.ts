@@ -140,8 +140,8 @@ export default defineConfig({
       // every singleton, so ONE React instance serves shell + all remotes.
       shareStrategy: "loaded-first",
       shared: {
-        react: { singleton: true, requiredVersion: "^19.2.8" },
-        "react-dom": { singleton: true, requiredVersion: "^19.2.8" },
+        react: { singleton: true, requiredVersion: "^19.3.0" },
+        "react-dom": { singleton: true, requiredVersion: "^19.3.0" },
         "react-router-dom": { singleton: true, requiredVersion: "^7.18.3" },
         "@warehouse/ui-kit": { singleton: true },
       },
