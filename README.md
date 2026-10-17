@@ -174,6 +174,8 @@ npm run build
 # with the shell + every remote dev server in the table above running, and the
 # backend services + BFF reachable at config.json's apiOrigin (Kong):
 npm run verify:routes   # headless Playwright smoke check of every route
+# same check without backends (the browser answers every apiOrigin call with a 503):
+VERIFY_STUB_API=1 npm run verify:routes
 
 # needs only the shell's own dev server -- stubs the console-bff report calls:
 npm run verify:dashboards
