@@ -34,6 +34,11 @@ export function ContextReportScreen<TDto>({
 }): ReactElement {
   const { data, loading, error } = useFetch<TDto>(config.reportUrl);
   const freshness = useFetch<ReportFreshness>(config.freshnessUrl);
+  // Two freshness generations on the wire (see ReportFreshness): per-report
+  // readers answer { lagSeconds }, the four Phase 4.1 context-level readers
+  // answer { as_of, lag_seconds }. Read whichever is present; a null
+  // lag_seconds stays null ("freshness unknown"), never a fabricated 0.
+  const lagSeconds = freshness.data?.lagSeconds ?? freshness.data?.lag_seconds ?? null;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "var(--wh-space-5)" }}>
@@ -54,7 +59,7 @@ export function ContextReportScreen<TDto>({
             {config.subtitle}
           </p>
         </div>
-        <FreshnessBadge lagSeconds={freshness.data?.lagSeconds ?? null} />
+        <FreshnessBadge lagSeconds={lagSeconds} />
       </div>
 
       {error && (

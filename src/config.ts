@@ -45,6 +45,7 @@ export interface ReportsBaseUrls {
   laborPerformance: string;
   processPathManagement: string;
   networkFulfillment: string;
+  warehousePlanning: string;
 }
 
 /** Kong's path prefix for each bounded context. */
@@ -84,6 +85,7 @@ const REPORTS_API_PATHS: Record<keyof ReportsBaseUrls, string> = {
   laborPerformance: "/api/labor-performance",
   processPathManagement: "/api/process-path-management",
   networkFulfillment: "/api/network-fulfillment",
+  warehousePlanning: "/api/warehouse-planning",
 };
 
 /** Standalone dev ports, mirroring e2e-tests/env.sh's HTTP_PORT map. */
@@ -112,6 +114,12 @@ const DEV_BASE_URLS: ServiceBaseUrls = {
  * `/reports/acknowledgement`) has a harness-assigned dev port. Both are
  * placeholders for local standalone dev only; run that binary on the
  * port listed here, or point `apiOrigin` at Kong instead.
+ *
+ * warehousePlanning (8110) continues that same next-free-integer
+ * convention for the Phase 4.1 screens: warehouse-planning's
+ * `planning-reports` binary (serving /reports/bottleneck-frequency,
+ * /reports/shortage-trend, /reports/plan-throughput and
+ * /reports/freshness) also has no harness-assigned dev port.
  */
 const DEV_REPORTS_BASE_URLS: ReportsBaseUrls = {
   facilityLayout: "http://localhost:8101",
@@ -123,6 +131,7 @@ const DEV_REPORTS_BASE_URLS: ReportsBaseUrls = {
   laborPerformance: "http://localhost:8107",
   processPathManagement: "http://localhost:8108",
   networkFulfillment: "http://localhost:8109",
+  warehousePlanning: "http://localhost:8110",
 };
 
 const BFF_API_PATH = "/api/warehouse-ops-agent";
@@ -198,6 +207,7 @@ export function resolveReportsBaseUrls(
     laborPerformance: `${apiOrigin}${REPORTS_API_PATHS.laborPerformance}`,
     processPathManagement: `${apiOrigin}${REPORTS_API_PATHS.processPathManagement}`,
     networkFulfillment: `${apiOrigin}${REPORTS_API_PATHS.networkFulfillment}`,
+    warehousePlanning: `${apiOrigin}${REPORTS_API_PATHS.warehousePlanning}`,
   };
 }
 
