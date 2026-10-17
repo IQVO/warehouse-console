@@ -128,6 +128,15 @@ export default defineConfig({
           name: "inbound_mfe",
           entry: remoteEntry("inbound-receiving", 5193),
         },
+        // slotting-optimization's remote: container `slotting_mfe`, exposes
+        // ./App only, mounted on /slotting/*. Pinned with
+        // IQVO/slotting-optimization web/vite.config.ts: gateway path
+        // /mfes/slotting-optimization/, dev port 5194.
+        slotting_mfe: {
+          type: "module",
+          name: "slotting_mfe",
+          entry: remoteEntry("slotting-optimization", 5194),
+        },
       },
       // The shell must win the React singleton negotiation. With the
       // default "version-first", every remote's remoteEntry is preloaded

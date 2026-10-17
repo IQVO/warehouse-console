@@ -44,6 +44,9 @@ const routes = [
   { path: "/product-master", label: "product-master", expect: /\S/ },
   { path: "/network-inventory", label: "network-inventory", expect: /\S/ },
   { path: "/inbound-receiving", label: "inbound-receiving", expect: /\S/ },
+  // slotting-optimization's remote (connect-all 2.2b): container
+  // slotting_mfe, gateway path /mfes/slotting-optimization/, dev :5194.
+  { path: "/slotting", label: "slotting-optimization", expect: /\S/ },
   // /reports/:context -- one Bounded Context Report screen per slug in
   // src/features/context-reports/registry.ts (src/remotes-registration.test.ts
   // fails when a registered slug is missing here). Each must render its own
@@ -61,6 +64,7 @@ const routes = [
   { path: "/reports/network-inventory-planning", label: "report:network-inventory-planning", expect: /Network Inventory: Stuck/i },
   { path: "/reports/product-master", label: "report:product-master", expect: /Product Master: Data Quality/i },
   { path: "/reports/inbound-receiving", label: "report:inbound-receiving", expect: /Inbound: Receiving/i },
+  { path: "/reports/slotting-optimization", label: "report:slotting-optimization", expect: /Slotting: Slot Plan Funnel/i },
   // An unknown report slug falls through to the shell's own 404 screen.
   { path: "/reports/no-such-context", label: "report:404", expect: /Page not found/i },
   // An unmatched URL must explain itself, not render empty chrome.

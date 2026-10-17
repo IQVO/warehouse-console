@@ -12,6 +12,7 @@ import { warehousePlanningShortageConfig } from "./warehousePlanning.config";
 import { networkInventoryStuckTransfersConfig } from "./networkInventoryPlanning.config";
 import { productMasterDataQualityConfig } from "./productMaster.config";
 import { inboundReceivingPerformanceConfig } from "./inboundReceiving.config";
+import { slottingPlanFunnelConfig } from "./slottingOptimization.config";
 
 /**
  * Every bounded context's report, in one place, so App.tsx's route table
@@ -53,4 +54,6 @@ export const REPORT_ROUTES: ReportRouteEntry[] = [
   { path: "product-master", config: productMasterDataQualityConfig },
   // WMS tier (inbound / dock).
   { path: "inbound-receiving", config: inboundReceivingPerformanceConfig },
+  // WMS tier (forward-pick slotting; connect-all 2.2a shipped the reader).
+  { path: "slotting-optimization", config: slottingPlanFunnelConfig },
 ];

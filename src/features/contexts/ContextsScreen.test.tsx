@@ -7,7 +7,11 @@ import { SERVICE_BASE_URL } from "../../config";
 import { ContextsScreen } from "./ContextsScreen";
 
 describe("ContextsScreen launchpad", () => {
-  it("lists a Capacity Planning tile that links to the warehouse-planning remote", () => {
+  // 15s budget: this test renders the full launchpad and is the one that
+  // tips over the default 5s when the suite grows (it did when the slotting
+  // report-config file joined the same worker pool). It passes in
+  // isolation; the budget covers loaded CI/dev machines, not a hang.
+  it("lists a Capacity Planning tile that links to the warehouse-planning remote", { timeout: 15_000 }, () => {
     // The two live badges (queue depth, sites) are best-effort; stub them so
     // the unhandled-request guard in test/setup.ts stays strict.
     server.use(

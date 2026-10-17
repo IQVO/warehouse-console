@@ -112,11 +112,42 @@ describe("inbound_mfe registration", () => {
     const app = read("src/App.tsx");
     expect(app).toMatch(/^const InboundRemote = lazy\(\(\) => import\("inbound_mfe\/App"\)\);$/m);
     expect(app).toMatch(/path="\/inbound-receiving\/\*"/);
-    expect(app).toMatch(/"\/inbound-receiving",\n\];/);
+    expect(app).toMatch(/"\/inbound-receiving",\n  "\/slotting",\n\];/);
   });
 
   it("is covered by verify:routes", () => {
     expect(read("scripts/verify-all-routes.cjs")).toContain('path: "/inbound-receiving"');
+  });
+});
+
+describe("slotting_mfe registration", () => {
+  // Pinned with IQVO/slotting-optimization web/vite.config.ts: federation
+  // name slotting_mfe, gateway path /mfes/slotting-optimization/, dev
+  // port 5194 (next free on the ladder after inbound-receiving's 5193).
+  it("is a federation remote named slotting_mfe served from /mfes/slotting-optimization/ (dev :5194)", () => {
+    const vite = read("vite.config.ts");
+    expect(vite).toMatch(
+      /slotting_mfe:\s*\{\s*type:\s*"module",\s*name:\s*"slotting_mfe",\s*entry:\s*remoteEntry\("slotting-optimization",\s*5194\),\s*\}/,
+    );
+  });
+
+  it("does not reuse another remote's container name or dev port", () => {
+    const vite = read("vite.config.ts");
+    expect(vite.match(/name:\s*"slotting_mfe"/g)).toHaveLength(1);
+    expect(vite.match(/remoteEntry\("[^"]+",\s*5194\)/g)).toHaveLength(1);
+    const ports = [...vite.matchAll(/remoteEntry\("[^"]+",\s*(\d+)\)/g)].map((m) => m[1]);
+    expect(new Set(ports).size).toBe(ports.length);
+  });
+
+  it("is imported lazily at module scope as slotting_mfe/App and mounted on a splat route", () => {
+    const app = read("src/App.tsx");
+    expect(app).toMatch(/^const SlottingRemote = lazy\(\(\) => import\("slotting_mfe\/App"\)\);$/m);
+    expect(app).toMatch(/path="\/slotting\/\*"/);
+    expect(app).toMatch(/"\/slotting",\n\];/);
+  });
+
+  it("is covered by verify:routes", () => {
+    expect(read("scripts/verify-all-routes.cjs")).toContain('path: "/slotting"');
   });
 });
 
