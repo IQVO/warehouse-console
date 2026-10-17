@@ -51,6 +51,7 @@ export interface ReportsBaseUrls {
   networkInventoryPlanning: string;
   productMaster: string;
   inboundReceiving: string;
+  slottingOptimization: string;
 }
 
 /** Kong's path prefix for each bounded context. */
@@ -94,6 +95,7 @@ const REPORTS_API_PATHS: Record<keyof ReportsBaseUrls, string> = {
   networkInventoryPlanning: "/api/network-inventory-planning",
   productMaster: "/api/product-master",
   inboundReceiving: "/api/inbound-receiving",
+  slottingOptimization: "/api/slotting-optimization",
 };
 
 /** Standalone dev ports, mirroring e2e-tests/env.sh's HTTP_PORT map. */
@@ -141,6 +143,10 @@ const DEV_BASE_URLS: ServiceBaseUrls = {
  * inboundReceiving (8113) ditto: inbound-reports (serving
  * /reports/receiving-performance and /reports/freshness) has no
  * harness-assigned dev port either.
+ *
+ * slottingOptimization (8114) ditto: slotting-reports (serving
+ * /reports/slot-plan-funnel and /reports/freshness) has no
+ * harness-assigned dev port either.
  */
 const DEV_REPORTS_BASE_URLS: ReportsBaseUrls = {
   facilityLayout: "http://localhost:8101",
@@ -156,6 +162,7 @@ const DEV_REPORTS_BASE_URLS: ReportsBaseUrls = {
   networkInventoryPlanning: "http://localhost:8111",
   productMaster: "http://localhost:8112",
   inboundReceiving: "http://localhost:8113",
+  slottingOptimization: "http://localhost:8114",
 };
 
 const BFF_API_PATH = "/api/warehouse-ops-agent";
@@ -235,6 +242,7 @@ export function resolveReportsBaseUrls(
     networkInventoryPlanning: `${apiOrigin}${REPORTS_API_PATHS.networkInventoryPlanning}`,
     productMaster: `${apiOrigin}${REPORTS_API_PATHS.productMaster}`,
     inboundReceiving: `${apiOrigin}${REPORTS_API_PATHS.inboundReceiving}`,
+    slottingOptimization: `${apiOrigin}${REPORTS_API_PATHS.slottingOptimization}`,
   };
 }
 
