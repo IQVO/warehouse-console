@@ -18,7 +18,7 @@ contract, BDD or mutation suites in this repo.
 | Type check | `tsc -b --noEmit` | `make typecheck` / `npm run typecheck` | yes (`typecheck`) |
 | Lint | oxlint (`.oxlintrc.json`) | `make lint` / `npm run lint` | yes (`lint`) |
 | Production build | `tsc -b && vite build` | `make build` / `npm run build` | yes (`build`) |
-| Route smoke | Playwright (`scripts/verify-all-routes.cjs`) | `npm run verify:routes` | no |
+| Route smoke | Playwright (`scripts/verify-all-routes.cjs`) | `npm run verify:routes` | advisory (`verify-routes.yml`: weekly, dispatch, PRs touching routing; not a required check) |
 | Dashboard degradation | Playwright (`scripts/verify-dashboards.cjs`) | `npm run verify:dashboards` | no |
 | Agent-guide / repo config lints | Python stdlib (`scripts/harness/`) | `make guide-lint`, `make harness-test`, `python3 scripts/harness/repo_lint.py` | yes (`guide-lint`) |
 | Docs site | Docusaurus | `npm ci`, `npm run typecheck`, `npm run build` in `docs/` | yes (`docs`) |
@@ -108,7 +108,11 @@ Both exit `1` on any collected error.
   renders, and records page errors and failed requests. It then clicks the
   Contexts nav link and fails on a full document navigation. It needs every
   listed remote's dev server and the APIs (including each `<context>-reports`
-  reader) at `apiOrigin`. `src/remotes-registration.test.ts` fails when a
+  reader) at `apiOrigin`, unless `VERIFY_STUB_API=1`: then the browser answers
+  every `apiOrigin` call with a 503 and no backend (or Kong CORS) is needed;
+  the `verify-routes` workflow runs it that way against all 13 remotes'
+  `develop`. Any route showing the remote error card ("This module is
+  unavailable right now") fails. `src/remotes-registration.test.ts` fails when a
   registered report slug or `/network-fulfillment` is missing from its list.
 - **`npm run verify:dashboards`** needs only the shell's dev server: it
   intercepts `**/console/reports/wms*` and `**/console/reports/wes*` and
