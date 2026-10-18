@@ -68,7 +68,10 @@ USER root
 # libexpat>=2.9.0-r0 is pinned explicitly (CVE-2026-77214, HIGH). Trivy found
 # 2.8.5-r0 in the base image; the pin busts cached upgrade layers and ensures
 # the fixed package is installed.
-RUN apk upgrade --no-cache && apk add --no-cache 'libexpat>=2.9.0-r0' 'pcre2>=10.49-r0' 'tiff>=4.7.2-r0'
+# libx11>=1.8.14-r0 is pinned the same way (CVE-2026-88806, HIGH): trivy-scan
+# found 1.8.13-r0 in the alpine 3.24.2 runtime layer; the pin also busts the
+# cached `apk upgrade` layer so the fixed package is installed.
+RUN apk upgrade --no-cache && apk add --no-cache 'libexpat>=2.9.0-r0' 'pcre2>=10.49-r0' 'tiff>=4.7.2-r0' 'libx11>=1.8.14-r0'
 USER nginx
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build --chown=nginx:nginx /workspace/warehouse-console/dist /usr/share/nginx/html
