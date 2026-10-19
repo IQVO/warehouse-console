@@ -1,5 +1,7 @@
 # Project: Warehouse Console (the shell — not a bounded context)
 
+<!-- harness-template: v4 -->
+
 The React SPA shell for the `warehouse-systems` micro-frontend fleet. It owns
 routing, top navigation, the shared design-system consumption, and the screens no
 single bounded context owns: Floor (`/`, built on `warehouse-ops-agent`'s
