@@ -13,6 +13,13 @@ import { networkInventoryStuckTransfersConfig } from "./networkInventoryPlanning
 import { productMasterDataQualityConfig } from "./productMaster.config";
 import { inboundReceivingPerformanceConfig } from "./inboundReceiving.config";
 import { slottingPlanFunnelConfig } from "./slottingOptimization.config";
+import { networkInventoryTransferFunnelConfig } from "./networkInventoryTransferFunnel.config";
+import { networkInventoryStateDwellConfig } from "./networkInventoryStateDwell.config";
+import { networkInventoryRebalanceRunsConfig } from "./networkInventoryRebalanceRuns.config";
+import { taskInterleavingHintAdoptionConfig } from "./taskInterleaving.config";
+import { pickFaceReplenishmentFunnelConfig } from "./pickFaceReplenishment.config";
+import { warehousePlanningBottleneckFrequencyConfig } from "./warehousePlanningBottleneckFrequency.config";
+import { warehousePlanningPlanThroughputConfig } from "./warehousePlanningPlanThroughput.config";
 
 /**
  * Every bounded context's report, in one place, so App.tsx's route table
@@ -27,7 +34,7 @@ import { slottingPlanFunnelConfig } from "./slottingOptimization.config";
 export interface ReportRouteEntry {
   path: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- a
-  // heterogeneous registry of ContextReportConfig<T> for thirteen DIFFERENT
+  // heterogeneous registry of ContextReportConfig<T> for many DIFFERENT
   // T's has no sound common instantiation; each entry is only ever read
   // back through its own config object; renderBody in each remains fully
   // typed. Same shape unavoidably shows up in DataTable<T>/Column<T>
@@ -56,4 +63,18 @@ export const REPORT_ROUTES: ReportRouteEntry[] = [
   { path: "inbound-receiving", config: inboundReceivingPerformanceConfig },
   // WMS tier (forward-pick slotting; connect-all 2.2a shipped the reader).
   { path: "slotting-optimization", config: slottingPlanFunnelConfig },
+  // Phase 4.1 follow-up: a context's further reports (no production screen
+  // called them before). Slug is `<context>-<report>`; the context's first
+  // report keeps the bare context slug above, and ContextReportRouteScreen
+  // links the siblings by `contextId`.
+  { path: "warehouse-planning-bottleneck-frequency", config: warehousePlanningBottleneckFrequencyConfig },
+  { path: "warehouse-planning-plan-throughput", config: warehousePlanningPlanThroughputConfig },
+  { path: "network-inventory-planning-transfer-funnel", config: networkInventoryTransferFunnelConfig },
+  { path: "network-inventory-planning-state-dwell", config: networkInventoryStateDwellConfig },
+  { path: "network-inventory-planning-rebalance-runs", config: networkInventoryRebalanceRunsConfig },
+  // WMS tier (forward-pick replenishment; PFR #16). The reports reader is chart-gated
+  // (analytics.enabled) -- until infra enables it the screen shows its error card.
+  { path: "pick-face-replenishment", config: pickFaceReplenishmentFunnelConfig },
+  // WES tier (task execution; TI #21). Same chart-gated reports reader as PFR above.
+  { path: "task-interleaving", config: taskInterleavingHintAdoptionConfig },
 ];

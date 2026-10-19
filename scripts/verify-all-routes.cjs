@@ -65,6 +65,13 @@ const routes = [
   { path: "/reports/product-master", label: "report:product-master", expect: /Product Master: Data Quality/i },
   { path: "/reports/inbound-receiving", label: "report:inbound-receiving", expect: /Inbound: Receiving/i },
   { path: "/reports/slotting-optimization", label: "report:slotting-optimization", expect: /Slotting: Slot Plan Funnel/i },
+  { path: "/reports/warehouse-planning-bottleneck-frequency", label: "report:warehouse-planning-bottleneck-frequency", expect: /Capacity Planning: Bottleneck Frequency/i },
+  { path: "/reports/warehouse-planning-plan-throughput", label: "report:warehouse-planning-plan-throughput", expect: /Capacity Planning: Plan Throughput/i },
+  { path: "/reports/network-inventory-planning-transfer-funnel", label: "report:network-inventory-planning-transfer-funnel", expect: /Network Inventory: Transfer Funnel/i },
+  { path: "/reports/network-inventory-planning-state-dwell", label: "report:network-inventory-planning-state-dwell", expect: /Network Inventory: State Dwell/i },
+  { path: "/reports/network-inventory-planning-rebalance-runs", label: "report:network-inventory-planning-rebalance-runs", expect: /Network Inventory: Rebalance Runs/i },
+  { path: "/reports/pick-face-replenishment", label: "report:pick-face-replenishment", expect: /Pick-Face Replenishment: Funnel/i },
+  { path: "/reports/task-interleaving", label: "report:task-interleaving", expect: /Task Interleaving: Hint Adoption/i },
   // An unknown report slug falls through to the shell's own 404 screen.
   { path: "/reports/no-such-context", label: "report:404", expect: /Page not found/i },
   // An unmatched URL must explain itself, not render empty chrome.

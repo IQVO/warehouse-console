@@ -70,6 +70,17 @@ network-fulfillment's screen calls `GET /reports/acknowledgement` (and
 `GET /reports/acknowledgement/freshness`) and renders the fields of that context's
 `acknowledgementRowDTO` (`internal/adapters/inbound/http/reports_handler.go`).
 
+Since Phase 4.1 the registry (`src/features/context-reports/registry.ts`) lists more than one
+screen for some contexts and covers more than the nine above. A context's first report keeps
+the bare slug (`/reports/warehouse-planning`), further ones use `<context>-<report>`
+(`/reports/warehouse-planning-bottleneck-frequency`, `…-plan-throughput`,
+`/reports/network-inventory-planning-transfer-funnel`, `…-state-dwell`, `…-rebalance-runs`), and
+each screen links its siblings. `/reports/pick-face-replenishment` (`GET
+/reports/replenishment-funnel`) and `/reports/task-interleaving` (`GET /reports/hint-adoption`)
+read the new `pfr-reports` / `ti-reports` readers; both use the context-level
+`GET /reports/freshness`. Their web remotes are NOT registered in this shell yet (both
+`web/` builds currently claim dev port 5195, and neither has a gateway route in warehouse-infra).
+
 Everything else (`/order-management`, `/inventory`, `/planning`, `/fulfillment`, `/workforce`,
 `/facility`, `/process-path`, `/labor`, `/network-fulfillment`, `/capacity`, `/product-master`, `/network-inventory`, `/inbound-receiving`) is a Module Federation remote owned
 by that bounded context's own repo, reachable from the Contexts launchpad — this shell only

@@ -30,9 +30,11 @@ import type { ContextReportConfig } from "./types";
  * operator gets from the API itself.
  *
  * nip-reports also serves /reports/transfer-funnel, /reports/state-dwell
- * and /reports/rebalance-runs; this screen pins the most operational one
- * (transfers stuck in a saga state right now) and surfaces its two
- * sections -- the per-day/per-state history table and the actionable
+ * and /reports/rebalance-runs; each has its own screen
+ * (networkInventoryTransferFunnel/StateDwell/RebalanceRuns.config.tsx).
+ * This one keeps the bare `network-inventory-planning` slug (the most
+ * operational: transfers stuck in a saga state right now) and surfaces its
+ * two sections -- the per-day/per-state history table and the actionable
  * `latest` occurrences -- the way the multi-section configs do.
  *
  * Day-bucketed, so the screen asks for a trailing 30-day window.
