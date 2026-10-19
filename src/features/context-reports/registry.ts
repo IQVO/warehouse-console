@@ -16,6 +16,7 @@ import { slottingPlanFunnelConfig } from "./slottingOptimization.config";
 import { networkInventoryTransferFunnelConfig } from "./networkInventoryTransferFunnel.config";
 import { networkInventoryStateDwellConfig } from "./networkInventoryStateDwell.config";
 import { networkInventoryRebalanceRunsConfig } from "./networkInventoryRebalanceRuns.config";
+import { pickFaceReplenishmentFunnelConfig } from "./pickFaceReplenishment.config";
 import { warehousePlanningBottleneckFrequencyConfig } from "./warehousePlanningBottleneckFrequency.config";
 import { warehousePlanningPlanThroughputConfig } from "./warehousePlanningPlanThroughput.config";
 
@@ -70,4 +71,7 @@ export const REPORT_ROUTES: ReportRouteEntry[] = [
   { path: "network-inventory-planning-transfer-funnel", config: networkInventoryTransferFunnelConfig },
   { path: "network-inventory-planning-state-dwell", config: networkInventoryStateDwellConfig },
   { path: "network-inventory-planning-rebalance-runs", config: networkInventoryRebalanceRunsConfig },
+  // WMS tier (forward-pick replenishment; PFR #16). The reports reader is chart-gated
+  // (analytics.enabled) -- until infra enables it the screen shows its error card.
+  { path: "pick-face-replenishment", config: pickFaceReplenishmentFunnelConfig },
 ];

@@ -70,6 +70,7 @@ const routes = [
   { path: "/reports/network-inventory-planning-transfer-funnel", label: "report:network-inventory-planning-transfer-funnel", expect: /Network Inventory: Transfer Funnel/i },
   { path: "/reports/network-inventory-planning-state-dwell", label: "report:network-inventory-planning-state-dwell", expect: /Network Inventory: State Dwell/i },
   { path: "/reports/network-inventory-planning-rebalance-runs", label: "report:network-inventory-planning-rebalance-runs", expect: /Network Inventory: Rebalance Runs/i },
+  { path: "/reports/pick-face-replenishment", label: "report:pick-face-replenishment", expect: /Pick-Face Replenishment: Funnel/i },
   // An unknown report slug falls through to the shell's own 404 screen.
   { path: "/reports/no-such-context", label: "report:404", expect: /Page not found/i },
   // An unmatched URL must explain itself, not render empty chrome.
