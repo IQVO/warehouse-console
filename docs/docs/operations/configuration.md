@@ -114,6 +114,9 @@ entry here plus a route in `src/App.tsx`.
 | `productmaster_mfe` | `productmaster_mfe` | `/mfes/product-master/` | 5191 | `/product-master/*` |
 | `nip_mfe` | `nip_mfe` | `/mfes/network-inventory-planning/` | 5192 | `/network-inventory/*` |
 | `inbound_mfe` | `inbound_mfe` | `/mfes/inbound-receiving/` | 5193 | `/inbound-receiving/*` |
+| `slotting_mfe` | `slotting_mfe` | `/mfes/slotting-optimization/` | 5194 | `/slotting/*` |
+| `replenishment_mfe` | `replenishment_mfe` | `/mfes/pick-face-replenishment/` | 5196 | `/pick-face-replenishment/*` |
+| `task_interleaving_mfe` | `task_interleaving_mfe` | `/mfes/task-interleaving/` | 5197 | `/task-interleaving/*` |
 
 Note `network_fulfillment_mfe`: the shell imports it under that key, but the
 remote's federation container is named `netfulfil_mfe`.

@@ -47,6 +47,11 @@ const routes = [
   // slotting-optimization's remote (connect-all 2.2b): container
   // slotting_mfe, gateway path /mfes/slotting-optimization/, dev :5194.
   { path: "/slotting", label: "slotting-optimization", expect: /\S/ },
+  // pick-face-replenishment's and task-interleaving's remotes: containers
+  // replenishment_mfe (dev :5196, /mfes/pick-face-replenishment/) and
+  // task_interleaving_mfe (dev :5197, /mfes/task-interleaving/).
+  { path: "/pick-face-replenishment", label: "pick-face-replenishment", expect: /\S/ },
+  { path: "/task-interleaving", label: "task-interleaving", expect: /\S/ },
   // /reports/:context -- one Bounded Context Report screen per slug in
   // src/features/context-reports/registry.ts (src/remotes-registration.test.ts
   // fails when a registered slug is missing here). Each must render its own
@@ -65,6 +70,13 @@ const routes = [
   { path: "/reports/product-master", label: "report:product-master", expect: /Product Master: Data Quality/i },
   { path: "/reports/inbound-receiving", label: "report:inbound-receiving", expect: /Inbound: Receiving/i },
   { path: "/reports/slotting-optimization", label: "report:slotting-optimization", expect: /Slotting: Slot Plan Funnel/i },
+  { path: "/reports/warehouse-planning-bottleneck-frequency", label: "report:warehouse-planning-bottleneck-frequency", expect: /Capacity Planning: Bottleneck Frequency/i },
+  { path: "/reports/warehouse-planning-plan-throughput", label: "report:warehouse-planning-plan-throughput", expect: /Capacity Planning: Plan Throughput/i },
+  { path: "/reports/network-inventory-planning-transfer-funnel", label: "report:network-inventory-planning-transfer-funnel", expect: /Network Inventory: Transfer Funnel/i },
+  { path: "/reports/network-inventory-planning-state-dwell", label: "report:network-inventory-planning-state-dwell", expect: /Network Inventory: State Dwell/i },
+  { path: "/reports/network-inventory-planning-rebalance-runs", label: "report:network-inventory-planning-rebalance-runs", expect: /Network Inventory: Rebalance Runs/i },
+  { path: "/reports/pick-face-replenishment", label: "report:pick-face-replenishment", expect: /Pick-Face Replenishment: Funnel/i },
+  { path: "/reports/task-interleaving", label: "report:task-interleaving", expect: /Task Interleaving: Hint Adoption/i },
   // An unknown report slug falls through to the shell's own 404 screen.
   { path: "/reports/no-such-context", label: "report:404", expect: /Page not found/i },
   // An unmatched URL must explain itself, not render empty chrome.

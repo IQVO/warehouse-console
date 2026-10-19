@@ -1,15 +1,18 @@
 # Project: Warehouse Console (the shell — not a bounded context)
 
+<!-- harness-template: v4 -->
+
 The React SPA shell for the `warehouse-systems` micro-frontend fleet. It owns
 routing, top navigation, the shared design-system consumption, and the screens no
 single bounded context owns: Floor (`/`, built on `warehouse-ops-agent`'s
 `GET /daily-brief`), Order Lifecycle (`/order-lifecycle`), the WMS/WES report
 dashboards (`/wms-dashboard`, `/wes-dashboard`) and per-context report screens
 (`/reports/<context>`). The fifth nav destination, Contexts (`/contexts`), is the
-launchpad into the thirteen bounded-context **remotes** (`/order-management`,
+launchpad into the sixteen bounded-context **remotes** (`/order-management`,
 `/inventory`, `/planning`, `/fulfillment`, `/workforce`, `/facility`,
 `/process-path`, `/labor`, `/network-fulfillment`, `/capacity`, `/product-master`, `/network-inventory`,
-`/inbound-receiving`). Each remote is owned and
+`/inbound-receiving`, `/slotting`, `/pick-face-replenishment`,
+`/task-interleaving`). Each remote is owned and
 deployed by its own repo; this shell only lazy-loads and hosts them. See ADR-0001
 in `docs/docs/adr/`.
 
@@ -82,7 +85,7 @@ scripts. Packaging: `Dockerfile` (Node build, `nginx-unprivileged` on 8080) and
 | `npm test` | vitest; run whenever you touch `src/` |
 | `npm run dev` | shell on :5173 (needs `public/config.json`) |
 | `npm run verify:dashboards` | Playwright; only the shell dev server, BFF calls stubbed |
-| `npm run verify:routes` | Playwright; shell + all 13 remote dev servers; backends, or `VERIFY_STUB_API=1` to answer the API 503 in the browser (CI: advisory `verify-routes` workflow) |
+| `npm run verify:routes` | Playwright; shell + all 16 remote dev servers; backends, or `VERIFY_STUB_API=1` to answer the API 503 in the browser (CI: advisory `verify-routes` workflow) |
 | `make guide-lint` | lint these agent guides (blocking in CI) |
 
 ## Skills (`.claude/skills/`)

@@ -4,7 +4,7 @@
  * which defaults to a trailing 24h window itself, hitting a context's own
  * reports service directly means THIS shell has to supply the window.
  *
- * Two lengths are used across the thirteen contexts' screens:
+ * Two lengths are used across the contexts' screens:
  *  - hour-bucketed reports (funnel/throughput/flow-accuracy/labor/performance)
  *    default to a trailing 24h window, matching the console-bff's own
  *    documented default so the two feel consistent to an operator switching
@@ -40,4 +40,14 @@ export function trailingDays(days: number, nowMs: number = Date.now()): ReportWi
 export function withWindow(url: string, window: ReportWindow): string {
   const params = new URLSearchParams({ from: window.from, to: window.to });
   return `${url}?${params.toString()}`;
+}
+
+/**
+ * A report's `day` bucket is a UTC calendar DATE ("2026-10-05"), not an
+ * instant. Passing it through an instant formatter parses it as midnight UTC
+ * and shows the previous evening in any timezone west of UTC ("Oct 4, 09:00
+ * PM"), so day-bucket columns and chart labels show the date as served.
+ */
+export function formatReportDay(day: string | null | undefined): string {
+  return day ? day : "—";
 }

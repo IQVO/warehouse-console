@@ -33,9 +33,11 @@ export interface ServiceBaseUrls {
 
 /**
  * Every bounded context that ships a Bounded Context Report screen
- * (thirteen: the original nine plus warehouse-planning,
- * network-inventory-planning, product-master and inbound-receiving from
- * Phase 4.1; see features/context-reports/registry.ts).
+ * (the original nine plus warehouse-planning, network-inventory-planning,
+ * product-master, inbound-receiving, slotting-optimization and, from
+ * Phase 4.1, pick-face-replenishment and task-interleaving; see
+ * features/context-reports/registry.ts, which may list several reports
+ * per context).
  */
 export interface ReportsBaseUrls {
   orderManagement: string;
@@ -52,6 +54,8 @@ export interface ReportsBaseUrls {
   productMaster: string;
   inboundReceiving: string;
   slottingOptimization: string;
+  pickFaceReplenishment: string;
+  taskInterleaving: string;
 }
 
 /** Kong's path prefix for each bounded context. */
@@ -96,6 +100,8 @@ const REPORTS_API_PATHS: Record<keyof ReportsBaseUrls, string> = {
   productMaster: "/api/product-master",
   inboundReceiving: "/api/inbound-receiving",
   slottingOptimization: "/api/slotting-optimization",
+  pickFaceReplenishment: "/api/pick-face-replenishment",
+  taskInterleaving: "/api/task-interleaving",
 };
 
 /** Standalone dev ports, mirroring e2e-tests/env.sh's HTTP_PORT map. */
@@ -147,6 +153,14 @@ const DEV_BASE_URLS: ServiceBaseUrls = {
  * slottingOptimization (8114) ditto: slotting-reports (serving
  * /reports/slot-plan-funnel and /reports/freshness) has no
  * harness-assigned dev port either.
+ *
+ * pickFaceReplenishment (8115) ditto: pfr-reports (serving
+ * /reports/replenishment-funnel and /reports/freshness) has no
+ * harness-assigned dev port either.
+ *
+ * taskInterleaving (8116) ditto: ti-reports (serving
+ * /reports/hint-adoption and /reports/freshness) has no
+ * harness-assigned dev port either.
  */
 const DEV_REPORTS_BASE_URLS: ReportsBaseUrls = {
   facilityLayout: "http://localhost:8101",
@@ -163,6 +177,8 @@ const DEV_REPORTS_BASE_URLS: ReportsBaseUrls = {
   productMaster: "http://localhost:8112",
   inboundReceiving: "http://localhost:8113",
   slottingOptimization: "http://localhost:8114",
+  pickFaceReplenishment: "http://localhost:8115",
+  taskInterleaving: "http://localhost:8116",
 };
 
 const BFF_API_PATH = "/api/warehouse-ops-agent";
@@ -243,6 +259,8 @@ export function resolveReportsBaseUrls(
     productMaster: `${apiOrigin}${REPORTS_API_PATHS.productMaster}`,
     inboundReceiving: `${apiOrigin}${REPORTS_API_PATHS.inboundReceiving}`,
     slottingOptimization: `${apiOrigin}${REPORTS_API_PATHS.slottingOptimization}`,
+    pickFaceReplenishment: `${apiOrigin}${REPORTS_API_PATHS.pickFaceReplenishment}`,
+    taskInterleaving: `${apiOrigin}${REPORTS_API_PATHS.taskInterleaving}`,
   };
 }
 
@@ -253,7 +271,7 @@ export const SERVICE_BASE_URL: ServiceBaseUrls = resolveServiceBaseUrls(
   import.meta.env.PROD,
 );
 
-/** Each of the 13 bounded contexts' OWN reports base URL, read directly by
+/** Each reporting bounded context's OWN reports base URL, read directly by
  *  this shell's per-context Bounded Context Report screens (never through
  *  console-bff/ops-agent -- see ReportsBaseUrls' doc comment). */
 export const REPORTS_BASE_URL: ReportsBaseUrls = resolveReportsBaseUrls(

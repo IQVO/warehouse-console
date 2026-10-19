@@ -22,7 +22,7 @@ shaped this way):
   fulfillment throughput, labor management and labor performance.
 - **Contexts** (`/contexts`) — the launchpad grid into every bounded context, following
   established enterprise WMS/ops-dashboard conventions (SAP Fiori's app-tile launchpad). It
-  lights up as active for its own route, for any of the thirteen remote routes below, and for the
+  lights up as active for its own route, for any of the sixteen remote routes below, and for the
   per-context `/reports/<context>` Bounded Context Report screens described below.
 
 Both dashboards read one section-oriented envelope from the console-bff
@@ -70,6 +70,17 @@ network-fulfillment's screen calls `GET /reports/acknowledgement` (and
 `GET /reports/acknowledgement/freshness`) and renders the fields of that context's
 `acknowledgementRowDTO` (`internal/adapters/inbound/http/reports_handler.go`).
 
+Since Phase 4.1 the registry (`src/features/context-reports/registry.ts`) lists more than one
+screen for some contexts and covers more than the nine above. A context's first report keeps
+the bare slug (`/reports/warehouse-planning`), further ones use `<context>-<report>`
+(`/reports/warehouse-planning-bottleneck-frequency`, `…-plan-throughput`,
+`/reports/network-inventory-planning-transfer-funnel`, `…-state-dwell`, `…-rebalance-runs`), and
+each screen links its siblings. `/reports/pick-face-replenishment` (`GET
+/reports/replenishment-funnel`) and `/reports/task-interleaving` (`GET /reports/hint-adoption`)
+read the new `pfr-reports` / `ti-reports` readers; both use the context-level
+`GET /reports/freshness`. Their web remotes are NOT registered in this shell yet (both
+`web/` builds currently claim dev port 5195, and neither has a gateway route in warehouse-infra).
+
 Everything else (`/order-management`, `/inventory`, `/planning`, `/fulfillment`, `/workforce`,
 `/facility`, `/process-path`, `/labor`, `/network-fulfillment`, `/capacity`, `/product-master`, `/network-inventory`, `/inbound-receiving`) is a Module Federation remote owned
 by that bounded context's own repo, reachable from the Contexts launchpad — this shell only
@@ -93,7 +104,14 @@ mounted under the `/network-inventory/*` splat route for its relative sub-routes
 mounted under the `/inbound-receiving/*` splat route for its relative sub-routes (`asns`,
 `asns/register`, `asns/:asnNumber`, `appointments`, `receipts`, `receipts/:receiptId`); its
 Contexts tile is "Inbound Receiving" and the remote calls `/api/inbound-receiving` on Kong, sending
-an `Idempotency-Key` header on every create `POST`. An unmatched URL renders
+an `Idempotency-Key` header on every create `POST`. `/slotting` is the slotting-optimization remote
+(federation container `slotting_mfe`, served at `/mfes/slotting-optimization/`, dev port 5194),
+`/pick-face-replenishment` the pick-face-replenishment remote (container `replenishment_mfe`,
+`/mfes/pick-face-replenishment/`, dev port 5196) and `/task-interleaving` the task-interleaving remote
+(container `task_interleaving_mfe`, `/mfes/task-interleaving/`, dev port 5197); each is mounted under its
+own `/*` splat route and has a Contexts tile. Their `/mfes/<context>/` gateway routes exist only once
+warehouse-infra's `apps.yaml` carries `frontend_remote` for the context; until then the Unavailable card
+is expected in a cluster. An unmatched URL renders
 the shell's own client-side "Page not found" screen rather than a server 404.
 
 This repo owns no OpenAPI or AsyncAPI spec of its own: this shell has no
@@ -160,6 +178,9 @@ built at least once) and each remote's own dev server running on its assigned po
 | productmaster-mfe | 5191 | product-master |
 | nip-mfe | 5192 | network-inventory-planning |
 | inbound-mfe | 5193 | inbound-receiving |
+| slotting-mfe | 5194 | slotting-optimization |
+| replenishment-mfe | 5196 | pick-face-replenishment |
+| task-interleaving-mfe | 5197 | task-interleaving |
 
 ```bash
 # one-time: build the sibling ui-kit
