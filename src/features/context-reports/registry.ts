@@ -13,6 +13,9 @@ import { networkInventoryStuckTransfersConfig } from "./networkInventoryPlanning
 import { productMasterDataQualityConfig } from "./productMaster.config";
 import { inboundReceivingPerformanceConfig } from "./inboundReceiving.config";
 import { slottingPlanFunnelConfig } from "./slottingOptimization.config";
+import { networkInventoryTransferFunnelConfig } from "./networkInventoryTransferFunnel.config";
+import { networkInventoryStateDwellConfig } from "./networkInventoryStateDwell.config";
+import { networkInventoryRebalanceRunsConfig } from "./networkInventoryRebalanceRuns.config";
 import { warehousePlanningBottleneckFrequencyConfig } from "./warehousePlanningBottleneckFrequency.config";
 import { warehousePlanningPlanThroughputConfig } from "./warehousePlanningPlanThroughput.config";
 
@@ -64,4 +67,7 @@ export const REPORT_ROUTES: ReportRouteEntry[] = [
   // links the siblings by `contextId`.
   { path: "warehouse-planning-bottleneck-frequency", config: warehousePlanningBottleneckFrequencyConfig },
   { path: "warehouse-planning-plan-throughput", config: warehousePlanningPlanThroughputConfig },
+  { path: "network-inventory-planning-transfer-funnel", config: networkInventoryTransferFunnelConfig },
+  { path: "network-inventory-planning-state-dwell", config: networkInventoryStateDwellConfig },
+  { path: "network-inventory-planning-rebalance-runs", config: networkInventoryRebalanceRunsConfig },
 ];
