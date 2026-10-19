@@ -55,6 +55,7 @@ export interface ReportsBaseUrls {
   inboundReceiving: string;
   slottingOptimization: string;
   pickFaceReplenishment: string;
+  taskInterleaving: string;
 }
 
 /** Kong's path prefix for each bounded context. */
@@ -100,6 +101,7 @@ const REPORTS_API_PATHS: Record<keyof ReportsBaseUrls, string> = {
   inboundReceiving: "/api/inbound-receiving",
   slottingOptimization: "/api/slotting-optimization",
   pickFaceReplenishment: "/api/pick-face-replenishment",
+  taskInterleaving: "/api/task-interleaving",
 };
 
 /** Standalone dev ports, mirroring e2e-tests/env.sh's HTTP_PORT map. */
@@ -155,6 +157,10 @@ const DEV_BASE_URLS: ServiceBaseUrls = {
  * pickFaceReplenishment (8115) ditto: pfr-reports (serving
  * /reports/replenishment-funnel and /reports/freshness) has no
  * harness-assigned dev port either.
+ *
+ * taskInterleaving (8116) ditto: ti-reports (serving
+ * /reports/hint-adoption and /reports/freshness) has no
+ * harness-assigned dev port either.
  */
 const DEV_REPORTS_BASE_URLS: ReportsBaseUrls = {
   facilityLayout: "http://localhost:8101",
@@ -172,6 +178,7 @@ const DEV_REPORTS_BASE_URLS: ReportsBaseUrls = {
   inboundReceiving: "http://localhost:8113",
   slottingOptimization: "http://localhost:8114",
   pickFaceReplenishment: "http://localhost:8115",
+  taskInterleaving: "http://localhost:8116",
 };
 
 const BFF_API_PATH = "/api/warehouse-ops-agent";
@@ -253,6 +260,7 @@ export function resolveReportsBaseUrls(
     inboundReceiving: `${apiOrigin}${REPORTS_API_PATHS.inboundReceiving}`,
     slottingOptimization: `${apiOrigin}${REPORTS_API_PATHS.slottingOptimization}`,
     pickFaceReplenishment: `${apiOrigin}${REPORTS_API_PATHS.pickFaceReplenishment}`,
+    taskInterleaving: `${apiOrigin}${REPORTS_API_PATHS.taskInterleaving}`,
   };
 }
 

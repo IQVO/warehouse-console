@@ -16,6 +16,7 @@ import { slottingPlanFunnelConfig } from "./slottingOptimization.config";
 import { networkInventoryTransferFunnelConfig } from "./networkInventoryTransferFunnel.config";
 import { networkInventoryStateDwellConfig } from "./networkInventoryStateDwell.config";
 import { networkInventoryRebalanceRunsConfig } from "./networkInventoryRebalanceRuns.config";
+import { taskInterleavingHintAdoptionConfig } from "./taskInterleaving.config";
 import { pickFaceReplenishmentFunnelConfig } from "./pickFaceReplenishment.config";
 import { warehousePlanningBottleneckFrequencyConfig } from "./warehousePlanningBottleneckFrequency.config";
 import { warehousePlanningPlanThroughputConfig } from "./warehousePlanningPlanThroughput.config";
@@ -74,4 +75,6 @@ export const REPORT_ROUTES: ReportRouteEntry[] = [
   // WMS tier (forward-pick replenishment; PFR #16). The reports reader is chart-gated
   // (analytics.enabled) -- until infra enables it the screen shows its error card.
   { path: "pick-face-replenishment", config: pickFaceReplenishmentFunnelConfig },
+  // WES tier (task execution; TI #21). Same chart-gated reports reader as PFR above.
+  { path: "task-interleaving", config: taskInterleavingHintAdoptionConfig },
 ];
