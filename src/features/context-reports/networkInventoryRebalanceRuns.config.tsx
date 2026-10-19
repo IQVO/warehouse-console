@@ -1,8 +1,8 @@
 import type { ReactElement } from "react";
 import { BarChart, Card, DataTable, LineChart } from "@warehouse/ui-kit";
-import { formatInstant, formatNumber, formatPercent } from "@warehouse/ui-kit";
+import { formatNumber, formatPercent } from "@warehouse/ui-kit";
 import { REPORTS_BASE_URL } from "../../config";
-import { trailingDays, withWindow } from "./reportWindow";
+import { formatReportDay, trailingDays, withWindow } from "./reportWindow";
 import type { ContextReportConfig } from "./types";
 
 /**
@@ -46,7 +46,7 @@ function proposalsSeries(
 ): { label: string; value: number }[] {
   return [...days]
     .sort((a, b) => a.day.localeCompare(b.day))
-    .map((d) => ({ label: formatInstant(d.day), value: d.proposals }));
+    .map((d) => ({ label: formatReportDay(d.day), value: d.proposals }));
 }
 
 function rejectionRate(d: RebalanceRunsDayDto): string {
@@ -105,7 +105,7 @@ function renderBody(data: RebalanceRunsReportDto): ReactElement {
       <Card title="Rebalance Runs by Day" padded={false}>
         <DataTable<RebalanceRunsDayDto>
           columns={[
-            { key: "day", header: "Day", render: (d) => formatInstant(d.day) },
+            { key: "day", header: "Day", render: (d) => formatReportDay(d.day) },
             {
               key: "runs",
               header: "Runs",

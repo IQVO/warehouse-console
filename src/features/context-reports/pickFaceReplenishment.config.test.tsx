@@ -93,6 +93,10 @@ describe("pickFaceReplenishmentFunnelConfig", () => {
     );
     expect(screen.getByRole("columnheader", { name: "Units Replenished" })).toBeInTheDocument();
     expect(screen.getByText("Policy versions declared")).toBeInTheDocument();
+    // cancelled is a count beside the funnel, not a funnel stage
+    expect(screen.getByText("Cancelled", { selector: "dt" })).toBeInTheDocument();
+    // the UTC day bucket is shown as served, not shifted by the viewer's timezone
+    expect(screen.getByText("2026-10-05", { selector: "td" })).toBeInTheDocument();
     // 288 / 216 units appear in the chart and the table
     expect(screen.getAllByText("288").length).toBeGreaterThan(0);
     expect(screen.getAllByText("216").length).toBeGreaterThan(0);

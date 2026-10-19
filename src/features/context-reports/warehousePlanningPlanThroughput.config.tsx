@@ -1,8 +1,8 @@
 import type { ReactElement } from "react";
 import { BarChart, Card, DataTable, LineChart } from "@warehouse/ui-kit";
-import { formatDuration, formatInstant, formatNumber } from "@warehouse/ui-kit";
+import { formatDuration, formatNumber } from "@warehouse/ui-kit";
 import { REPORTS_BASE_URL } from "../../config";
-import { trailingDays, withWindow } from "./reportWindow";
+import { formatReportDay, trailingDays, withWindow } from "./reportWindow";
 import type { ContextReportConfig } from "./types";
 
 /**
@@ -70,7 +70,7 @@ function dailyPublishedSeries(
   }
   return [...totals.entries()]
     .sort(([a], [b]) => a.localeCompare(b))
-    .map(([day, value]) => ({ label: formatInstant(day), value }));
+    .map(([day, value]) => ({ label: formatReportDay(day), value }));
 }
 
 function renderBody(data: PlanThroughputReportDto): ReactElement {
@@ -109,7 +109,7 @@ function renderBody(data: PlanThroughputReportDto): ReactElement {
       <Card title="Plans Created / Published by Day / Site" padded={false}>
         <DataTable<PlanThroughputDayDto>
           columns={[
-            { key: "day", header: "Day", render: (d) => formatInstant(d.day) },
+            { key: "day", header: "Day", render: (d) => formatReportDay(d.day) },
             { key: "site", header: "Site", render: (d) => siteLabel(d) },
             {
               key: "plans_created",

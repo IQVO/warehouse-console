@@ -2,12 +2,11 @@ import type { ReactElement } from "react";
 import { BarChart, Card, DataTable, LineChart } from "@warehouse/ui-kit";
 import {
   formatDuration,
-  formatInstant,
   formatNumber,
   formatPercent,
 } from "@warehouse/ui-kit";
 import { REPORTS_BASE_URL } from "../../config";
-import { trailingDays, withWindow } from "./reportWindow";
+import { formatReportDay, trailingDays, withWindow } from "./reportWindow";
 import type { ContextReportConfig } from "./types";
 
 /**
@@ -65,7 +64,7 @@ const WINDOW = trailingDays(30);
 function issuedSeries(days: HintAdoptionDayDto[]): { label: string; value: number }[] {
   return [...days]
     .sort((a, b) => a.day.localeCompare(b.day))
-    .map((d) => ({ label: formatInstant(d.day), value: d.hints_issued }));
+    .map((d) => ({ label: formatReportDay(d.day), value: d.hints_issued }));
 }
 
 function rate(d: HintAdoptionDayDto): string {
@@ -126,7 +125,7 @@ function renderBody(data: HintAdoptionReportDto): ReactElement {
       <Card title="Hint Adoption by Day" padded={false}>
         <DataTable<HintAdoptionDayDto>
           columns={[
-            { key: "day", header: "Day", render: (d) => formatInstant(d.day) },
+            { key: "day", header: "Day", render: (d) => formatReportDay(d.day) },
             {
               key: "hints_issued",
               header: "Issued",

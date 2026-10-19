@@ -1,8 +1,8 @@
 import type { ReactElement } from "react";
 import { BarChart, Card, DataTable } from "@warehouse/ui-kit";
-import { formatDuration, formatInstant, formatNumber } from "@warehouse/ui-kit";
+import { formatDuration, formatNumber } from "@warehouse/ui-kit";
 import { REPORTS_BASE_URL } from "../../config";
-import { trailingDays, withWindow } from "./reportWindow";
+import { formatReportDay, trailingDays, withWindow } from "./reportWindow";
 import type { ContextReportConfig } from "./types";
 
 /**
@@ -68,7 +68,7 @@ function renderBody(data: StateDwellReportDto): ReactElement {
       <Card title="Saga Age at Exit by Day / State" padded={false}>
         <DataTable<StateDwellDayDto>
           columns={[
-            { key: "day", header: "Day", render: (d) => formatInstant(d.day) },
+            { key: "day", header: "Day", render: (d) => formatReportDay(d.day) },
             { key: "state", header: "State Left", render: (d) => d.state },
             {
               key: "transitions",

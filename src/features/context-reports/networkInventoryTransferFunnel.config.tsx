@@ -1,8 +1,8 @@
 import type { ReactElement } from "react";
 import { BarChart, Card, DataTable } from "@warehouse/ui-kit";
-import { formatInstant, formatNumber } from "@warehouse/ui-kit";
+import { formatNumber } from "@warehouse/ui-kit";
 import { REPORTS_BASE_URL } from "../../config";
-import { trailingDays, withWindow } from "./reportWindow";
+import { formatReportDay, trailingDays, withWindow } from "./reportWindow";
 import type { ContextReportConfig } from "./types";
 
 /**
@@ -63,7 +63,7 @@ function renderBody(data: TransferFunnelReportDto): ReactElement {
       <Card title="Transfers by Day / State" padded={false}>
         <DataTable<TransferFunnelDayDto>
           columns={[
-            { key: "day", header: "Day", render: (d) => formatInstant(d.day) },
+            { key: "day", header: "Day", render: (d) => formatReportDay(d.day) },
             { key: "state", header: "State Reached", render: (d) => d.state },
             {
               key: "transfers",

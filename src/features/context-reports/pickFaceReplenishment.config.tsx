@@ -1,8 +1,8 @@
 import type { ReactElement } from "react";
 import { BarChart, Card, DataTable, FunnelChart, LineChart } from "@warehouse/ui-kit";
-import { formatDuration, formatInstant, formatNumber } from "@warehouse/ui-kit";
+import { formatDuration, formatNumber } from "@warehouse/ui-kit";
 import { REPORTS_BASE_URL } from "../../config";
-import { trailingDays, withWindow } from "./reportWindow";
+import { formatReportDay, trailingDays, withWindow } from "./reportWindow";
 import type { ContextReportConfig } from "./types";
 
 /**
@@ -60,7 +60,7 @@ function raisedSeries(
 ): { label: string; value: number }[] {
   return [...days]
     .sort((a, b) => a.day.localeCompare(b.day))
-    .map((d) => ({ label: formatInstant(d.day), value: d.requests_raised }));
+    .map((d) => ({ label: formatReportDay(d.day), value: d.requests_raised }));
 }
 
 function renderBody(data: ReplenishmentFunnelReportDto): ReactElement {
@@ -91,15 +91,27 @@ function renderBody(data: ReplenishmentFunnelReportDto): ReactElement {
           />
         </Card>
         <Card title="Request Funnel (Window Totals)">
+          {/* Cancelled is not a stage after Completed, so it is a plain
+              count below the funnel, not a third (falsely "dropped") stage. */}
           <FunnelChart
             title="REPLENISHMENT REQUESTS"
             stages={[
               { label: "Raised", value: raised },
               { label: "Completed", value: completed },
-              { label: "Cancelled", value: cancelled },
             ]}
             emptyState={<div>No replenishment requests in this window.</div>}
           />
+          <dl
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr auto",
+              gap: "var(--wh-space-2)",
+              margin: "var(--wh-space-3) 0 0",
+            }}
+          >
+            <dt>Cancelled</dt>
+            <dd style={{ textAlign: "right", margin: 0 }}>{formatNumber(cancelled)}</dd>
+          </dl>
         </Card>
         <Card title="Units (Window Totals)">
           <BarChart
@@ -127,7 +139,7 @@ function renderBody(data: ReplenishmentFunnelReportDto): ReactElement {
       <Card title="Replenishment by Day" padded={false}>
         <DataTable<ReplenishmentFunnelDayDto>
           columns={[
-            { key: "day", header: "Day", render: (d) => formatInstant(d.day) },
+            { key: "day", header: "Day", render: (d) => formatReportDay(d.day) },
             {
               key: "requests_raised",
               header: "Raised",
