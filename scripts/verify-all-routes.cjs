@@ -65,6 +65,8 @@ const routes = [
   { path: "/reports/product-master", label: "report:product-master", expect: /Product Master: Data Quality/i },
   { path: "/reports/inbound-receiving", label: "report:inbound-receiving", expect: /Inbound: Receiving/i },
   { path: "/reports/slotting-optimization", label: "report:slotting-optimization", expect: /Slotting: Slot Plan Funnel/i },
+  { path: "/reports/warehouse-planning-bottleneck-frequency", label: "report:warehouse-planning-bottleneck-frequency", expect: /Capacity Planning: Bottleneck Frequency/i },
+  { path: "/reports/warehouse-planning-plan-throughput", label: "report:warehouse-planning-plan-throughput", expect: /Capacity Planning: Plan Throughput/i },
   // An unknown report slug falls through to the shell's own 404 screen.
   { path: "/reports/no-such-context", label: "report:404", expect: /Page not found/i },
   // An unmatched URL must explain itself, not render empty chrome.

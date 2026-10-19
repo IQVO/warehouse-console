@@ -27,9 +27,12 @@ import type { ContextReportConfig } from "./types";
  * per-report sibling like the first nine screens' readers serve.
  *
  * warehouse-planning also serves /reports/bottleneck-frequency and
- * /reports/plan-throughput; this screen pins the most operational one
- * (plans shipping short of capacity) and mirrors the one-URL-per-screen
- * convention every other config follows.
+ * /reports/plan-throughput; each has its own screen
+ * (warehousePlanningBottleneckFrequency.config.tsx,
+ * warehousePlanningPlanThroughput.config.tsx) so the one-URL-per-screen
+ * convention every other config follows still holds. This one keeps the
+ * bare `warehouse-planning` slug (the most operational: plans shipping
+ * short of capacity).
  *
  * Day-bucketed (`day` is a UTC calendar date; from/to default to the
  * trailing 30 days server-side), so the screen asks for a trailing 30-day

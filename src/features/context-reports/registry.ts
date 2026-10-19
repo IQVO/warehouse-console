@@ -13,6 +13,8 @@ import { networkInventoryStuckTransfersConfig } from "./networkInventoryPlanning
 import { productMasterDataQualityConfig } from "./productMaster.config";
 import { inboundReceivingPerformanceConfig } from "./inboundReceiving.config";
 import { slottingPlanFunnelConfig } from "./slottingOptimization.config";
+import { warehousePlanningBottleneckFrequencyConfig } from "./warehousePlanningBottleneckFrequency.config";
+import { warehousePlanningPlanThroughputConfig } from "./warehousePlanningPlanThroughput.config";
 
 /**
  * Every bounded context's report, in one place, so App.tsx's route table
@@ -27,7 +29,7 @@ import { slottingPlanFunnelConfig } from "./slottingOptimization.config";
 export interface ReportRouteEntry {
   path: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- a
-  // heterogeneous registry of ContextReportConfig<T> for thirteen DIFFERENT
+  // heterogeneous registry of ContextReportConfig<T> for many DIFFERENT
   // T's has no sound common instantiation; each entry is only ever read
   // back through its own config object; renderBody in each remains fully
   // typed. Same shape unavoidably shows up in DataTable<T>/Column<T>
@@ -56,4 +58,10 @@ export const REPORT_ROUTES: ReportRouteEntry[] = [
   { path: "inbound-receiving", config: inboundReceivingPerformanceConfig },
   // WMS tier (forward-pick slotting; connect-all 2.2a shipped the reader).
   { path: "slotting-optimization", config: slottingPlanFunnelConfig },
+  // Phase 4.1 follow-up: a context's further reports (no production screen
+  // called them before). Slug is `<context>-<report>`; the context's first
+  // report keeps the bare context slug above, and ContextReportRouteScreen
+  // links the siblings by `contextId`.
+  { path: "warehouse-planning-bottleneck-frequency", config: warehousePlanningBottleneckFrequencyConfig },
+  { path: "warehouse-planning-plan-throughput", config: warehousePlanningPlanThroughputConfig },
 ];

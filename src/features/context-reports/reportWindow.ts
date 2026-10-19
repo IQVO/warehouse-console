@@ -4,7 +4,7 @@
  * which defaults to a trailing 24h window itself, hitting a context's own
  * reports service directly means THIS shell has to supply the window.
  *
- * Two lengths are used across the thirteen contexts' screens:
+ * Two lengths are used across the contexts' screens:
  *  - hour-bucketed reports (funnel/throughput/flow-accuracy/labor/performance)
  *    default to a trailing 24h window, matching the console-bff's own
  *    documented default so the two feel consistent to an operator switching
