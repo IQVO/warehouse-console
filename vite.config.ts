@@ -137,6 +137,25 @@ export default defineConfig({
           name: "slotting_mfe",
           entry: remoteEntry("slotting-optimization", 5194),
         },
+        // pick-face-replenishment's remote: container `replenishment_mfe`
+        // (the key and name match; the repo name differs), exposes ./App
+        // only, mounted on /pick-face-replenishment/*. Pinned with
+        // IQVO/pick-face-replenishment web/vite.config.ts: gateway path
+        // /mfes/pick-face-replenishment/, dev port 5196.
+        replenishment_mfe: {
+          type: "module",
+          name: "replenishment_mfe",
+          entry: remoteEntry("pick-face-replenishment", 5196),
+        },
+        // task-interleaving's remote: container `task_interleaving_mfe`,
+        // exposes ./App only, mounted on /task-interleaving/*. Pinned with
+        // IQVO/task-interleaving web/vite.config.ts: gateway path
+        // /mfes/task-interleaving/, dev port 5197.
+        task_interleaving_mfe: {
+          type: "module",
+          name: "task_interleaving_mfe",
+          entry: remoteEntry("task-interleaving", 5197),
+        },
       },
       // The shell must win the React singleton negotiation. With the
       // default "version-first", every remote's remoteEntry is preloaded

@@ -83,4 +83,58 @@ describe("ContextsScreen launchpad", () => {
     expect(tile).toHaveAttribute("href", "/inbound-receiving");
     expect(tile).toHaveTextContent("inbound-receiving");
   });
+
+  it("lists a Slotting Optimization tile that links to the slotting-optimization remote", () => {
+    server.use(
+      http.get(`${SERVICE_BASE_URL.fulfillmentExecution}/queues/PICK/depth`, () =>
+        HttpResponse.json({ taskType: "PICK", depth: 3 }),
+      ),
+      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json([])),
+    );
+    render(
+      <MemoryRouter>
+        <ContextsScreen />
+      </MemoryRouter>,
+    );
+
+    const tile = screen.getByRole("link", { name: /Slotting Optimization/ });
+    expect(tile).toHaveAttribute("href", "/slotting");
+    expect(tile).toHaveTextContent("slotting-optimization");
+  });
+
+  it("lists a Pick-Face Replenishment tile that links to the pick-face-replenishment remote", () => {
+    server.use(
+      http.get(`${SERVICE_BASE_URL.fulfillmentExecution}/queues/PICK/depth`, () =>
+        HttpResponse.json({ taskType: "PICK", depth: 3 }),
+      ),
+      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json([])),
+    );
+    render(
+      <MemoryRouter>
+        <ContextsScreen />
+      </MemoryRouter>,
+    );
+
+    const tile = screen.getByRole("link", { name: /Pick-Face Replenishment/ });
+    expect(tile).toHaveAttribute("href", "/pick-face-replenishment");
+    expect(tile).toHaveTextContent("pick-face-replenishment");
+  });
+
+  it("lists a Task Interleaving tile that links to the task-interleaving remote", () => {
+    server.use(
+      http.get(`${SERVICE_BASE_URL.fulfillmentExecution}/queues/PICK/depth`, () =>
+        HttpResponse.json({ taskType: "PICK", depth: 3 }),
+      ),
+      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json([])),
+    );
+    render(
+      <MemoryRouter>
+        <ContextsScreen />
+      </MemoryRouter>,
+    );
+
+    const tile = screen.getByRole("link", { name: /Task Interleaving/ });
+    expect(tile).toHaveAttribute("href", "/task-interleaving");
+    expect(tile).toHaveTextContent("task-interleaving");
+  });
 });
