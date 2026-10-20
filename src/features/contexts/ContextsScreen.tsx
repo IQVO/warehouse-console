@@ -195,6 +195,24 @@ export function ContextsScreen(): ReactElement {
           description="Advance ship notices, dock appointments per door and day, and the receipt workbench with its close-time discrepancies."
           href="/inbound-receiving"
         />
+        <ContextTile
+          context="slotting-optimization"
+          title="Slotting Optimization"
+          description="Proposed forward pick-slot plans for SKUs, and the human decision on each: draft, approved or rejected."
+          href="/slotting"
+        />
+        <ContextTile
+          context="pick-face-replenishment"
+          title="Pick-Face Replenishment"
+          description="Min/max policies per site and SKU, and the replenishment requests that refill pick faces from reserve before they run dry."
+          href="/pick-face-replenishment"
+        />
+        <ContextTile
+          context="task-interleaving"
+          title="Task Interleaving"
+          description="Advisory hints that let operators chain compatible nearby tasks instead of travelling empty."
+          href="/task-interleaving"
+        />
       </div>
     </div>
   );

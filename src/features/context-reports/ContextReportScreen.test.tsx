@@ -7,7 +7,7 @@ import { ContextReportScreen } from "./ContextReportScreen";
 import type { ContextReportConfig } from "./types";
 
 /**
- * A synthetic config, not one of the thirteen real ones -- this file tests
+ * A synthetic config, not one of the real ones -- this file tests
  * ContextReportScreen's OWN three degradation states in isolation, which
  * every real per-context config inherits for free. The per-context
  * configs (facilityLayout.config.test.tsx, fulfillmentExecution.config.test.tsx)

@@ -7,7 +7,7 @@ sidebar_label: Module Federation
 # Module Federation
 
 This app is the federation **host** (`@module-federation/vite`); each of the
-thirteen remotes is built and deployed independently by its own bounded-context
+sixteen remotes is built and deployed independently by its own bounded-context
 repo. The ports in the diagram are the remotes' **dev-server** ports, used by
 `npm run dev`.
 
@@ -27,6 +27,9 @@ graph LR
   ProductMaster["productmaster_mfe :5191"]
   Nip["nip_mfe :5192"]
   Inbound["inbound_mfe :5193"]
+  Slotting["slotting_mfe :5194"]
+  Replenishment["replenishment_mfe :5196"]
+  TaskInterleaving["task_interleaving_mfe :5197"]
 
   Console --> Orders
   Console --> Inventory
@@ -41,6 +44,9 @@ graph LR
   Console --> ProductMaster
   Console --> Nip
   Console --> Inbound
+  Console --> Slotting
+  Console --> Replenishment
+  Console --> TaskInterleaving
 ```
 
 ## Where a remote is loaded from
@@ -57,7 +63,8 @@ shell at `/` and each remote at `/mfes/<context>/` — `order-management`,
 `inventory-storage`, `wes-work-planning`, `fulfillment-execution`,
 `workforce-management`, `facility-layout`, `process-path-management`,
 `labor-performance`, `network-fulfillment`, `warehouse-planning`, `product-master`,
-`network-inventory-planning`, `inbound-receiving`. The entry path is same-origin with the shell, so no
+`network-inventory-planning`, `inbound-receiving`, `slotting-optimization`,
+`pick-face-replenishment`, `task-interleaving`. The entry path is same-origin with the shell, so no
 remote needs a CORS policy for its assets. Kong on `http://localhost:8000`
 serves only the APIs and never handles HTML, JavaScript or CSS.
 
@@ -94,6 +101,15 @@ header** to `<apiOrigin>/api/inbound-receiving`; the action `POST`s (`cancel`,
 `check-in`, `close`) send the header too, so Kong's CORS policy for the console
 origin must allow `Idempotency-Key` (and `If-Match`, which the remote does not
 send today) as request headers.
+
+`slotting_mfe` (slotting-optimization), `replenishment_mfe`
+(pick-face-replenishment) and `task_interleaving_mfe` (task-interleaving) each
+expose `./App` with no props and are mounted on the splat routes `/slotting/*`,
+`/pick-face-replenishment/*` and `/task-interleaving/*`. The route slug is not
+always the repo name (`/slotting`), the gateway path always is. A gateway path
+only exists once warehouse-infra's `apps.yaml` carries `frontend_remote` for
+the context; without it the shell shows the inline "unavailable" card for that
+remote, not a blank page.
 
 `vite.config.ts` stays in object form (it reads `process.argv` for the build
 flag) rather than the `({ command }) => ({...})` callback form, because

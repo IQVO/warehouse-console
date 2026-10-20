@@ -47,6 +47,11 @@ const routes = [
   // slotting-optimization's remote (connect-all 2.2b): container
   // slotting_mfe, gateway path /mfes/slotting-optimization/, dev :5194.
   { path: "/slotting", label: "slotting-optimization", expect: /\S/ },
+  // pick-face-replenishment's and task-interleaving's remotes: containers
+  // replenishment_mfe (dev :5196, /mfes/pick-face-replenishment/) and
+  // task_interleaving_mfe (dev :5197, /mfes/task-interleaving/).
+  { path: "/pick-face-replenishment", label: "pick-face-replenishment", expect: /\S/ },
+  { path: "/task-interleaving", label: "task-interleaving", expect: /\S/ },
   // /reports/:context -- one Bounded Context Report screen per slug in
   // src/features/context-reports/registry.ts (src/remotes-registration.test.ts
   // fails when a registered slug is missing here). Each must render its own

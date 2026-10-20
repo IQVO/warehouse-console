@@ -28,6 +28,9 @@ graph TD
   NF["network-fulfillment<br/><i>Supporting</i>"]
   NIP["network-inventory-planning<br/><i>network inventory balancing</i>"]
   IR["inbound-receiving<br/><i>WMS · Supporting</i>"]
+  SO["slotting-optimization"]
+  PFR["pick-face-replenishment<br/><i>WMS · Supporting</i>"]
+  TI["task-interleaving<br/><i>WES · Supporting</i>"]
   OA["warehouse-ops-agent<br/>(console-bff)"]
 
   Console -->|"hosts order_mgmt_mfe"| OM
@@ -43,6 +46,9 @@ graph TD
   Console -->|"hosts network_fulfillment_mfe"| NF
   Console -->|"hosts nip_mfe"| NIP
   Console -->|"hosts inbound_mfe"| IR
+  Console -->|"hosts slotting_mfe"| SO
+  Console -->|"hosts replenishment_mfe"| PFR
+  Console -->|"hosts task_interleaving_mfe"| TI
   Console -->|"Floor, Order Lifecycle, WMS/WES reports"| OA
   Console -.->|"Contexts badge: GET /queues/PICK/depth"| FE
   Console -.->|"Contexts badge: GET /sites"| FL
