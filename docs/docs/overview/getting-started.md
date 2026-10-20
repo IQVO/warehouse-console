@@ -30,6 +30,9 @@ remote from `/mfes/<context>/remoteEntry.js` on the web gateway instead.
 | productmaster-mfe | 5191 | product-master |
 | nip-mfe | 5192 | network-inventory-planning |
 | inbound-mfe | 5193 | inbound-receiving |
+| slotting-mfe | 5194 | slotting-optimization |
+| replenishment-mfe | 5196 | pick-face-replenishment |
+| task-interleaving-mfe | 5197 | task-interleaving |
 
 ## Run it
 

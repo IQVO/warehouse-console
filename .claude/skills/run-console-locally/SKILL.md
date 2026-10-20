@@ -28,7 +28,7 @@ mkdir -p public && echo '{ "apiOrigin": "http://localhost:8000" }' > public/conf
 npm run dev        # shell on :5173 (strictPort: it fails rather than picking another port)
 ```
 
-Remote dev servers are started from each remote's own repo (`web/`, `npm run dev`) on the ports in `vite.config.ts` and the README table: 5181 order-management, 5182 inventory-storage, 5183 wes-work-planning, 5184 fulfillment-execution, 5185 workforce-management, 5186 facility-layout, 5187 labor-performance, 5188 network-fulfillment, 5189 process-path-management, 5190 warehouse-planning (capacity_mfe), 5191 product-master (productmaster_mfe), 5192 network-inventory-planning (nip_mfe), 5193 inbound-receiving (inbound_mfe). Start only the ones you need; an absent remote just shows its inline "unavailable" card.
+Remote dev servers are started from each remote's own repo (`web/`, `npm run dev`) on the ports in `vite.config.ts` and the README table: 5181 order-management, 5182 inventory-storage, 5183 wes-work-planning, 5184 fulfillment-execution, 5185 workforce-management, 5186 facility-layout, 5187 labor-performance, 5188 network-fulfillment, 5189 process-path-management, 5190 warehouse-planning (capacity_mfe), 5191 product-master (productmaster_mfe), 5192 network-inventory-planning (nip_mfe), 5193 inbound-receiving (inbound_mfe), 5194 slotting-optimization (slotting_mfe), 5196 pick-face-replenishment (replenishment_mfe), 5197 task-interleaving (task_interleaving_mfe). Start only the ones you need; an absent remote just shows its inline "unavailable" card.
 
 Never trust `ps` alone. `npm run dev` also spawns Module Federation DTS helper workers that survive their parent and look like a running server. Prove each port answers:
 
@@ -58,12 +58,12 @@ kubectl port-forward pod/<oltp-pod> 8081:8080
 
 ```bash
 npm run verify:dashboards   # needs ONLY `npm run dev`; the script stubs console-bff report calls
-npm run verify:routes       # needs the shell + all 13 remote dev servers + reachable backends
+npm run verify:routes       # needs the shell + all 16 remote dev servers + reachable backends
 VERIFY_STUB_API=1 npm run verify:routes   # same, but the API origin is answered 503 in the browser: no backend, no Kong CORS
 ```
 
 - `scripts/verify-dashboards.cjs` checks all-sections-available, one-section `available: false`, and whole-request failure for `/wms-dashboard` and `/wes-dashboard`; screenshots go to `/tmp/warehouse-console-dashboards` (override with `SHOT_DIR`). Only the existence of `public/config.json` matters, not its values.
-- `scripts/verify-all-routes.cjs` loads each route headlessly, asserts expected text and that `nav a` renders, and asserts nav clicks are client-side (a full page reload means ui-kit links lost the `NavigationProvider` from `src/App.tsx`). It exits non-zero on page errors, failed requests (a page cancelling its own fetch, `net::ERR_ABORTED`, is ignored) or the RemoteBoundary fallback card ("This module is unavailable right now"), which a 404 or crashing remote shows without raising a page error. The advisory `verify-routes` workflow runs it in CI with `VERIFY_STUB_API=1` against the `develop` dev servers of all 13 remotes. It hardcodes `http://localhost:5173`, and its route list is maintained by hand.
+- `scripts/verify-all-routes.cjs` loads each route headlessly, asserts expected text and that `nav a` renders, and asserts nav clicks are client-side (a full page reload means ui-kit links lost the `NavigationProvider` from `src/App.tsx`). It exits non-zero on page errors, failed requests (a page cancelling its own fetch, `net::ERR_ABORTED`, is ignored) or the RemoteBoundary fallback card ("This module is unavailable right now"), which a 404 or crashing remote shows without raising a page error. The advisory `verify-routes` workflow runs it in CI with `VERIFY_STUB_API=1` against the `develop` dev servers of all 16 remotes. It hardcodes `http://localhost:5173`, and its route list is maintained by hand.
 - Both need Playwright browsers (`npx playwright install chromium` once).
 - Not every change needs `verify:routes`, but a navigation/routing/remote-hosting change must not be called done on unit tests alone.
 

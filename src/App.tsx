@@ -47,6 +47,8 @@ const REMOTE_PREFIXES = [
   "/network-inventory",
   "/inbound-receiving",
   "/slotting",
+  "/pick-face-replenishment",
+  "/task-interleaving",
 ];
 
 // Each lazy() call MUST run exactly once, at module load, not inside a
@@ -83,6 +85,10 @@ const NipRemote = lazy(() => import("nip_mfe/App"));
 const InboundRemote = lazy(() => import("inbound_mfe/App"));
 // @ts-expect-error -- remote module resolved at runtime by Module Federation
 const SlottingRemote = lazy(() => import("slotting_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const ReplenishmentRemote = lazy(() => import("replenishment_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const TaskInterleavingRemote = lazy(() => import("task_interleaving_mfe/App"));
 /* eslint-enable react-refresh/only-export-components */
 
 /** Anchored prefix match: a bare startsWith would light up "Inventory"
@@ -175,6 +181,24 @@ function Shell() {
         <Route
           path="/slotting/*"
           element={<RemoteBoundary label="Slotting" component={SlottingRemote} />}
+        />
+        <Route
+          path="/pick-face-replenishment/*"
+          element={
+            <RemoteBoundary
+              label="Pick-Face Replenishment"
+              component={ReplenishmentRemote}
+            />
+          }
+        />
+        <Route
+          path="/task-interleaving/*"
+          element={
+            <RemoteBoundary
+              label="Task Interleaving"
+              component={TaskInterleavingRemote}
+            />
+          }
         />
         <Route path="/reports/:context" element={<ContextReportRouteScreen />} />
         {/* Unmatched URLs used to render the chrome around an empty
