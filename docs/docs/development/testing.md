@@ -110,7 +110,7 @@ Both exit `1` on any collected error.
   listed remote's dev server and the APIs (including each `<context>-reports`
   reader) at `apiOrigin`, unless `VERIFY_STUB_API=1`: then the browser answers
   every `apiOrigin` call with a 503 and no backend (or Kong CORS) is needed;
-  the `verify-routes` workflow runs it that way against all 16 remotes'
+  the `verify-routes` workflow runs it that way against all 18 remotes'
   `develop`. Any route showing the remote error card ("This module is
   unavailable right now") fails. `src/remotes-registration.test.ts` fails when a
   registered report slug or `/network-fulfillment` is missing from its list.

@@ -49,6 +49,8 @@ const REMOTE_PREFIXES = [
   "/slotting",
   "/pick-face-replenishment",
   "/task-interleaving",
+  "/returns-processing",
+  "/exception-management",
 ];
 
 // Each lazy() call MUST run exactly once, at module load, not inside a
@@ -89,6 +91,10 @@ const SlottingRemote = lazy(() => import("slotting_mfe/App"));
 const ReplenishmentRemote = lazy(() => import("replenishment_mfe/App"));
 // @ts-expect-error -- remote module resolved at runtime by Module Federation
 const TaskInterleavingRemote = lazy(() => import("task_interleaving_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const ReturnsRemote = lazy(() => import("returns_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const ExceptionsRemote = lazy(() => import("exceptions_mfe/App"));
 /* eslint-enable react-refresh/only-export-components */
 
 /** Anchored prefix match: a bare startsWith would light up "Inventory"
@@ -197,6 +203,19 @@ function Shell() {
             <RemoteBoundary
               label="Task Interleaving"
               component={TaskInterleavingRemote}
+            />
+          }
+        />
+        <Route
+          path="/returns-processing/*"
+          element={<RemoteBoundary label="Returns" component={ReturnsRemote} />}
+        />
+        <Route
+          path="/exception-management/*"
+          element={
+            <RemoteBoundary
+              label="Problem Solve"
+              component={ExceptionsRemote}
             />
           }
         />
