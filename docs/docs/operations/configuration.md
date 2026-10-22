@@ -117,9 +117,13 @@ entry here plus a route in `src/App.tsx`.
 | `slotting_mfe` | `slotting_mfe` | `/mfes/slotting-optimization/` | 5194 | `/slotting/*` |
 | `replenishment_mfe` | `replenishment_mfe` | `/mfes/pick-face-replenishment/` | 5196 | `/pick-face-replenishment/*` |
 | `task_interleaving_mfe` | `task_interleaving_mfe` | `/mfes/task-interleaving/` | 5197 | `/task-interleaving/*` |
+| `returns_mfe` | `returns_mfe` | `/mfes/returns-processing/` | 4010 | `/returns-processing/*` |
+| `exceptions_mfe` | `exceptions_mfe` | `/mfes/exception-management/` | 4011 | `/exception-management/*` |
 
 Note `network_fulfillment_mfe`: the shell imports it under that key, but the
-remote's federation container is named `netfulfil_mfe`.
+remote's federation container is named `netfulfil_mfe`. The last two ports sit
+off the 51xx ladder on purpose: every 5181..5197 slot was taken when those
+remotes landed, so their repos pinned 4010/4011 as free.
 
 Other federation settings:
 

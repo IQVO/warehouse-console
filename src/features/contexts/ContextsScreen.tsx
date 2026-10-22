@@ -213,6 +213,18 @@ export function ContextsScreen(): ReactElement {
           description="Advisory hints that let operators chain compatible nearby tasks instead of travelling empty."
           href="/task-interleaving"
         />
+        <ContextTile
+          context="returns-processing"
+          title="Returns"
+          description="Return authorizations against allocated, manifested order lines, receipt opening and inspection with grading, and the disposition decided for every return line."
+          href="/returns-processing"
+        />
+        <ContextTile
+          context="exception-management"
+          title="Problem Solve"
+          description="The problem-solve queue: exception cases opened from fleet events, triage, assignment and SLA escalation, resolution with audit trail, and the auto-resolve policies."
+          href="/exception-management"
+        />
       </div>
     </div>
   );

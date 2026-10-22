@@ -33,6 +33,8 @@ remote from `/mfes/<context>/remoteEntry.js` on the web gateway instead.
 | slotting-mfe | 5194 | slotting-optimization |
 | replenishment-mfe | 5196 | pick-face-replenishment |
 | task-interleaving-mfe | 5197 | task-interleaving |
+| returns-mfe | 4010 | returns-processing |
+| exceptions-mfe | 4011 | exception-management |
 
 ## Run it
 

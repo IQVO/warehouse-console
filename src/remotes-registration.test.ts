@@ -173,7 +173,7 @@ describe("replenishment_mfe registration", () => {
     const app = read("src/App.tsx");
     expect(app).toMatch(/^const ReplenishmentRemote = lazy\(\(\) => import\("replenishment_mfe\/App"\)\);$/m);
     expect(app).toMatch(/path="\/pick-face-replenishment\/\*"/);
-    expect(app).toMatch(/"\/pick-face-replenishment",\n  "\/task-interleaving",\n\];/);
+    expect(app).toMatch(/"\/pick-face-replenishment",\n  "\/task-interleaving",\n/);
   });
 
   it("is covered by verify:routes", () => {
@@ -203,7 +203,7 @@ describe("task_interleaving_mfe registration", () => {
     const app = read("src/App.tsx");
     expect(app).toMatch(/^const TaskInterleavingRemote = lazy\(\(\) => import\("task_interleaving_mfe\/App"\)\);$/m);
     expect(app).toMatch(/path="\/task-interleaving\/\*"/);
-    expect(app).toMatch(/"\/task-interleaving",\n\];/);
+    expect(app).toMatch(/"\/task-interleaving",\n  "\/returns-processing",\n/);
   });
 
   it("is covered by verify:routes", () => {
@@ -211,17 +211,79 @@ describe("task_interleaving_mfe registration", () => {
   });
 });
 
+describe("returns_mfe registration", () => {
+  // Pinned with IQVO/returns-processing web/vite.config.ts: federation name
+  // returns_mfe, gateway path /mfes/returns-processing/, dev port 4010
+  // (off the fully-taken 51xx ladder, chosen by the remote's repo).
+  it("is a federation remote named returns_mfe served from /mfes/returns-processing/ (dev :4010)", () => {
+    const vite = read("vite.config.ts");
+    expect(vite).toMatch(
+      /returns_mfe:\s*\{\s*type:\s*"module",\s*name:\s*"returns_mfe",\s*entry:\s*remoteEntry\("returns-processing",\s*4010\),\s*\}/,
+    );
+  });
+
+  it("does not reuse another remote's container name or dev port", () => {
+    const vite = read("vite.config.ts");
+    expect(vite.match(/name:\s*"returns_mfe"/g)).toHaveLength(1);
+    expect(vite.match(/remoteEntry\("[^"]+",\s*4010\)/g)).toHaveLength(1);
+    const ports = [...vite.matchAll(/remoteEntry\("[^"]+",\s*(\d+)\)/g)].map((m) => m[1]);
+    expect(new Set(ports).size).toBe(ports.length);
+  });
+
+  it("is imported lazily at module scope as returns_mfe/App and mounted on a splat route", () => {
+    const app = read("src/App.tsx");
+    expect(app).toMatch(/^const ReturnsRemote = lazy\(\(\) => import\("returns_mfe\/App"\)\);$/m);
+    expect(app).toMatch(/path="\/returns-processing\/\*"/);
+    expect(app).toMatch(/"\/returns-processing",\n  "\/exception-management",\n\];/);
+  });
+
+  it("is covered by verify:routes", () => {
+    expect(read("scripts/verify-all-routes.cjs")).toContain('path: "/returns-processing"');
+  });
+});
+
+describe("exceptions_mfe registration", () => {
+  // Pinned with IQVO/exception-management web/vite.config.ts: federation
+  // name exceptions_mfe, gateway path /mfes/exception-management/, dev
+  // port 4011 (off the 51xx ladder like returns_mfe's 4010).
+  it("is a federation remote named exceptions_mfe served from /mfes/exception-management/ (dev :4011)", () => {
+    const vite = read("vite.config.ts");
+    expect(vite).toMatch(
+      /exceptions_mfe:\s*\{\s*type:\s*"module",\s*name:\s*"exceptions_mfe",\s*entry:\s*remoteEntry\("exception-management",\s*4011\),\s*\}/,
+    );
+  });
+
+  it("does not reuse another remote's container name or dev port", () => {
+    const vite = read("vite.config.ts");
+    expect(vite.match(/name:\s*"exceptions_mfe"/g)).toHaveLength(1);
+    expect(vite.match(/remoteEntry\("[^"]+",\s*4011\)/g)).toHaveLength(1);
+    const ports = [...vite.matchAll(/remoteEntry\("[^"]+",\s*(\d+)\)/g)].map((m) => m[1]);
+    expect(new Set(ports).size).toBe(ports.length);
+  });
+
+  it("is imported lazily at module scope as exceptions_mfe/App and mounted on a splat route", () => {
+    const app = read("src/App.tsx");
+    expect(app).toMatch(/^const ExceptionsRemote = lazy\(\(\) => import\("exceptions_mfe\/App"\)\);$/m);
+    expect(app).toMatch(/path="\/exception-management\/\*"/);
+    expect(app).toMatch(/"\/exception-management",\n\];/);
+  });
+
+  it("is covered by verify:routes", () => {
+    expect(read("scripts/verify-all-routes.cjs")).toContain('path: "/exception-management"');
+  });
+});
+
 describe("remote registry totals", () => {
-  // The fleet has sixteen remotes; a hand-edited list that drops or doubles
+  // The fleet has eighteen remotes; a hand-edited list that drops or doubles
   // one breaks this before it breaks a route.
-  it("registers sixteen remotes with unique keys, container names and ports", () => {
+  it("registers eighteen remotes with unique keys, container names and ports", () => {
     const vite = read("vite.config.ts");
     const entries = [
       ...vite.matchAll(
         /(\w+_mfe):\s*\{\s*type:\s*"module",\s*name:\s*"([^"]+)",\s*entry:\s*remoteEntry\("([^"]+)",\s*(\d+)\)/g,
       ),
     ];
-    expect(entries).toHaveLength(16);
+    expect(entries).toHaveLength(18);
     for (const col of [1, 2, 3, 4]) {
       const values = entries.map((m) => m[col]);
       expect(new Set(values).size).toBe(values.length);
@@ -234,7 +296,7 @@ describe("remote registry totals", () => {
       ...app.match(/const REMOTE_PREFIXES = \[([^\]]*)\]/)![1].matchAll(/"(\/[^"]+)"/g),
     ].map((m) => m[1]);
     const routes = [...app.matchAll(/path="(\/[^"/]+)\/\*"/g)].map((m) => m[1]);
-    expect(prefixes).toHaveLength(16);
+    expect(prefixes).toHaveLength(18);
     expect([...prefixes].sort()).toEqual([...routes].sort());
   });
 });
