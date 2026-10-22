@@ -7,7 +7,7 @@ sidebar_label: Module Federation
 # Module Federation
 
 This app is the federation **host** (`@module-federation/vite`); each of the
-sixteen remotes is built and deployed independently by its own bounded-context
+eighteen remotes is built and deployed independently by its own bounded-context
 repo. The ports in the diagram are the remotes' **dev-server** ports, used by
 `npm run dev`.
 
@@ -30,6 +30,8 @@ graph LR
   Slotting["slotting_mfe :5194"]
   Replenishment["replenishment_mfe :5196"]
   TaskInterleaving["task_interleaving_mfe :5197"]
+  Returns["returns_mfe :4010"]
+  Exceptions["exceptions_mfe :4011"]
 
   Console --> Orders
   Console --> Inventory
@@ -47,6 +49,8 @@ graph LR
   Console --> Slotting
   Console --> Replenishment
   Console --> TaskInterleaving
+  Console --> Returns
+  Console --> Exceptions
 ```
 
 ## Where a remote is loaded from
@@ -64,7 +68,8 @@ shell at `/` and each remote at `/mfes/<context>/` — `order-management`,
 `workforce-management`, `facility-layout`, `process-path-management`,
 `labor-performance`, `network-fulfillment`, `warehouse-planning`, `product-master`,
 `network-inventory-planning`, `inbound-receiving`, `slotting-optimization`,
-`pick-face-replenishment`, `task-interleaving`. The entry path is same-origin with the shell, so no
+`pick-face-replenishment`, `task-interleaving`, `returns-processing`,
+`exception-management`. The entry path is same-origin with the shell, so no
 remote needs a CORS policy for its assets. Kong on `http://localhost:8000`
 serves only the APIs and never handles HTML, JavaScript or CSS.
 
@@ -110,6 +115,13 @@ always the repo name (`/slotting`), the gateway path always is. A gateway path
 only exists once warehouse-infra's `apps.yaml` carries `frontend_remote` for
 the context; without it the shell shows the inline "unavailable" card for that
 remote, not a blank page.
+
+`returns_mfe` (returns-processing, dev :4010) and `exceptions_mfe`
+(exception-management, dev :4011) follow the same shape — `./App` with no
+props, mounted on `/returns-processing/*` and `/exception-management/*` — but
+their dev ports sit OFF the 51xx ladder on purpose: every 5181..5197 slot was
+already taken, so their repos pinned 4010/4011 as free. Same
+`frontend_remote` caveat as above.
 
 `vite.config.ts` stays in object form (it reads `process.argv` for the build
 flag) rather than the `({ command }) => ({...})` callback form, because

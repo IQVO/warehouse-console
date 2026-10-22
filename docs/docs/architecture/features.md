@@ -91,7 +91,7 @@ read).
 
 `ContextsScreen` renders one `LaunchTile` per destination: three
 cross-service tiles (Order Lifecycle, WMS Dashboard, WES Dashboard) and
-sixteen bounded-context tiles linking to the remote routes. Two tiles carry
+eighteen bounded-context tiles linking to the remote routes. Two tiles carry
 live badges, polled every 30 000 ms: Fulfillment (`<depth> in PICK` from
 `GET /queues/PICK/depth`) and Facility (`<n> site(s)` from `GET /sites`). A
 failed badge read simply omits the badge.
