@@ -30,7 +30,8 @@ plus one launchpad into everything else (see
 Everything else (`/order-management`, `/inventory`, `/planning`,
 `/fulfillment`, `/workforce`, `/facility`, `/process-path`, `/labor`,
 `/network-fulfillment`, `/capacity`, `/product-master`, `/network-inventory`,
-`/inbound-receiving`, `/slotting`, `/pick-face-replenishment`, `/task-interleaving`) is a Module Federation **remote** owned and deployed by
+`/inbound-receiving`, `/slotting`, `/pick-face-replenishment`, `/task-interleaving`,
+`/returns-processing`, `/exception-management`) is a Module Federation **remote** owned and deployed by
 that bounded context's own repo — this shell only lazy-loads and hosts them;
 it never contains their business logic. Each context with a reports reader
 also gets a shell-owned Bounded Context Report screen at `/reports/<context>`,

@@ -31,6 +31,8 @@ graph TD
   SO["slotting-optimization"]
   PFR["pick-face-replenishment<br/><i>WMS · Supporting</i>"]
   TI["task-interleaving<br/><i>WES · Supporting</i>"]
+  RP["returns-processing<br/><i>WMS · Supporting</i>"]
+  EM["exception-management<br/><i>WES · Supporting</i>"]
   OA["warehouse-ops-agent<br/>(console-bff)"]
 
   Console -->|"hosts order_mgmt_mfe"| OM
@@ -49,6 +51,8 @@ graph TD
   Console -->|"hosts slotting_mfe"| SO
   Console -->|"hosts replenishment_mfe"| PFR
   Console -->|"hosts task_interleaving_mfe"| TI
+  Console -->|"hosts returns_mfe"| RP
+  Console -->|"hosts exceptions_mfe"| EM
   Console -->|"Floor, Order Lifecycle, WMS/WES reports"| OA
   Console -.->|"Contexts badge: GET /queues/PICK/depth"| FE
   Console -.->|"Contexts badge: GET /sites"| FL

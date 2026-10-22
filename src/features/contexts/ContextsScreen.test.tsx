@@ -137,4 +137,40 @@ describe("ContextsScreen launchpad", () => {
     expect(tile).toHaveAttribute("href", "/task-interleaving");
     expect(tile).toHaveTextContent("task-interleaving");
   });
+
+  it("lists a Returns tile that links to the returns-processing remote", () => {
+    server.use(
+      http.get(`${SERVICE_BASE_URL.fulfillmentExecution}/queues/PICK/depth`, () =>
+        HttpResponse.json({ taskType: "PICK", depth: 3 }),
+      ),
+      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json([])),
+    );
+    render(
+      <MemoryRouter>
+        <ContextsScreen />
+      </MemoryRouter>,
+    );
+
+    const tile = screen.getByRole("link", { name: /Returns/ });
+    expect(tile).toHaveAttribute("href", "/returns-processing");
+    expect(tile).toHaveTextContent("returns-processing");
+  });
+
+  it("lists a Problem Solve tile that links to the exception-management remote", () => {
+    server.use(
+      http.get(`${SERVICE_BASE_URL.fulfillmentExecution}/queues/PICK/depth`, () =>
+        HttpResponse.json({ taskType: "PICK", depth: 3 }),
+      ),
+      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json([])),
+    );
+    render(
+      <MemoryRouter>
+        <ContextsScreen />
+      </MemoryRouter>,
+    );
+
+    const tile = screen.getByRole("link", { name: /Problem Solve/ });
+    expect(tile).toHaveAttribute("href", "/exception-management");
+    expect(tile).toHaveTextContent("exception-management");
+  });
 });

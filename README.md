@@ -22,7 +22,7 @@ shaped this way):
   fulfillment throughput, labor management and labor performance.
 - **Contexts** (`/contexts`) — the launchpad grid into every bounded context, following
   established enterprise WMS/ops-dashboard conventions (SAP Fiori's app-tile launchpad). It
-  lights up as active for its own route, for any of the sixteen remote routes below, and for the
+  lights up as active for its own route, for any of the eighteen remote routes below, and for the
   per-context `/reports/<context>` Bounded Context Report screens described below.
 
 Both dashboards read one section-oriented envelope from the console-bff
@@ -109,7 +109,12 @@ an `Idempotency-Key` header on every create `POST`. `/slotting` is the slotting-
 `/pick-face-replenishment` the pick-face-replenishment remote (container `replenishment_mfe`,
 `/mfes/pick-face-replenishment/`, dev port 5196) and `/task-interleaving` the task-interleaving remote
 (container `task_interleaving_mfe`, `/mfes/task-interleaving/`, dev port 5197); each is mounted under its
-own `/*` splat route and has a Contexts tile. Their `/mfes/<context>/` gateway routes exist only once
+own `/*` splat route and has a Contexts tile. `/returns-processing` is the returns-processing remote
+(federation container `returns_mfe`, served at `/mfes/returns-processing/`, dev port 4010) and
+`/exception-management` the exception-management remote (container `exceptions_mfe`,
+`/mfes/exception-management/`, dev port 4011); their Contexts tiles are "Returns" and "Problem Solve".
+Both dev ports sit deliberately OFF the 51xx MFE ladder (every 5181..5197 slot is taken; the remote
+repos pinned 4010/4011 as free). Every context's `/mfes/<context>/` gateway route exists only once
 warehouse-infra's `apps.yaml` carries `frontend_remote` for the context; until then the Unavailable card
 is expected in a cluster. An unmatched URL renders
 the shell's own client-side "Page not found" screen rather than a server 404.
@@ -181,6 +186,8 @@ built at least once) and each remote's own dev server running on its assigned po
 | slotting-mfe | 5194 | slotting-optimization |
 | replenishment-mfe | 5196 | pick-face-replenishment |
 | task-interleaving-mfe | 5197 | task-interleaving |
+| returns-mfe | 4010 | returns-processing |
+| exceptions-mfe | 4011 | exception-management |
 
 ```bash
 # one-time: build the sibling ui-kit
