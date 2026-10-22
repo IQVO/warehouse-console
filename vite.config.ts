@@ -156,6 +156,27 @@ export default defineConfig({
           name: "task_interleaving_mfe",
           entry: remoteEntry("task-interleaving", 5197),
         },
+        // returns-processing's remote: container `returns_mfe`, exposes
+        // ./App only, mounted on /returns-processing/*. Pinned with
+        // IQVO/returns-processing web/vite.config.ts: gateway path
+        // /mfes/returns-processing/, dev port 4010 (deliberately OFF the
+        // 51xx ladder -- every 5181..5197 slot is taken; the remote repo
+        // pinned 4010 as free).
+        returns_mfe: {
+          type: "module",
+          name: "returns_mfe",
+          entry: remoteEntry("returns-processing", 4010),
+        },
+        // exception-management's remote: container `exceptions_mfe`,
+        // exposes ./App only, mounted on /exception-management/*. Pinned
+        // with IQVO/exception-management web/vite.config.ts: gateway path
+        // /mfes/exception-management/, dev port 4011 (off the 51xx ladder
+        // like returns_mfe's 4010).
+        exceptions_mfe: {
+          type: "module",
+          name: "exceptions_mfe",
+          entry: remoteEntry("exception-management", 4011),
+        },
       },
       // The shell must win the React singleton negotiation. With the
       // default "version-first", every remote's remoteEntry is preloaded

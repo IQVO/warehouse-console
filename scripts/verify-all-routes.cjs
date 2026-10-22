@@ -52,6 +52,12 @@ const routes = [
   // task_interleaving_mfe (dev :5197, /mfes/task-interleaving/).
   { path: "/pick-face-replenishment", label: "pick-face-replenishment", expect: /\S/ },
   { path: "/task-interleaving", label: "task-interleaving", expect: /\S/ },
+  // returns-processing's and exception-management's remotes: containers
+  // returns_mfe (dev :4010, /mfes/returns-processing/) and exceptions_mfe
+  // (dev :4011, /mfes/exception-management/) -- both deliberately off the
+  // fully-taken 51xx MFE ladder.
+  { path: "/returns-processing", label: "returns-processing", expect: /\S/ },
+  { path: "/exception-management", label: "exception-management", expect: /\S/ },
   // /reports/:context -- one Bounded Context Report screen per slug in
   // src/features/context-reports/registry.ts (src/remotes-registration.test.ts
   // fails when a registered slug is missing here). Each must render its own
