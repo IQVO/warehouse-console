@@ -42,6 +42,8 @@ const routes = [
   { path: "/network-fulfillment", label: "network-fulfillment", expect: /\S/ },
   { path: "/capacity", label: "capacity", expect: /\S/ },
   { path: "/product-master", label: "product-master", expect: /\S/ },
+  // Packaging screen of the same remote (product-master web/, products/:sku/packaging): a deep link under the splat route.
+  { path: "/product-master/products/SKU-1/packaging", label: "product-master-packaging", expect: /\S/ },
   { path: "/network-inventory", label: "network-inventory", expect: /\S/ },
   { path: "/inbound-receiving", label: "inbound-receiving", expect: /\S/ },
   // slotting-optimization's remote (connect-all 2.2b): container

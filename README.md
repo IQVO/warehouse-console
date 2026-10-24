@@ -92,7 +92,7 @@ read side for warehouse-planning is being built separately, and this shell adds 
 screen only once that endpoint is merged. `/product-master` is the product-master remote
 (federation container `productmaster_mfe`, served at `/mfes/product-master/`, dev port 5191),
 mounted the same way under the `/product-master/*` splat route for its own relative sub-routes
-(`register`, `products/:sku`); its Contexts tile is "Product Master" and the remote calls
+(`register`, `products/:sku`, `products/:sku/packaging`: pack levels, GTINs and eaches per pack, with declare, retire and a GTIN lookup); its Contexts tile is "Product Master" and the remote calls
 `/api/product-master` on Kong. product-master has no Bounded Context Report screen here: its
 `product-reports` service (master data quality, product-master ADR 0006) runs in the kind
 cluster, but its Kong route `/api/product-master/reports/*` currently answers 404 because the
