@@ -60,6 +60,21 @@ const routes = [
   // fully-taken 51xx MFE ladder.
   { path: "/returns-processing", label: "returns-processing", expect: /\S/ },
   { path: "/exception-management", label: "exception-management", expect: /\S/ },
+  // The retail-network fleet's ten remotes (customer-ordering through
+  // vendor-connectivity): containers customer_ordering_mfe ..
+  // vendor_connectivity_mfe, gateway path /mfes/<repo>/, dev ports
+  // 4012..4021 -- off the fully-taken 51xx MFE ladder like returns_mfe's
+  // 4010 and exceptions_mfe's 4011.
+  { path: "/customer-ordering", label: "customer-ordering", expect: /\S/ },
+  { path: "/delivery-promise", label: "delivery-promise", expect: /\S/ },
+  { path: "/last-mile-delivery", label: "last-mile-delivery", expect: /\S/ },
+  { path: "/linehaul-transportation", label: "linehaul-transportation", expect: /\S/ },
+  { path: "/node-performance", label: "node-performance", expect: /\S/ },
+  { path: "/node-topology", label: "node-topology", expect: /\S/ },
+  { path: "/offer-availability", label: "offer-availability", expect: /\S/ },
+  { path: "/order-sourcing", label: "order-sourcing", expect: /\S/ },
+  { path: "/shipping-and-tracking", label: "shipping-and-tracking", expect: /\S/ },
+  { path: "/vendor-connectivity", label: "vendor-connectivity", expect: /\S/ },
   // /reports/:context -- one Bounded Context Report screen per slug in
   // src/features/context-reports/registry.ts (src/remotes-registration.test.ts
   // fails when a registered slug is missing here). Each must render its own
