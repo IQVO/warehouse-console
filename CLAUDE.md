@@ -16,7 +16,7 @@ launchpad into the eighteen bounded-context **remotes** (`/order-management`,
 deployed by its own repo; this shell only lazy-loads and hosts them. See ADR-0001
 in `docs/docs/adr/`.
 
-Domain model source of truth: `/Users/claudioed/docs/amazon-fulfillment-ddd.md` and
+Domain model source of truth: `/Users/claudioed/docs/fulfillment-reference-ddd.md` and
 `/Users/claudioed/warehouse-systems-ddd.md`. This repo models no bounded context:
 no aggregates, no domain events, no persistence.
 
