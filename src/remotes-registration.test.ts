@@ -56,6 +56,7 @@ describe("productmaster_mfe registration", () => {
 
   it("is covered by verify:routes", () => {
     expect(read("scripts/verify-all-routes.cjs")).toContain('path: "/product-master"');
+    expect(read("scripts/verify-all-routes.cjs")).toContain('path: "/product-master/products/SKU-1/packaging"');
   });
 });
 

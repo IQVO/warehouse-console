@@ -72,7 +72,12 @@ describe("productmaster_mfe route (/product-master/*)", () => {
     );
   }
 
-  it.each(["/product-master", "/product-master/register", "/product-master/products/SKU-1"])(
+  it.each([
+    "/product-master",
+    "/product-master/register",
+    "/product-master/products/SKU-1",
+    "/product-master/products/SKU-1/packaging",
+  ])(
     "%s is a shell route that falls back to the unavailable card when the remote is down",
     async (path) => {
       stubBadges();
