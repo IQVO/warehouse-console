@@ -207,6 +207,33 @@ VERIFY_STUB_API=1 npm run verify:routes
 
 # needs only the shell's own dev server -- stubs the console-bff report calls:
 npm run verify:dashboards
+
+# against the deployed kind product (Nginx assets on :80, Kong APIs on :8000):
+npm run verify:cluster
+```
+
+`verify:routes` and `verify:dashboards` accept `BASE_URL` and `API_ORIGIN`; their defaults
+remain `http://localhost:5173` and `http://localhost:8000`. `verify:cluster` pins the
+production split edge and checks deep-link refresh, every context-specific remote
+screen (all 28 registered remotes), federation entry/chunk origins, Kong-only API traffic, real WMS/WES reports,
+client-side navigation, browser/request failures, and an in-browser remote-entry outage
+that exercises `RemoteBoundary` without changing the cluster. The report gate requires
+the exact seven dashboard sections, non-zero series, and projection freshness no older
+than `MAX_REPORT_FRESHNESS_SECONDS` (default: 300), so run it after the ecosystem
+analytics setup has created the run-scoped facts. Set `ARTIFACT_DIR` to choose where
+HARs, request logs, console logs, screenshots and failure traces are written (default:
+`/tmp/warehouse-console-cluster-verify`).
+
+Cluster CI jobs can invoke the same gate in the runner that owns the kind cluster with
+the checked-in composite action. The caller must first check out `warehouse-console`
+and `warehouse-ui-kit` as siblings and deploy/seed the cluster; the action deliberately
+does not mutate cluster workloads:
+
+```yaml
+- uses: claudioed/warehouse-console/.github/actions/verify-cluster@<warehouse-console-sha>
+  with:
+    working-directory: warehouse-console
+    artifact-name: cluster-browser-${{ github.run_id }}
 ```
 
 `verify:dashboards` covers the three states the report screens have to get right — every
