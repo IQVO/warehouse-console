@@ -11,7 +11,9 @@
     "preview": "vite preview --port 5173",
     "verify:routes": "node scripts/verify-all-routes.cjs",
     "verify:dashboards": "node scripts/verify-dashboards.cjs",
-    "test": "vitest run",
+    "verify:cluster": "BASE_URL=http://localhost API_ORIGIN=http://localhost:8000 node scripts/verify-cluster.cjs",
+    "test": "vitest run && npm run test:browser-scripts",
+    "test:browser-scripts": "node --test scripts/browser-verify-common.test.cjs scripts/verify-cluster.test.cjs",
     "test:watch": "vitest"
   },
   "dependencies": {

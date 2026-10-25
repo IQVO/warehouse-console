@@ -1,8 +1,9 @@
 /**
- * Dev-only smoke check: loads every route in a real headless browser and
+ * Browser route smoke check: loads every route in a real headless browser and
  * confirms each one renders without page errors or failed requests.
- * Requires the shell (npm run dev, :5173) and all 6 remotes' dev servers
- * to already be running -- this does not start them for you.
+ * Defaults to the dev shell (:5173) and accepts BASE_URL/API_ORIGIN overrides.
+ * The selected shell and all 8 remotes must already be running; this script
+ * does not start them.
  *
  * Usage: npm run verify:routes
  *
@@ -12,6 +13,13 @@
  * actually be on screen.
  */
 const { chromium } = require("playwright");
+const {
+  isDocumentRequest,
+  runtimeConfig,
+  urlAt,
+} = require("./browser-verify-common.cjs");
+
+const { baseUrl, apiOrigin } = runtimeConfig();
 
 const routes = [
   { path: "/", label: "floor", expect: /Floor/i },
@@ -47,9 +55,11 @@ const routes = [
     }
   });
 
+  console.log(`web: ${baseUrl}`);
+  console.log(`expected API origin: ${apiOrigin}`);
   for (const route of routes) {
     console.log(`=== ${route.label} (${route.path}) ===`);
-    await page.goto(`http://localhost:5173${route.path}`, {
+    await page.goto(urlAt(baseUrl, route.path), {
       waitUntil: "networkidle",
       timeout: 20000,
     });
@@ -77,18 +87,20 @@ const routes = [
   // the ui-kit is emitting plain <a href> again, which tears down and
   // re-downloads every Module Federation remote on every click.
   console.log("=== client-side navigation ===");
-  await page.goto("http://localhost:5173/", { waitUntil: "networkidle" });
-  let documentNavigations = 0;
-  page.on("framenavigated", (frame) => {
-    if (frame === page.mainFrame()) documentNavigations += 1;
-  });
+  await page.goto(urlAt(baseUrl, "/"), { waitUntil: "networkidle" });
+  const documentRequests = [];
+  const documentRequestListener = (request) => {
+    if (isDocumentRequest(request)) documentRequests.push(request.url());
+  };
+  page.on("request", documentRequestListener);
   const navLink = page.locator('nav a[href="/contexts"]').first();
   if ((await navLink.count()) > 0) {
     await navLink.click();
-    await page.waitForTimeout(500);
-    if (documentNavigations > 0) {
+    await page.waitForURL(urlAt(baseUrl, "/contexts"), { timeout: 20000 });
+    page.off("request", documentRequestListener);
+    if (documentRequests.length > 0) {
       errors.push(
-        `FULL PAGE RELOAD on nav click (${documentNavigations}); expected client-side routing`,
+        `FULL PAGE RELOAD on nav click (${documentRequests.join(", ")}); expected client-side routing`,
       );
     } else {
       console.log("ok: nav click routed client-side");
