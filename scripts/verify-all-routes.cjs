@@ -199,8 +199,6 @@ const routes = [
       );
     } else {
       console.log("ok: nav click routed client-side");
-    } else {
-      errors.push("FULL PAGE RELOAD on nav click; expected client-side routing");
     }
   } else {
     errors.push("SHELL MISSING: no /contexts nav link to click");
