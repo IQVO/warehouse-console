@@ -69,6 +69,10 @@ jobs:
         working-directory: warehouse-ui-kit
       - run: npm ci
         working-directory: warehouse-console
+      # verify-cluster.test.cjs drives a real headless Chromium through the
+      # split web/API edge; same install the verify-routes workflow uses.
+      - run: npx playwright install --with-deps chromium
+        working-directory: warehouse-console
       - run: npm test
         working-directory: warehouse-console
 
