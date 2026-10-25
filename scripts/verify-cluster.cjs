@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 "use strict";
 
-const { mkdirSync, writeFileSync } = require("node:fs");
+const { mkdirSync, mkdtempSync, writeFileSync } = require("node:fs");
 const path = require("node:path");
 const { chromium } = require("playwright");
 const {
@@ -21,9 +21,11 @@ const timeoutMs = Number.parseInt(process.env.VERIFY_TIMEOUT_MS || "30000", 10);
 const maxReportFreshnessSeconds = Number.parseFloat(
   process.env.MAX_REPORT_FRESHNESS_SECONDS || "300",
 );
-const artifactDir = path.resolve(
-  process.env.ARTIFACT_DIR || "/tmp/warehouse-console-cluster-verify",
-);
+// A fresh, unpredictable directory per run (CodeQL: insecure temporary
+// file) unless CI pins ARTIFACT_DIR explicitly.
+const artifactDir = process.env.ARTIFACT_DIR
+  ? path.resolve(process.env.ARTIFACT_DIR)
+  : mkdtempSync(path.join(require("node:os").tmpdir(), "warehouse-console-cluster-verify-"));
 const degradedContext = process.env.DEGRADED_REMOTE_CONTEXT || "order-management";
 
 if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
