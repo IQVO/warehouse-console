@@ -2,10 +2,19 @@
  * Browser route smoke check: loads every route in a real headless browser and
  * confirms each one renders without page errors or failed requests.
  * Defaults to the dev shell (:5173) and accepts BASE_URL/API_ORIGIN overrides.
- * The selected shell and all 8 remotes must already be running; this script
- * does not start them.
+ * The selected shell, every remote's dev server and the APIs at the resolved
+ * apiOrigin (including each <context>-reports reader) must already be
+ * running -- this does not start them for you.
  *
  * Usage: npm run verify:routes
+ *        VERIFY_STUB_API=1 npm run verify:routes   (no backends, see below)
+ *
+ * VERIFY_STUB_API=1 answers every call to config.json's apiOrigin with a
+ * 503 inside the browser (page.route), so no backend and no Kong CORS are
+ * needed. Every screen is designed to render its heading and an error state
+ * when its API is down, so the same routes and assertions still apply; what
+ * it proves is what unit tests cannot: each remote's remoteEntry loads and
+ * mounts, routing, nav and the 404 screens. It does not prove data panels.
  *
  * This script used to read the page text, print it, and throw it away: the
  * exit code depended only on pageerror/requestfailed, so a completely
@@ -20,6 +29,8 @@ const {
 } = require("./browser-verify-common.cjs");
 
 const { baseUrl, apiOrigin } = runtimeConfig();
+
+const STUB_API = process.env.VERIFY_STUB_API === "1";
 
 const routes = [
   { path: "/", label: "floor", expect: /Floor/i },
@@ -36,6 +47,69 @@ const routes = [
   { path: "/facility", label: "facility", expect: /\S/ },
   { path: "/process-path", label: "process-path", expect: /\S/ },
   { path: "/labor", label: "labor", expect: /\S/ },
+  { path: "/network-fulfillment", label: "network-fulfillment", expect: /\S/ },
+  { path: "/capacity", label: "capacity", expect: /\S/ },
+  { path: "/product-master", label: "product-master", expect: /\S/ },
+  // Packaging screen of the same remote (product-master web/, products/:sku/packaging): a deep link under the splat route.
+  { path: "/product-master/products/SKU-1/packaging", label: "product-master-packaging", expect: /\S/ },
+  { path: "/network-inventory", label: "network-inventory", expect: /\S/ },
+  { path: "/inbound-receiving", label: "inbound-receiving", expect: /\S/ },
+  // slotting-optimization's remote (connect-all 2.2b): container
+  // slotting_mfe, gateway path /mfes/slotting-optimization/, dev :5194.
+  { path: "/slotting", label: "slotting-optimization", expect: /\S/ },
+  // pick-face-replenishment's and task-interleaving's remotes: containers
+  // replenishment_mfe (dev :5196, /mfes/pick-face-replenishment/) and
+  // task_interleaving_mfe (dev :5197, /mfes/task-interleaving/).
+  { path: "/pick-face-replenishment", label: "pick-face-replenishment", expect: /\S/ },
+  { path: "/task-interleaving", label: "task-interleaving", expect: /\S/ },
+  // returns-processing's and exception-management's remotes: containers
+  // returns_mfe (dev :4010, /mfes/returns-processing/) and exceptions_mfe
+  // (dev :4011, /mfes/exception-management/) -- both deliberately off the
+  // fully-taken 51xx MFE ladder.
+  { path: "/returns-processing", label: "returns-processing", expect: /\S/ },
+  { path: "/exception-management", label: "exception-management", expect: /\S/ },
+  // The retail-network fleet's ten remotes (customer-ordering through
+  // vendor-connectivity): containers customer_ordering_mfe ..
+  // vendor_connectivity_mfe, gateway path /mfes/<repo>/, dev ports
+  // 4012..4021 -- off the fully-taken 51xx MFE ladder like returns_mfe's
+  // 4010 and exceptions_mfe's 4011.
+  { path: "/customer-ordering", label: "customer-ordering", expect: /\S/ },
+  { path: "/delivery-promise", label: "delivery-promise", expect: /\S/ },
+  { path: "/last-mile-delivery", label: "last-mile-delivery", expect: /\S/ },
+  { path: "/linehaul-transportation", label: "linehaul-transportation", expect: /\S/ },
+  { path: "/node-performance", label: "node-performance", expect: /\S/ },
+  { path: "/node-topology", label: "node-topology", expect: /\S/ },
+  { path: "/offer-availability", label: "offer-availability", expect: /\S/ },
+  { path: "/order-sourcing", label: "order-sourcing", expect: /\S/ },
+  { path: "/shipping-and-tracking", label: "shipping-and-tracking", expect: /\S/ },
+  { path: "/vendor-connectivity", label: "vendor-connectivity", expect: /\S/ },
+  // /reports/:context -- one Bounded Context Report screen per slug in
+  // src/features/context-reports/registry.ts (src/remotes-registration.test.ts
+  // fails when a registered slug is missing here). Each must render its own
+  // heading whether the reports reader answers or the error card shows.
+  { path: "/reports/order-management", label: "report:order-management", expect: /Orders: Funnel/i },
+  { path: "/reports/inventory-storage", label: "report:inventory-storage", expect: /Inventory: Flow/i },
+  { path: "/reports/wes-work-planning", label: "report:wes-work-planning", expect: /Planning: Release/i },
+  { path: "/reports/fulfillment-execution", label: "report:fulfillment-execution", expect: /Fulfillment: Throughput/i },
+  { path: "/reports/workforce-management", label: "report:workforce-management", expect: /Workforce: Labor/i },
+  { path: "/reports/facility-layout", label: "report:facility-layout", expect: /Facility: Catalog Growth/i },
+  { path: "/reports/process-path-management", label: "report:process-path-management", expect: /Process Paths: Catalogue/i },
+  { path: "/reports/labor-performance", label: "report:labor-performance", expect: /Labor: Performance/i },
+  { path: "/reports/network-fulfillment", label: "report:network-fulfillment", expect: /Network Fulfillment: Acknowledgement/i },
+  { path: "/reports/warehouse-planning", label: "report:warehouse-planning", expect: /Capacity Planning: Shortage/i },
+  { path: "/reports/network-inventory-planning", label: "report:network-inventory-planning", expect: /Network Inventory: Stuck/i },
+  { path: "/reports/product-master", label: "report:product-master", expect: /Product Master: Data Quality/i },
+  { path: "/reports/inbound-receiving", label: "report:inbound-receiving", expect: /Inbound: Receiving/i },
+  { path: "/reports/slotting-optimization", label: "report:slotting-optimization", expect: /Slotting: Slot Plan Funnel/i },
+  { path: "/reports/warehouse-planning-bottleneck-frequency", label: "report:warehouse-planning-bottleneck-frequency", expect: /Capacity Planning: Bottleneck Frequency/i },
+  { path: "/reports/warehouse-planning-plan-throughput", label: "report:warehouse-planning-plan-throughput", expect: /Capacity Planning: Plan Throughput/i },
+  { path: "/reports/network-inventory-planning-transfer-funnel", label: "report:network-inventory-planning-transfer-funnel", expect: /Network Inventory: Transfer Funnel/i },
+  { path: "/reports/network-inventory-planning-state-dwell", label: "report:network-inventory-planning-state-dwell", expect: /Network Inventory: State Dwell/i },
+  { path: "/reports/network-inventory-planning-rebalance-runs", label: "report:network-inventory-planning-rebalance-runs", expect: /Network Inventory: Rebalance Runs/i },
+  { path: "/reports/pick-face-replenishment", label: "report:pick-face-replenishment", expect: /Pick-Face Replenishment: Funnel/i },
+  { path: "/reports/task-interleaving", label: "report:task-interleaving", expect: /Task Interleaving: Hint Adoption/i },
+  // An unknown report slug falls through to the shell's own 404 screen.
+  { path: "/reports/no-such-context", label: "report:404", expect: /Page not found/i },
   // An unmatched URL must explain itself, not render empty chrome.
   { path: "/no-such-screen", label: "404", expect: /Page not found/i },
 ];
@@ -47,7 +121,21 @@ const routes = [
   page.on("pageerror", (err) =>
     errors.push(`[${page.url()}] PAGE ERROR: ${err.message}`),
   );
+  if (STUB_API) {
+    const { apiOrigin } = require("../public/config.json");
+    await page.route(`${apiOrigin}/**`, (route) =>
+      route.fulfill({
+        status: 503,
+        contentType: "application/problem+json",
+        headers: { "access-control-allow-origin": "*" },
+        body: '{"title":"verify:routes stub: no backend","status":503}',
+      }),
+    );
+  }
   page.on("requestfailed", (req) => {
+    // ERR_ABORTED is the page cancelling its own fetch (ui-kit's useFetch aborts
+    // on effect cleanup, and StrictMode runs every dev effect twice), not a backend failure.
+    if (req.failure()?.errorText === "net::ERR_ABORTED") return;
     if (!req.url().includes("mf-types") && !req.url().includes("@vite")) {
       errors.push(
         `[${page.url()}] REQUEST FAILED: ${req.url()} ${req.failure()?.errorText}`,
@@ -68,6 +156,13 @@ const routes = [
     const bodyText = await page.locator("body").innerText();
     console.log(bodyText.slice(0, 500));
 
+    // RemoteBoundary swallows a remote that failed to load or threw on mount
+    // (404 remoteEntry, wrong federation name, missing ./App) behind this card,
+    // which satisfies every /\S/ expectation and raises no pageerror.
+    if (/This module is unavailable right now/i.test(bodyText)) {
+      errors.push(`[${route.path}] REMOTE UNAVAILABLE: RemoteBoundary rendered its fallback card`);
+    }
+
     if (!route.expect.test(bodyText)) {
       errors.push(
         `[${route.path}] CONTENT ASSERTION FAILED: expected ${route.expect} in rendered page`,
@@ -87,7 +182,7 @@ const routes = [
   // the ui-kit is emitting plain <a href> again, which tears down and
   // re-downloads every Module Federation remote on every click.
   console.log("=== client-side navigation ===");
-  await page.goto(urlAt(baseUrl, "/"), { waitUntil: "networkidle" });
+  await page.goto(urlAt(baseUrl, STUB_API ? "/order-lifecycle" : "/"), { waitUntil: "networkidle" });
   const documentRequests = [];
   const documentRequestListener = (request) => {
     if (isDocumentRequest(request)) documentRequests.push(request.url());
@@ -104,7 +199,11 @@ const routes = [
       );
     } else {
       console.log("ok: nav click routed client-side");
+    } else {
+      errors.push("FULL PAGE RELOAD on nav click; expected client-side routing");
     }
+  } else {
+    errors.push("SHELL MISSING: no /contexts nav link to click");
   }
   console.log();
 

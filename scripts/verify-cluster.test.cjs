@@ -204,7 +204,7 @@ test("cluster verifier accepts the split edge and rejects browser failures", { t
       0,
       `verifier exited ${result.code} (${result.signal})\nstdout:\n${result.stdout}\nstderr:\n${result.stderr}`,
     );
-    assert.match(result.stdout, /8 remote entries and chunks stayed on the web origin/);
+    assert.match(result.stdout, new RegExp(`${REMOTES.length} remote entries and chunks stayed on the web origin`));
     assert.match(result.stdout, /real WMS and WES report responses rendered/);
     assert.match(result.stdout, /remote boundary isolated order-management/);
 

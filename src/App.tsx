@@ -7,6 +7,7 @@ import { OrderLifecycleScreen } from "./features/order-lifecycle/OrderLifecycleS
 import { WmsDashboardScreen } from "./features/wms-dashboard/WmsDashboardScreen";
 import { WesDashboardScreen } from "./features/wes-dashboard/WesDashboardScreen";
 import { NotFoundScreen } from "./features/not-found/NotFoundScreen";
+import { ContextReportRouteScreen } from "./features/context-reports/ContextReportRouteScreen";
 import { RemoteBoundary } from "./shell/RemoteBoundary";
 import { RouterLink } from "./shell/RouterLink";
 
@@ -40,6 +41,26 @@ const REMOTE_PREFIXES = [
   "/facility",
   "/process-path",
   "/labor",
+  "/network-fulfillment",
+  "/capacity",
+  "/product-master",
+  "/network-inventory",
+  "/inbound-receiving",
+  "/slotting",
+  "/pick-face-replenishment",
+  "/task-interleaving",
+  "/returns-processing",
+  "/exception-management",
+  "/customer-ordering",
+  "/delivery-promise",
+  "/last-mile-delivery",
+  "/linehaul-transportation",
+  "/node-performance",
+  "/node-topology",
+  "/offer-availability",
+  "/order-sourcing",
+  "/shipping-and-tracking",
+  "/vendor-connectivity",
 ];
 
 // Each lazy() call MUST run exactly once, at module load, not inside a
@@ -64,6 +85,46 @@ const FacilityRemote = lazy(() => import("facility_mfe/App"));
 const ProcessPathRemote = lazy(() => import("process_path_mfe/App"));
 // @ts-expect-error -- remote module resolved at runtime by Module Federation
 const LaborRemote = lazy(() => import("labor_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const NetworkFulfillmentRemote = lazy(() => import("network_fulfillment_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const CapacityRemote = lazy(() => import("capacity_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const ProductMasterRemote = lazy(() => import("productmaster_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const NipRemote = lazy(() => import("nip_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const InboundRemote = lazy(() => import("inbound_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const SlottingRemote = lazy(() => import("slotting_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const ReplenishmentRemote = lazy(() => import("replenishment_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const TaskInterleavingRemote = lazy(() => import("task_interleaving_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const ReturnsRemote = lazy(() => import("returns_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const ExceptionsRemote = lazy(() => import("exceptions_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const CustomerOrderingRemote = lazy(() => import("customer_ordering_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const DeliveryPromiseRemote = lazy(() => import("delivery_promise_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const LastMileRemote = lazy(() => import("last_mile_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const LinehaulRemote = lazy(() => import("linehaul_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const NodePerformanceRemote = lazy(() => import("node_performance_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const NodeTopologyRemote = lazy(() => import("node_topology_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const OfferAvailabilityRemote = lazy(() => import("offer_availability_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const OrderSourcingRemote = lazy(() => import("order_sourcing_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const ShippingRemote = lazy(() => import("shipping_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const VendorConnectivityRemote = lazy(() => import("vendor_connectivity_mfe/App"));
 /* eslint-enable react-refresh/only-export-components */
 
 /** Anchored prefix match: a bare startsWith would light up "Inventory"
@@ -80,8 +141,10 @@ function Shell() {
       item.href === "/"
         ? location.pathname === "/"
         : item.id === "contexts"
-          ? // Contexts owns the eight remote routes as well as its own.
+          ? // Contexts owns the eight remote routes as well as its own,
+            // plus every per-context /reports/<context> detail screen.
             location.pathname.startsWith("/contexts") ||
+            location.pathname.startsWith("/reports") ||
             REMOTE_PREFIXES.some((p) => isUnder(location.pathname, p))
           : isUnder(location.pathname, item.href),
   }));
@@ -126,6 +189,157 @@ function Shell() {
           path="/labor/*"
           element={<RemoteBoundary label="Labor Performance" component={LaborRemote} />}
         />
+        <Route
+          path="/network-fulfillment/*"
+          element={
+            <RemoteBoundary
+              label="Network Fulfillment"
+              component={NetworkFulfillmentRemote}
+            />
+          }
+        />
+        <Route
+          path="/capacity/*"
+          element={<RemoteBoundary label="Capacity Planning" component={CapacityRemote} />}
+        />
+        <Route
+          path="/product-master/*"
+          element={<RemoteBoundary label="Product Master" component={ProductMasterRemote} />}
+        />
+        <Route
+          path="/network-inventory/*"
+          element={<RemoteBoundary label="Network Inventory" component={NipRemote} />}
+        />
+        <Route
+          path="/inbound-receiving/*"
+          element={<RemoteBoundary label="Inbound Receiving" component={InboundRemote} />}
+        />
+        <Route
+          path="/slotting/*"
+          element={<RemoteBoundary label="Slotting" component={SlottingRemote} />}
+        />
+        <Route
+          path="/pick-face-replenishment/*"
+          element={
+            <RemoteBoundary
+              label="Pick-Face Replenishment"
+              component={ReplenishmentRemote}
+            />
+          }
+        />
+        <Route
+          path="/task-interleaving/*"
+          element={
+            <RemoteBoundary
+              label="Task Interleaving"
+              component={TaskInterleavingRemote}
+            />
+          }
+        />
+        <Route
+          path="/returns-processing/*"
+          element={<RemoteBoundary label="Returns" component={ReturnsRemote} />}
+        />
+        <Route
+          path="/exception-management/*"
+          element={
+            <RemoteBoundary
+              label="Problem Solve"
+              component={ExceptionsRemote}
+            />
+          }
+        />
+        <Route
+          path="/customer-ordering/*"
+          element={
+            <RemoteBoundary
+              label="Customer Ordering"
+              component={CustomerOrderingRemote}
+            />
+          }
+        />
+        <Route
+          path="/delivery-promise/*"
+          element={
+            <RemoteBoundary
+              label="Delivery Promise"
+              component={DeliveryPromiseRemote}
+            />
+          }
+        />
+        <Route
+          path="/last-mile-delivery/*"
+          element={
+            <RemoteBoundary
+              label="Last Mile Delivery"
+              component={LastMileRemote}
+            />
+          }
+        />
+        <Route
+          path="/linehaul-transportation/*"
+          element={
+            <RemoteBoundary
+              label="Linehaul Transportation"
+              component={LinehaulRemote}
+            />
+          }
+        />
+        <Route
+          path="/node-performance/*"
+          element={
+            <RemoteBoundary
+              label="Node Performance"
+              component={NodePerformanceRemote}
+            />
+          }
+        />
+        <Route
+          path="/node-topology/*"
+          element={
+            <RemoteBoundary
+              label="Node Topology"
+              component={NodeTopologyRemote}
+            />
+          }
+        />
+        <Route
+          path="/offer-availability/*"
+          element={
+            <RemoteBoundary
+              label="Offer Availability"
+              component={OfferAvailabilityRemote}
+            />
+          }
+        />
+        <Route
+          path="/order-sourcing/*"
+          element={
+            <RemoteBoundary
+              label="Order Sourcing"
+              component={OrderSourcingRemote}
+            />
+          }
+        />
+        <Route
+          path="/shipping-and-tracking/*"
+          element={
+            <RemoteBoundary
+              label="Shipping & Tracking"
+              component={ShippingRemote}
+            />
+          }
+        />
+        <Route
+          path="/vendor-connectivity/*"
+          element={
+            <RemoteBoundary
+              label="Vendor Connectivity"
+              component={VendorConnectivityRemote}
+            />
+          }
+        />
+        <Route path="/reports/:context" element={<ContextReportRouteScreen />} />
         {/* Unmatched URLs used to render the chrome around an empty
             <main> -- a blank page with a working nav and no explanation. */}
         <Route path="*" element={<NotFoundScreen />} />

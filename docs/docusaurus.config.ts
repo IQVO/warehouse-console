@@ -12,10 +12,10 @@ const config: Config = {
     v4: true,
   },
 
-  url: 'https://claudioed.github.io',
+  url: 'https://iqvo.github.io',
   baseUrl: '/warehouse-console/',
 
-  organizationName: 'claudioed',
+  organizationName: 'IQVO',
   projectName: 'warehouse-console',
   deploymentBranch: 'gh-pages',
   trailingSlash: false,
@@ -43,7 +43,7 @@ const config: Config = {
         docs: {
           sidebarPath: './sidebars.ts',
           editUrl:
-            'https://github.com/claudioed/warehouse-console/tree/main/docs/',
+            'https://github.com/IQVO/warehouse-console/tree/main/docs/',
         },
         blog: false,
         theme: {
@@ -79,7 +79,7 @@ const config: Config = {
           position: 'left',
         },
         {
-          href: 'https://github.com/claudioed/warehouse-console',
+          href: 'https://github.com/IQVO/warehouse-console',
           label: 'GitHub',
           position: 'right',
         },
@@ -102,15 +102,15 @@ const config: Config = {
             {label: 'Context map', to: '/docs/ecosystem/context-map'},
             {
               label: 'warehouse-ops-agent (console-bff)',
-              href: 'https://github.com/claudioed/warehouse-ops-agent',
+              href: 'https://github.com/IQVO/warehouse-ops-agent',
             },
             {
               label: 'warehouse-ui-kit (design system)',
-              href: 'https://github.com/claudioed/warehouse-ui-kit',
+              href: 'https://github.com/IQVO/warehouse-ui-kit',
             },
             {
               label: 'facility-layout',
-              href: 'https://github.com/claudioed/facility-layout',
+              href: 'https://github.com/IQVO/facility-layout',
             },
           ],
         },
@@ -119,7 +119,7 @@ const config: Config = {
           items: [
             {
               label: 'warehouse-console on GitHub',
-              href: 'https://github.com/claudioed/warehouse-console',
+              href: 'https://github.com/IQVO/warehouse-console',
             },
           ],
         },

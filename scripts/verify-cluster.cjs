@@ -299,7 +299,7 @@ function dashboardEndpoint(kind) {
         throw new Error(`missing federation entry or chunk for ${remote.context}`);
       }
     }
-    console.log("PASS 8 remote entries and chunks stayed on the web origin");
+    console.log(`PASS ${REMOTES.length} remote entries and chunks stayed on the web origin`);
 
     if (reportKinds.size !== 2) {
       throw new Error("both real report APIs were not observed");

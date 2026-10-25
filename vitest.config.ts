@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import { defineConfig, mergeConfig } from "vitest/config";
 import viteConfig from "./vite.config.ts";
 
@@ -19,6 +20,17 @@ export default mergeConfig(
       // module instance than the one rendering the test tree, producing
       // "Invalid hook call" / "Cannot read properties of null".
       dedupe: ["react", "react-dom"],
+      // Federated remotes (`<name>_mfe/App`) only exist at runtime, so Vite's
+      // import analysis cannot resolve them when a test imports src/App.tsx.
+      // Point them at a stub that throws on evaluation: the lazy() import then
+      // rejects exactly as a remote that is down would, which is the case
+      // RemoteBoundary handles and src/App.test.tsx asserts.
+      alias: [
+        {
+          find: /^[a-z_]+_mfe\/App$/,
+          replacement: fileURLToPath(new URL("./src/test/remoteUnavailable.ts", import.meta.url)),
+        },
+      ],
     },
     test: {
       environment: "jsdom",

@@ -22,7 +22,8 @@ shaped this way):
   fulfillment throughput, labor management and labor performance.
 - **Contexts** (`/contexts`) — the launchpad grid into every bounded context, following
   established enterprise WMS/ops-dashboard conventions (SAP Fiori's app-tile launchpad). It
-  lights up as active for its own route and for any of the eight remote routes below.
+  lights up as active for its own route, for any of the eighteen remote routes below, and for the
+  per-context `/reports/<context>` Bounded Context Report screens described below.
 
 Both dashboards read one section-oriented envelope from the console-bff
 (`GET /console/reports/{wms,wes}?from=&to=`, default trailing 24h) and render each section
@@ -33,11 +34,90 @@ arrives as `available: false` and renders as a single "data unavailable" card; t
 the dashboard still shows its real numbers. Only a whole-request failure produces a
 dashboard-level error state.
 
+### Bounded Context Report screens (`/reports/<context>`)
+
+Each of the nine bounded contexts also gets its own **Bounded Context Report** screen,
+reachable from a "View metrics report" link on its Contexts tile. Unlike the WMS/WES
+dashboards above, these read that context's OWN `GET /reports/...` REST endpoint DIRECTLY —
+never through console-bff/warehouse-ops-agent — because they render the unaggregated,
+context-specific analytical projection each service's own reports reader already serves, not
+a cross-service rollup. This is still shell-owned infrastructure, not remote business logic:
+a generic read-only analytics envelope, following the same "shell owns cross-cutting
+screens" reasoning as Floor/Order-Lifecycle/WMS/WES above.
+
+Every context's report DTO is genuinely different — different domain, different metric
+names, different bucket dimensions (see `src/features/context-reports/*.config.tsx` for the
+real endpoint path and field names read directly from each context's own
+`reports_handler.go`) — so there is deliberately no single shared row/column schema. One
+reusable presentational shell, `ContextReportScreen`
+(`src/features/context-reports/ContextReportScreen.tsx`), owns the three degradation states
+(loading / populated / whole-request error) and the `FreshnessBadge` reading that context's
+sibling `/reports/.../freshness` endpoint; each context's own config object is the only place
+that maps its real DTO onto the shared `@warehouse/ui-kit` primitives (`Card`, `DataTable`,
+`BarChart`, `LineChart`, `FunnelChart`).
+
+One thing every one of these nine screens needs from the cluster, called out explicitly rather
+than silently assumed (see `src/config.ts`'s own doc comments for the full detail):
+
+- **Kong routing for the reports readers.** Every analytics-enabled chart stands up a separate
+  `<context>-reports` Service. warehouse-infra renders a second Kong route per
+  analytics-enabled context, `/api/<context>/reports` → `<context>-reports` (stripped to
+  `/reports/...`), in `terraform/services.tf` (and `terraform/network-fulfillment.tf`,
+  `terraform/network-inventory-planning.tf`), so a report screen resolves wherever that
+  context's reports binary is deployed.
+
+network-fulfillment's screen calls `GET /reports/acknowledgement` (and
+`GET /reports/acknowledgement/freshness`) and renders the fields of that context's
+`acknowledgementRowDTO` (`internal/adapters/inbound/http/reports_handler.go`).
+
+Since Phase 4.1 the registry (`src/features/context-reports/registry.ts`) lists more than one
+screen for some contexts and covers more than the nine above. A context's first report keeps
+the bare slug (`/reports/warehouse-planning`), further ones use `<context>-<report>`
+(`/reports/warehouse-planning-bottleneck-frequency`, `…-plan-throughput`,
+`/reports/network-inventory-planning-transfer-funnel`, `…-state-dwell`, `…-rebalance-runs`), and
+each screen links its siblings. `/reports/pick-face-replenishment` (`GET
+/reports/replenishment-funnel`) and `/reports/task-interleaving` (`GET /reports/hint-adoption`)
+read the new `pfr-reports` / `ti-reports` readers; both use the context-level
+`GET /reports/freshness`. Their web remotes are NOT registered in this shell yet (both
+`web/` builds currently claim dev port 5195, and neither has a gateway route in warehouse-infra).
+
 Everything else (`/order-management`, `/inventory`, `/planning`, `/fulfillment`, `/workforce`,
-`/facility`, `/process-path`, `/labor`) is a Module Federation remote owned by that bounded
-context's own repo, reachable from the Contexts launchpad — this shell only lazy-loads and
-hosts them; it never contains their business logic. An unmatched URL renders the shell's own
-client-side "Page not found" screen rather than a server 404.
+`/facility`, `/process-path`, `/labor`, `/network-fulfillment`, `/capacity`, `/product-master`, `/network-inventory`, `/inbound-receiving`) is a Module Federation remote owned
+by that bounded context's own repo, reachable from the Contexts launchpad — this shell only
+lazy-loads and hosts them; it never contains their business logic. `/capacity` is the
+warehouse-planning remote (federation container `capacity_mfe`; the shell mounts its default
+`App` export, which takes no props, under the `/capacity/*` splat route so its own relative
+sub-routes `paths` and `plans` resolve). It has no Bounded Context Report screen: an analytics
+read side for warehouse-planning is being built separately, and this shell adds a report
+screen only once that endpoint is merged. `/product-master` is the product-master remote
+(federation container `productmaster_mfe`, served at `/mfes/product-master/`, dev port 5191),
+mounted the same way under the `/product-master/*` splat route for its own relative sub-routes
+(`register`, `products/:sku`, `products/:sku/packaging`: pack levels, GTINs and eaches per pack, with declare, retire and a GTIN lookup); its Contexts tile is "Product Master" and the remote calls
+`/api/product-master` on Kong. product-master has no Bounded Context Report screen here: its
+`product-reports` service (master data quality, product-master ADR 0006) runs in the kind
+cluster, but its Kong route `/api/product-master/reports/*` currently answers 404 because the
+`/api/product-master` route shadows it. `/network-inventory` is the network-inventory-planning remote
+(federation container `nip_mfe`, served at `/mfes/network-inventory-planning/`, dev port 5192),
+mounted under the `/network-inventory/*` splat route for its relative sub-routes (`simulation`,
+`rebalance-runs`, `transfers/:id`). `/inbound-receiving` is the inbound-receiving remote
+(federation container `inbound_mfe`, served at `/mfes/inbound-receiving/`, dev port 5193),
+mounted under the `/inbound-receiving/*` splat route for its relative sub-routes (`asns`,
+`asns/register`, `asns/:asnNumber`, `appointments`, `receipts`, `receipts/:receiptId`); its
+Contexts tile is "Inbound Receiving" and the remote calls `/api/inbound-receiving` on Kong, sending
+an `Idempotency-Key` header on every create `POST`. `/slotting` is the slotting-optimization remote
+(federation container `slotting_mfe`, served at `/mfes/slotting-optimization/`, dev port 5194),
+`/pick-face-replenishment` the pick-face-replenishment remote (container `replenishment_mfe`,
+`/mfes/pick-face-replenishment/`, dev port 5196) and `/task-interleaving` the task-interleaving remote
+(container `task_interleaving_mfe`, `/mfes/task-interleaving/`, dev port 5197); each is mounted under its
+own `/*` splat route and has a Contexts tile. `/returns-processing` is the returns-processing remote
+(federation container `returns_mfe`, served at `/mfes/returns-processing/`, dev port 4010) and
+`/exception-management` the exception-management remote (container `exceptions_mfe`,
+`/mfes/exception-management/`, dev port 4011); their Contexts tiles are "Returns" and "Problem Solve".
+Both dev ports sit deliberately OFF the 51xx MFE ladder (every 5181..5197 slot is taken; the remote
+repos pinned 4010/4011 as free). Every context's `/mfes/<context>/` gateway route exists only once
+warehouse-infra's `apps.yaml` carries `frontend_remote` for the context; until then the Unavailable card
+is expected in a cluster. An unmatched URL renders
+the shell's own client-side "Page not found" screen rather than a server 404.
 
 This repo owns no OpenAPI or AsyncAPI spec of its own: this shell has no
 domain model to describe (no aggregates, no endpoints it publishes), so there is nothing to
@@ -51,6 +131,27 @@ console-only read layer, not a public API.
 This repository, and every other repository in the `warehouse-systems` set, is a personal
 study project exploring Domain-Driven Design, hexagonal architecture, and micro-frontend
 composition patterns. It is not production software and has no support guarantees.
+
+## Documentation
+
+The full documentation site is published at <https://iqvo.github.io/warehouse-console/>
+(built from `docs/` on every push to `main`). Pages:
+
+- Overview: [introduction](docs/docs/overview/index.md),
+  [getting started](docs/docs/overview/getting-started.md)
+- Architecture: [Module Federation](docs/docs/architecture/module-federation.md),
+  [cross-cutting screens](docs/docs/architecture/cross-cutting-screens.md),
+  [feature modules](docs/docs/architecture/features.md) (every `src/features/*` module)
+- Operations: [configuration](docs/docs/operations/configuration.md) (`/config.json`,
+  remotes, nginx, Helm values), [runbook](docs/docs/operations/runbook.md),
+  [troubleshooting](docs/docs/operations/troubleshooting.md)
+- Development: [testing](docs/docs/development/testing.md) (Vitest, Playwright smoke
+  scripts, CI jobs)
+- Ecosystem: [context map](docs/docs/ecosystem/context-map.md),
+  [consuming the fleet](docs/docs/ecosystem/consuming-the-fleet.md)
+- Decisions: [ADR index](docs/docs/adr/index.md)
+
+Run the site locally with `npm ci && npm run start` in `docs/`.
 
 ## Architecture
 
@@ -77,6 +178,16 @@ built at least once) and each remote's own dev server running on its assigned po
 | facility-mfe | 5186 | facility-layout |
 | labor-mfe | 5187 | labor-performance |
 | process-path-mfe | 5189 | process-path-management |
+| network-fulfillment-mfe | 5188 | network-fulfillment |
+| capacity-mfe | 5190 | warehouse-planning |
+| productmaster-mfe | 5191 | product-master |
+| nip-mfe | 5192 | network-inventory-planning |
+| inbound-mfe | 5193 | inbound-receiving |
+| slotting-mfe | 5194 | slotting-optimization |
+| replenishment-mfe | 5196 | pick-face-replenishment |
+| task-interleaving-mfe | 5197 | task-interleaving |
+| returns-mfe | 4010 | returns-processing |
+| exceptions-mfe | 4011 | exception-management |
 
 ```bash
 # one-time: build the sibling ui-kit
@@ -88,9 +199,11 @@ npm run typecheck    # tsc -b --noEmit
 npm run lint         # oxlint
 npm run build
 
-# with the shell + all 8 remote dev servers running, and the 8 backend
-# services + BFF reachable at config.json's apiOrigin (Kong):
+# with the shell + every remote dev server in the table above running, and the
+# backend services + BFF reachable at config.json's apiOrigin (Kong):
 npm run verify:routes   # headless Playwright smoke check of every route
+# same check without backends (the browser answers every apiOrigin call with a 503):
+VERIFY_STUB_API=1 npm run verify:routes
 
 # needs only the shell's own dev server -- stubs the console-bff report calls:
 npm run verify:dashboards
@@ -101,8 +214,8 @@ npm run verify:cluster
 
 `verify:routes` and `verify:dashboards` accept `BASE_URL` and `API_ORIGIN`; their defaults
 remain `http://localhost:5173` and `http://localhost:8000`. `verify:cluster` pins the
-production split edge and checks deep-link refresh, all eight context-specific remote
-screens, federation entry/chunk origins, Kong-only API traffic, real WMS/WES reports,
+production split edge and checks deep-link refresh, every context-specific remote
+screen (all 28 registered remotes), federation entry/chunk origins, Kong-only API traffic, real WMS/WES reports,
 client-side navigation, browser/request failures, and an in-browser remote-entry outage
 that exercises `RemoteBoundary` without changing the cluster. The report gate requires
 the exact seven dashboard sections, non-zero series, and projection freshness no older

@@ -35,9 +35,9 @@ test("runtime config accepts production edge origins and removes trailing slashe
 });
 
 test("the cluster manifest names all eight remotes with context-specific content", () => {
-  assert.equal(REMOTES.length, 8);
-  assert.equal(new Set(REMOTES.map(({ context }) => context)).size, 8);
-  assert.equal(new Set(REMOTES.map(({ route }) => route)).size, 8);
+  assert.ok(REMOTES.length >= 28, `expected the full remote fleet, got ${REMOTES.length}`);
+  assert.equal(new Set(REMOTES.map(({ context }) => context)).size, REMOTES.length);
+  assert.equal(new Set(REMOTES.map(({ route }) => route)).size, REMOTES.length);
   for (const remote of REMOTES) {
     assert.match(remote.entryPath, new RegExp(`^/mfes/${remote.context}/remoteEntry\\.js$`));
     assert.ok(remote.expectedText instanceof RegExp);
@@ -45,7 +45,7 @@ test("the cluster manifest names all eight remotes with context-specific content
   }
   assert.equal(
     CLUSTER_ROUTES.filter(({ kind }) => kind === "remote").length,
-    8,
+    REMOTES.length,
   );
 });
 

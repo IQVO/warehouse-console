@@ -1,0 +1,61 @@
+name: verify-routes
+
+# Advisory, NOT a required check (gap UX-1). Loads every console route in headless
+# Chromium against the shell and the DEV servers of all remotes (develop of each
+# repo), API answered 503 in the browser. Remote list and ports come from vite.config.ts.
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "30 7 * * 1"
+  pull_request:
+    paths:
+      - vite.config.ts
+      - src/App.tsx
+      - scripts/verify-all-routes.cjs
+      - .github/workflows/verify-routes.yml
+
+permissions:
+  contents: read
+
+jobs:
+  verify-routes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: warehouse-console
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: IQVO/warehouse-ui-kit
+          ref: develop
+          path: warehouse-ui-kit
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: "22"
+      - run: npm ci && npm run build
+        working-directory: warehouse-ui-kit
+      - run: npm ci && npx playwright install --with-deps chromium
+        working-directory: warehouse-console
+      - name: Start every remote's dev server
+        run: |
+          set -euo pipefail
+          sed -nE 's/.*remoteEntry\("([a-z-]+)", ([0-9]+)\).*/\1 \2/p' warehouse-console/vite.config.ts > remotes.txt
+          while read -r repo port; do
+            git clone -q --depth 1 -b develop "https://github.com/IQVO/${repo}.git"
+            (cd "${repo}/web" && npm ci --silent && nohup node node_modules/vite/bin/vite.js --port "${port}" > "../../${repo}.log" 2>&1 &)
+          done < remotes.txt
+      - name: Start the shell and run verify:routes
+        working-directory: warehouse-console
+        env:
+          VERIFY_STUB_API: "1"
+        run: |
+          set -euo pipefail
+          mkdir -p public && echo '{ "apiOrigin": "http://localhost:8000" }' > public/config.json
+          nohup npm run dev > ../shell.log 2>&1 &
+          for url in 5173/config.json $(awk '{print $2 "/remoteEntry.js"}' ../remotes.txt); do
+            curl -sf --retry 60 --retry-delay 1 --retry-connrefused "http://localhost:${url}" > /dev/null
+          done
+          npm run verify:routes
+      - if: failure()
+        run: tail -n 30 ./*.log

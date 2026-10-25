@@ -3,7 +3,9 @@
 replicaCount: 1
 
 image:
-  repository: claudioed/warehouse-console
+  # What CI's docker-publish job pushes (ghcr.io/iqvo/warehouse-console:
+  # latest, <short-sha> and the release vX.Y.Z tag).
+  repository: ghcr.io/iqvo/warehouse-console
   pullPolicy: IfNotPresent
   tag: ""
 

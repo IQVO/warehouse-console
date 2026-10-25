@@ -31,6 +31,33 @@ export interface ServiceBaseUrls {
   facilityLayout: string;
 }
 
+/**
+ * Every bounded context that ships a Bounded Context Report screen
+ * (the original nine plus warehouse-planning, network-inventory-planning,
+ * product-master, inbound-receiving, slotting-optimization and, from
+ * Phase 4.1, pick-face-replenishment and task-interleaving; see
+ * features/context-reports/registry.ts, which may list several reports
+ * per context).
+ */
+export interface ReportsBaseUrls {
+  orderManagement: string;
+  inventoryStorage: string;
+  wesWorkPlanning: string;
+  fulfillmentExecution: string;
+  workforceManagement: string;
+  facilityLayout: string;
+  laborPerformance: string;
+  processPathManagement: string;
+  networkFulfillment: string;
+  warehousePlanning: string;
+  networkInventoryPlanning: string;
+  productMaster: string;
+  inboundReceiving: string;
+  slottingOptimization: string;
+  pickFaceReplenishment: string;
+  taskInterleaving: string;
+}
+
 /** Kong's path prefix for each bounded context. */
 const API_PATHS: Record<keyof ServiceBaseUrls, string> = {
   orderManagement: "/api/order-management",
@@ -41,6 +68,42 @@ const API_PATHS: Record<keyof ServiceBaseUrls, string> = {
   facilityLayout: "/api/facility-layout",
 };
 
+/**
+ * Kong's path prefix for every reports-capable context, including the
+ * three that never got a plain ServiceBaseUrls entry (labor-performance,
+ * process-path-management, network-fulfillment): the shell never calls
+ * their OLTP APIs directly today, only their reports endpoint.
+ *
+ * Kong routing for these (warehouse-infra `terraform/services.tf`
+ * `service_reports` Ingress/HTTPRoute per analytics-enabled context, and
+ * `terraform/network-fulfillment.tf` for network-fulfillment): besides the
+ * main `/api/<context>` route to the OLTP Service, Kong renders a second
+ * route `/api/<context>/reports` to that context's SEPARATE
+ * `<context>-reports` Service, stripping the prefix down to `/reports`, which
+ * is exactly what every reports binary's NewReportsRouter registers. So
+ * `${apiOrigin}/api/<context>/reports/...` reaches the reader wherever that
+ * context's reports Deployment runs; a 404 there means the context has no
+ * reports deployment, not that the console is wired wrong.
+ */
+const REPORTS_API_PATHS: Record<keyof ReportsBaseUrls, string> = {
+  orderManagement: "/api/order-management",
+  inventoryStorage: "/api/inventory-storage",
+  wesWorkPlanning: "/api/wes-work-planning",
+  fulfillmentExecution: "/api/fulfillment-execution",
+  workforceManagement: "/api/workforce-management",
+  facilityLayout: "/api/facility-layout",
+  laborPerformance: "/api/labor-performance",
+  processPathManagement: "/api/process-path-management",
+  networkFulfillment: "/api/network-fulfillment",
+  warehousePlanning: "/api/warehouse-planning",
+  networkInventoryPlanning: "/api/network-inventory-planning",
+  productMaster: "/api/product-master",
+  inboundReceiving: "/api/inbound-receiving",
+  slottingOptimization: "/api/slotting-optimization",
+  pickFaceReplenishment: "/api/pick-face-replenishment",
+  taskInterleaving: "/api/task-interleaving",
+};
+
 /** Standalone dev ports, mirroring e2e-tests/env.sh's HTTP_PORT map. */
 const DEV_BASE_URLS: ServiceBaseUrls = {
   orderManagement: "http://localhost:8086",
@@ -49,6 +112,73 @@ const DEV_BASE_URLS: ServiceBaseUrls = {
   fulfillmentExecution: "http://localhost:8084",
   workforceManagement: "http://localhost:8085",
   facilityLayout: "http://localhost:8081",
+};
+
+/**
+ * Standalone dev ports for each context's SEPARATE `<svc>-reports` reader
+ * binary -- NOT the OLTP ports above (that process registers no
+ * `/reports/*` route at all; see cmd/<svc>/main.go using NewRouter, never
+ * NewReportsRouter). facilityLayout..laborPerformance mirror
+ * e2e-tests/env.sh's *_REPORTS_HTTP_PORT map (8101-8107) exactly.
+ *
+ * processPathManagement (8108) and networkFulfillment (8109) continue
+ * that file's own sequential-assignment convention (each new reports port
+ * is simply the next free integer after 8107, not a computed offset --
+ * see env.sh's own comment on LABOR_REPORTS_HTTP_PORT) but are NOT
+ * present in e2e-tests/env.sh: neither process-path-management's nor
+ * network-fulfillment's reports binary (`netfulfil-reports`, serving
+ * `/reports/acknowledgement`) has a harness-assigned dev port. Both are
+ * placeholders for local standalone dev only; run that binary on the
+ * port listed here, or point `apiOrigin` at Kong instead.
+ *
+ * warehousePlanning (8110) continues that same next-free-integer
+ * convention for the Phase 4.1 screens: warehouse-planning's
+ * `planning-reports` binary (serving /reports/bottleneck-frequency,
+ * /reports/shortage-trend, /reports/plan-throughput and
+ * /reports/freshness) also has no harness-assigned dev port.
+ *
+ * networkInventoryPlanning (8111) ditto: nip-reports (serving
+ * /reports/transfer-funnel, /reports/state-dwell,
+ * /reports/stuck-transfers, /reports/rebalance-runs and
+ * /reports/freshness) has no harness-assigned dev port either.
+ *
+ * productMaster (8112) ditto: product-reports (serving
+ * /reports/master-data-quality and /reports/freshness) has no
+ * harness-assigned dev port either.
+ *
+ * inboundReceiving (8113) ditto: inbound-reports (serving
+ * /reports/receiving-performance and /reports/freshness) has no
+ * harness-assigned dev port either.
+ *
+ * slottingOptimization (8114) ditto: slotting-reports (serving
+ * /reports/slot-plan-funnel and /reports/freshness) has no
+ * harness-assigned dev port either.
+ *
+ * pickFaceReplenishment (8115) ditto: pfr-reports (serving
+ * /reports/replenishment-funnel and /reports/freshness) has no
+ * harness-assigned dev port either.
+ *
+ * taskInterleaving (8116) ditto: ti-reports (serving
+ * /reports/hint-adoption and /reports/freshness) has no
+ * harness-assigned dev port either.
+ */
+const DEV_REPORTS_BASE_URLS: ReportsBaseUrls = {
+  facilityLayout: "http://localhost:8101",
+  inventoryStorage: "http://localhost:8102",
+  wesWorkPlanning: "http://localhost:8103",
+  fulfillmentExecution: "http://localhost:8104",
+  workforceManagement: "http://localhost:8105",
+  orderManagement: "http://localhost:8106",
+  laborPerformance: "http://localhost:8107",
+  processPathManagement: "http://localhost:8108",
+  networkFulfillment: "http://localhost:8109",
+  warehousePlanning: "http://localhost:8110",
+  networkInventoryPlanning: "http://localhost:8111",
+  productMaster: "http://localhost:8112",
+  inboundReceiving: "http://localhost:8113",
+  slottingOptimization: "http://localhost:8114",
+  pickFaceReplenishment: "http://localhost:8115",
+  taskInterleaving: "http://localhost:8116",
 };
 
 const BFF_API_PATH = "/api/warehouse-ops-agent";
@@ -101,9 +231,50 @@ export function resolveBffBaseUrl(
   return apiOrigin === undefined ? DEV_BFF_BASE_URL : `${apiOrigin}${BFF_API_PATH}`;
 }
 
+/**
+ * Base URL for each context's OWN `/reports/...` reader, read DIRECTLY --
+ * never through console-bff/ops-agent. See REPORTS_API_PATHS' doc comment
+ * for the Kong route that serves it.
+ */
+export function resolveReportsBaseUrls(
+  runtimeConfig: Partial<WarehouseConfig>,
+  isProduction: boolean,
+): ReportsBaseUrls {
+  const apiOrigin = apiOriginOf(runtimeConfig, isProduction);
+  if (apiOrigin === undefined) {
+    return DEV_REPORTS_BASE_URLS;
+  }
+  return {
+    orderManagement: `${apiOrigin}${REPORTS_API_PATHS.orderManagement}`,
+    inventoryStorage: `${apiOrigin}${REPORTS_API_PATHS.inventoryStorage}`,
+    wesWorkPlanning: `${apiOrigin}${REPORTS_API_PATHS.wesWorkPlanning}`,
+    fulfillmentExecution: `${apiOrigin}${REPORTS_API_PATHS.fulfillmentExecution}`,
+    workforceManagement: `${apiOrigin}${REPORTS_API_PATHS.workforceManagement}`,
+    facilityLayout: `${apiOrigin}${REPORTS_API_PATHS.facilityLayout}`,
+    laborPerformance: `${apiOrigin}${REPORTS_API_PATHS.laborPerformance}`,
+    processPathManagement: `${apiOrigin}${REPORTS_API_PATHS.processPathManagement}`,
+    networkFulfillment: `${apiOrigin}${REPORTS_API_PATHS.networkFulfillment}`,
+    warehousePlanning: `${apiOrigin}${REPORTS_API_PATHS.warehousePlanning}`,
+    networkInventoryPlanning: `${apiOrigin}${REPORTS_API_PATHS.networkInventoryPlanning}`,
+    productMaster: `${apiOrigin}${REPORTS_API_PATHS.productMaster}`,
+    inboundReceiving: `${apiOrigin}${REPORTS_API_PATHS.inboundReceiving}`,
+    slottingOptimization: `${apiOrigin}${REPORTS_API_PATHS.slottingOptimization}`,
+    pickFaceReplenishment: `${apiOrigin}${REPORTS_API_PATHS.pickFaceReplenishment}`,
+    taskInterleaving: `${apiOrigin}${REPORTS_API_PATHS.taskInterleaving}`,
+  };
+}
+
 const runtimeConfig = window.__WAREHOUSE_CONFIG__ ?? {};
 
 export const SERVICE_BASE_URL: ServiceBaseUrls = resolveServiceBaseUrls(
+  runtimeConfig,
+  import.meta.env.PROD,
+);
+
+/** Each reporting bounded context's OWN reports base URL, read directly by
+ *  this shell's per-context Bounded Context Report screens (never through
+ *  console-bff/ops-agent -- see ReportsBaseUrls' doc comment). */
+export const REPORTS_BASE_URL: ReportsBaseUrls = resolveReportsBaseUrls(
   runtimeConfig,
   import.meta.env.PROD,
 );
