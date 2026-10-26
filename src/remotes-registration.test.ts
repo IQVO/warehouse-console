@@ -545,7 +545,7 @@ describe("shipping_mfe registration", () => {
     const app = read("src/App.tsx");
     expect(app).toMatch(/^const ShippingRemote = lazy\(\(\) => import\("shipping_mfe\/App"\)\);$/m);
     expect(app).toMatch(/path="\/shipping-and-tracking\/\*"/);
-    expect(app).toMatch(/"\/shipping-and-tracking",\n  "\/vendor-connectivity",\n/);
+    expect(app).toMatch(/"\/shipping-and-tracking",\n  "\/seller-inbound",\n  "\/vendor-connectivity",\n/);
   });
 
   it("is covered by verify:routes", () => {
@@ -576,7 +576,7 @@ describe("vendor_connectivity_mfe registration", () => {
     const app = read("src/App.tsx");
     expect(app).toMatch(/^const VendorConnectivityRemote = lazy\(\(\) => import\("vendor_connectivity_mfe\/App"\)\);$/m);
     expect(app).toMatch(/path="\/vendor-connectivity\/\*"/);
-    expect(app).toMatch(/"\/vendor-connectivity",\n\];/);
+    expect(app).toMatch(/"\/seller-inbound",\n  "\/vendor-connectivity",\n\];/);
   });
 
   it("is covered by verify:routes", () => {
@@ -585,16 +585,16 @@ describe("vendor_connectivity_mfe registration", () => {
 });
 
 describe("remote registry totals", () => {
-  // The fleet has twenty-eight remotes; a hand-edited list that drops or doubles
+  // The fleet has twenty-nine remotes; a hand-edited list that drops or doubles
   // one breaks this before it breaks a route.
-  it("registers twenty-eight remotes with unique keys, container names and ports", () => {
+  it("registers twenty-nine remotes with unique keys, container names and ports", () => {
     const vite = read("vite.config.ts");
     const entries = [
       ...vite.matchAll(
         /(\w+_mfe):\s*\{\s*type:\s*"module",\s*name:\s*"([^"]+)",\s*entry:\s*remoteEntry\("([^"]+)",\s*(\d+)\)/g,
       ),
     ];
-    expect(entries).toHaveLength(28);
+    expect(entries).toHaveLength(29);
     for (const col of [1, 2, 3, 4]) {
       const values = entries.map((m) => m[col]);
       expect(new Set(values).size).toBe(values.length);
@@ -607,7 +607,7 @@ describe("remote registry totals", () => {
       ...app.match(/const REMOTE_PREFIXES = \[([^\]]*)\]/)![1].matchAll(/"(\/[^"]+)"/g),
     ].map((m) => m[1]);
     const routes = [...app.matchAll(/path="(\/[^"/]+)\/\*"/g)].map((m) => m[1]);
-    expect(prefixes).toHaveLength(28);
+    expect(prefixes).toHaveLength(29);
     expect([...prefixes].sort()).toEqual([...routes].sort());
   });
 });
@@ -626,5 +626,36 @@ describe("verify:routes coverage of the router", () => {
       expect(script).toContain(`path: "/reports/${path}"`);
     }
     expect(script).toMatch(/path: "\/reports\/no-such-context",[^}]*expect: \/Page not found\/i/);
+  });
+});
+
+describe("seller_inbound_mfe registration", () => {
+  // Pinned with IQVO/seller-inbound web/vite.config.ts: federation name
+  // seller_inbound_mfe, gateway path /mfes/seller-inbound/, dev port 4022
+  // (off the fully-taken 51xx ladder, 40xx series).
+  it("is a federation remote named seller_inbound_mfe served from /mfes/seller-inbound/ (dev :4022)", () => {
+    const vite = read("vite.config.ts");
+    expect(vite).toMatch(
+      /seller_inbound_mfe:\s*\{\s*type:\s*"module",\s*name:\s*"seller_inbound_mfe",\s*entry:\s*remoteEntry\("seller-inbound",\s*4022\),\s*\}/,
+    );
+  });
+
+  it("does not reuse another remote's container name or dev port", () => {
+    const vite = read("vite.config.ts");
+    expect(vite.match(/name:\s*"seller_inbound_mfe"/g)).toHaveLength(1);
+    expect(vite.match(/remoteEntry\("[^"]+",\s*4022\)/g)).toHaveLength(1);
+    const ports = [...vite.matchAll(/remoteEntry\("[^"]+",\s*(\d+)\)/g)].map((m) => m[1]);
+    expect(new Set(ports).size).toBe(ports.length);
+  });
+
+  it("is imported lazily at module scope as seller_inbound_mfe/App and mounted on a splat route", () => {
+    const app = read("src/App.tsx");
+    expect(app).toMatch(/^const SellerInboundRemote = lazy\(\(\) => import\("seller_inbound_mfe\/App"\)\);$/m);
+    expect(app).toMatch(/path="\/seller-inbound\/\*"/);
+    expect(app).toMatch(/"\/seller-inbound",\n  "\/vendor-connectivity",\n\];/);
+  });
+
+  it("is covered by verify:routes", () => {
+    expect(read("scripts/verify-all-routes.cjs")).toContain('path: "/seller-inbound"');
   });
 });
