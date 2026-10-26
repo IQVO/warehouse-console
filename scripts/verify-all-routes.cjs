@@ -82,6 +82,7 @@ const routes = [
   { path: "/offer-availability", label: "offer-availability", expect: /\S/ },
   { path: "/order-sourcing", label: "order-sourcing", expect: /\S/ },
   { path: "/shipping-and-tracking", label: "shipping-and-tracking", expect: /\S/ },
+  { path: "/seller-inbound", label: "seller-inbound", expect: /\S/ },
   { path: "/vendor-connectivity", label: "vendor-connectivity", expect: /\S/ },
   // /reports/:context -- one Bounded Context Report screen per slug in
   // src/features/context-reports/registry.ts (src/remotes-registration.test.ts

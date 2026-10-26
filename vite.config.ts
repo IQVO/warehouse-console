@@ -257,6 +257,14 @@ export default defineConfig({
           name: "vendor_connectivity_mfe",
           entry: remoteEntry("vendor-connectivity", 4021),
         },
+        // seller-inbound's remote: container `seller_inbound_mfe`, gateway path
+        // /mfes/seller-inbound/, dev port 4022 (off the fully-taken 51xx ladder,
+        // continuing the 40xx series after vendor-connectivity's 4021).
+        seller_inbound_mfe: {
+          type: "module",
+          name: "seller_inbound_mfe",
+          entry: remoteEntry("seller-inbound", 4022),
+        },
       },
       // The shell must win the React singleton negotiation. With the
       // default "version-first", every remote's remoteEntry is preloaded
