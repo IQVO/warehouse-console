@@ -54,7 +54,7 @@ RUN rm -f package-lock.json
 RUN npm run build
 
 # --- runtime stage ---
-FROM nginxinc/nginx-unprivileged:1.31-alpine@sha256:26b0bf6fbf07297983cb341998d79c831508787de26627dd2a112321b9c3a4af
+FROM nginxinc/nginx-unprivileged:1.31-alpine@sha256:b5047b9b76845eac124358373c6852377c52e4b05834a47647e955dd91cb8f1e
 # apk upgrade picks up any CVE fixes published to the 3.21 branch since the
 # base image was last rebuilt (openssl, libxml2, etc.), matching the fleet's
 # Go-service runtime stages. Root is only needed for this one step.
