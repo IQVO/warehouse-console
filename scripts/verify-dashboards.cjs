@@ -1,5 +1,6 @@
 /**
- * Dev-only check for the two report dashboards (/wms-dashboard, /wes-dashboard).
+ * Browser check for the two report dashboards (/wms-dashboard, /wes-dashboard).
+ * Defaults to the dev shell (:5173) and accepts BASE_URL/API_ORIGIN overrides.
  *
  * Unlike verify:routes this does NOT need a live backend: it intercepts the
  * console-bff report calls and serves fixtures, so it exercises the three
@@ -14,8 +15,10 @@
  * Usage: npm run verify:dashboards
  */
 const { chromium } = require("playwright");
+const { runtimeConfig, urlAt } = require("./browser-verify-common.cjs");
 
-const BASE = "http://localhost:5173";
+const { baseUrl: BASE, apiOrigin: API_ORIGIN } = runtimeConfig();
+const REPORTS_BASE = `${API_ORIGIN}/api/warehouse-ops-agent/console/reports`;
 const SHOT_DIR = process.env.SHOT_DIR || "/tmp/warehouse-console-dashboards";
 
 const wmsReport = {
@@ -159,16 +162,16 @@ async function drawnMarkCount(page) {
   const pageErrors = [];
   page.on("pageerror", (err) => pageErrors.push(err.message));
 
-  await page.route("**/console/reports/wms*", (route) =>
+  await page.route(`${REPORTS_BASE}/wms*`, (route) =>
     route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(wmsReport) }),
   );
-  await page.route("**/console/reports/wes*", (route) =>
+  await page.route(`${REPORTS_BASE}/wes*`, (route) =>
     route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(wesReport) }),
   );
 
   /* --- 1. WMS: every section available ------------------------------- */
   console.log("=== /wms-dashboard (all sections available) ===");
-  await page.goto(`${BASE}/wms-dashboard`, { waitUntil: "networkidle", timeout: 20000 });
+  await page.goto(urlAt(BASE, "/wms-dashboard"), { waitUntil: "networkidle", timeout: 20000 });
   await page.waitForTimeout(500);
   let body = await page.locator("body").innerText();
 
@@ -191,7 +194,7 @@ async function drawnMarkCount(page) {
 
   /* --- 2. WES: one section degraded ---------------------------------- */
   console.log("\n=== /wes-dashboard (labor-management available:false) ===");
-  await page.goto(`${BASE}/wes-dashboard`, { waitUntil: "networkidle", timeout: 20000 });
+  await page.goto(urlAt(BASE, "/wes-dashboard"), { waitUntil: "networkidle", timeout: 20000 });
   await page.waitForTimeout(500);
   body = await page.locator("body").innerText();
 
@@ -211,9 +214,9 @@ async function drawnMarkCount(page) {
 
   /* --- 3. whole-response failure ------------------------------------- */
   console.log("\n=== /wms-dashboard (BFF unreachable) ===");
-  await page.unroute("**/console/reports/wms*");
-  await page.route("**/console/reports/wms*", (route) => route.abort("connectionrefused"));
-  await page.goto(`${BASE}/wms-dashboard`, { waitUntil: "networkidle", timeout: 20000 });
+  await page.unroute(`${REPORTS_BASE}/wms*`);
+  await page.route(`${REPORTS_BASE}/wms*`, (route) => route.abort("connectionrefused"));
+  await page.goto(urlAt(BASE, "/wms-dashboard"), { waitUntil: "networkidle", timeout: 20000 });
   await page.waitForTimeout(500);
   body = await page.locator("body").innerText();
 
@@ -223,7 +226,7 @@ async function drawnMarkCount(page) {
 
   /* --- 4. launchpad + nav wiring ------------------------------------- */
   console.log("\n=== / (launchpad + nav links) ===");
-  await page.goto(`${BASE}/`, { waitUntil: "networkidle", timeout: 20000 });
+  await page.goto(urlAt(BASE, "/"), { waitUntil: "networkidle", timeout: 20000 });
   await page.waitForTimeout(300);
   check("nav has WMS Dashboard", (await page.locator('a[href="/wms-dashboard"]').count()) >= 1);
   check("nav has WES Dashboard", (await page.locator('a[href="/wes-dashboard"]').count()) >= 1);

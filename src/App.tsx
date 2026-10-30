@@ -60,6 +60,7 @@ const REMOTE_PREFIXES = [
   "/offer-availability",
   "/order-sourcing",
   "/shipping-and-tracking",
+  "/seller-inbound",
   "/vendor-connectivity",
 ];
 
@@ -123,6 +124,8 @@ const OfferAvailabilityRemote = lazy(() => import("offer_availability_mfe/App"))
 const OrderSourcingRemote = lazy(() => import("order_sourcing_mfe/App"));
 // @ts-expect-error -- remote module resolved at runtime by Module Federation
 const ShippingRemote = lazy(() => import("shipping_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const SellerInboundRemote = lazy(() => import("seller_inbound_mfe/App"));
 // @ts-expect-error -- remote module resolved at runtime by Module Federation
 const VendorConnectivityRemote = lazy(() => import("vendor_connectivity_mfe/App"));
 /* eslint-enable react-refresh/only-export-components */
@@ -327,6 +330,15 @@ function Shell() {
             <RemoteBoundary
               label="Shipping & Tracking"
               component={ShippingRemote}
+            />
+          }
+        />
+        <Route
+          path="/seller-inbound/*"
+          element={
+            <RemoteBoundary
+              label="Seller Inbound"
+              component={SellerInboundRemote}
             />
           }
         />
