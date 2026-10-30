@@ -1,5 +1,7 @@
 # warehouse-console
 
+[![CI](https://github.com/IQVO/warehouse-console/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/IQVO/warehouse-console/actions/workflows/ci.yml?query=branch%3Adevelop) [![release](https://img.shields.io/github/v/release/IQVO/warehouse-console?sort=semver)](https://github.com/IQVO/warehouse-console/releases) [![docs](https://img.shields.io/badge/docs-iqvo.github.io-blue)](https://iqvo.github.io/warehouse-console/) [![license](https://img.shields.io/badge/license-MIT-blue)](https://github.com/IQVO/warehouse-console/blob/develop/LICENSE)
+
 The React SPA shell for the [warehouse-systems](https://github.com/claudioed?tab=repositories&q=warehouse)
 micro-frontend console. Owns routing, top navigation, the shared design system, and the
 primary nav's five destinations — four cross-cutting screens this shell implements directly,
