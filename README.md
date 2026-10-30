@@ -126,11 +126,12 @@ definitions in its own repo; `console-bff`'s report-envelope shape is documented
 `warehouse-ops-agent`'s ADR-0002/ADR-0003 rather than as a formal spec, since it is a
 console-only read layer, not a public API.
 
-## Study project disclaimer
+## Disclaimer
 
-This repository, and every other repository in the `warehouse-systems` set, is a personal
-study project exploring Domain-Driven Design, hexagonal architecture, and micro-frontend
-composition patterns. It is not production software and has no support guarantees.
+This project is a domain-driven design study. It is not associated with,
+endorsed by or affiliated with any company, and it uses no company's code,
+data, logos or trademarks. All names, figures and examples are illustrative
+or synthetic.
 
 ## Documentation
 
@@ -306,3 +307,11 @@ Two details worth knowing before changing this:
 - The ConfigMap is mounted with `subPath`, which kubelet does **not**
   live-update, so the Deployment carries a `checksum/runtime-config`
   annotation to roll the pod whenever the value changes.
+
+## Architecture Decision Records
+
+The ADR index lives at [docs/docs/adr/index.md](docs/docs/adr/index.md).
+
+## License
+
+MIT — see [LICENSE](LICENSE).
