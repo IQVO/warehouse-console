@@ -177,6 +177,94 @@ export default defineConfig({
           name: "exceptions_mfe",
           entry: remoteEntry("exception-management", 4011),
         },
+        // customer-ordering's remote: container `customer_ordering_mfe`, gateway path
+        // /mfes/customer-ordering/, dev port 4012 (off the 51xx ladder,
+        // continuing the 40xx series).
+        customer_ordering_mfe: {
+          type: "module",
+          name: "customer_ordering_mfe",
+          entry: remoteEntry("customer-ordering", 4012),
+        },
+        // delivery-promise's remote: container `delivery_promise_mfe`, gateway path
+        // /mfes/delivery-promise/, dev port 4013 (off the 51xx ladder,
+        // continuing the 40xx series).
+        delivery_promise_mfe: {
+          type: "module",
+          name: "delivery_promise_mfe",
+          entry: remoteEntry("delivery-promise", 4013),
+        },
+        // last-mile-delivery's remote: container `last_mile_mfe`, gateway path
+        // /mfes/last-mile-delivery/, dev port 4014 (off the 51xx ladder,
+        // continuing the 40xx series).
+        last_mile_mfe: {
+          type: "module",
+          name: "last_mile_mfe",
+          entry: remoteEntry("last-mile-delivery", 4014),
+        },
+        // linehaul-transportation's remote: container `linehaul_mfe`, gateway path
+        // /mfes/linehaul-transportation/, dev port 4015 (off the 51xx ladder,
+        // continuing the 40xx series).
+        linehaul_mfe: {
+          type: "module",
+          name: "linehaul_mfe",
+          entry: remoteEntry("linehaul-transportation", 4015),
+        },
+        // node-performance's remote: container `node_performance_mfe`, gateway path
+        // /mfes/node-performance/, dev port 4016 (off the 51xx ladder,
+        // continuing the 40xx series).
+        node_performance_mfe: {
+          type: "module",
+          name: "node_performance_mfe",
+          entry: remoteEntry("node-performance", 4016),
+        },
+        // node-topology's remote: container `node_topology_mfe`, gateway path
+        // /mfes/node-topology/, dev port 4017 (off the 51xx ladder,
+        // continuing the 40xx series).
+        node_topology_mfe: {
+          type: "module",
+          name: "node_topology_mfe",
+          entry: remoteEntry("node-topology", 4017),
+        },
+        // offer-availability's remote: container `offer_availability_mfe`, gateway path
+        // /mfes/offer-availability/, dev port 4018 (off the 51xx ladder,
+        // continuing the 40xx series).
+        offer_availability_mfe: {
+          type: "module",
+          name: "offer_availability_mfe",
+          entry: remoteEntry("offer-availability", 4018),
+        },
+        // order-sourcing's remote: container `order_sourcing_mfe`, gateway path
+        // /mfes/order-sourcing/, dev port 4019 (off the 51xx ladder,
+        // continuing the 40xx series).
+        order_sourcing_mfe: {
+          type: "module",
+          name: "order_sourcing_mfe",
+          entry: remoteEntry("order-sourcing", 4019),
+        },
+        // shipping-and-tracking's remote: container `shipping_mfe`, gateway path
+        // /mfes/shipping-and-tracking/, dev port 4020 (off the 51xx ladder,
+        // continuing the 40xx series).
+        shipping_mfe: {
+          type: "module",
+          name: "shipping_mfe",
+          entry: remoteEntry("shipping-and-tracking", 4020),
+        },
+        // vendor-connectivity's remote: container `vendor_connectivity_mfe`, gateway path
+        // /mfes/vendor-connectivity/, dev port 4021 (off the 51xx ladder,
+        // continuing the 40xx series).
+        vendor_connectivity_mfe: {
+          type: "module",
+          name: "vendor_connectivity_mfe",
+          entry: remoteEntry("vendor-connectivity", 4021),
+        },
+        // seller-inbound's remote: container `seller_inbound_mfe`, gateway path
+        // /mfes/seller-inbound/, dev port 4022 (off the fully-taken 51xx ladder,
+        // continuing the 40xx series after vendor-connectivity's 4021).
+        seller_inbound_mfe: {
+          type: "module",
+          name: "seller_inbound_mfe",
+          entry: remoteEntry("seller-inbound", 4022),
+        },
       },
       // The shell must win the React singleton negotiation. With the
       // default "version-first", every remote's remoteEntry is preloaded

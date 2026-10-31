@@ -51,6 +51,17 @@ const REMOTE_PREFIXES = [
   "/task-interleaving",
   "/returns-processing",
   "/exception-management",
+  "/customer-ordering",
+  "/delivery-promise",
+  "/last-mile-delivery",
+  "/linehaul-transportation",
+  "/node-performance",
+  "/node-topology",
+  "/offer-availability",
+  "/order-sourcing",
+  "/shipping-and-tracking",
+  "/seller-inbound",
+  "/vendor-connectivity",
 ];
 
 // Each lazy() call MUST run exactly once, at module load, not inside a
@@ -95,6 +106,28 @@ const TaskInterleavingRemote = lazy(() => import("task_interleaving_mfe/App"));
 const ReturnsRemote = lazy(() => import("returns_mfe/App"));
 // @ts-expect-error -- remote module resolved at runtime by Module Federation
 const ExceptionsRemote = lazy(() => import("exceptions_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const CustomerOrderingRemote = lazy(() => import("customer_ordering_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const DeliveryPromiseRemote = lazy(() => import("delivery_promise_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const LastMileRemote = lazy(() => import("last_mile_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const LinehaulRemote = lazy(() => import("linehaul_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const NodePerformanceRemote = lazy(() => import("node_performance_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const NodeTopologyRemote = lazy(() => import("node_topology_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const OfferAvailabilityRemote = lazy(() => import("offer_availability_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const OrderSourcingRemote = lazy(() => import("order_sourcing_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const ShippingRemote = lazy(() => import("shipping_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const SellerInboundRemote = lazy(() => import("seller_inbound_mfe/App"));
+// @ts-expect-error -- remote module resolved at runtime by Module Federation
+const VendorConnectivityRemote = lazy(() => import("vendor_connectivity_mfe/App"));
 /* eslint-enable react-refresh/only-export-components */
 
 /** Anchored prefix match: a bare startsWith would light up "Inventory"
@@ -216,6 +249,105 @@ function Shell() {
             <RemoteBoundary
               label="Problem Solve"
               component={ExceptionsRemote}
+            />
+          }
+        />
+        <Route
+          path="/customer-ordering/*"
+          element={
+            <RemoteBoundary
+              label="Customer Ordering"
+              component={CustomerOrderingRemote}
+            />
+          }
+        />
+        <Route
+          path="/delivery-promise/*"
+          element={
+            <RemoteBoundary
+              label="Delivery Promise"
+              component={DeliveryPromiseRemote}
+            />
+          }
+        />
+        <Route
+          path="/last-mile-delivery/*"
+          element={
+            <RemoteBoundary
+              label="Last Mile Delivery"
+              component={LastMileRemote}
+            />
+          }
+        />
+        <Route
+          path="/linehaul-transportation/*"
+          element={
+            <RemoteBoundary
+              label="Linehaul Transportation"
+              component={LinehaulRemote}
+            />
+          }
+        />
+        <Route
+          path="/node-performance/*"
+          element={
+            <RemoteBoundary
+              label="Node Performance"
+              component={NodePerformanceRemote}
+            />
+          }
+        />
+        <Route
+          path="/node-topology/*"
+          element={
+            <RemoteBoundary
+              label="Node Topology"
+              component={NodeTopologyRemote}
+            />
+          }
+        />
+        <Route
+          path="/offer-availability/*"
+          element={
+            <RemoteBoundary
+              label="Offer Availability"
+              component={OfferAvailabilityRemote}
+            />
+          }
+        />
+        <Route
+          path="/order-sourcing/*"
+          element={
+            <RemoteBoundary
+              label="Order Sourcing"
+              component={OrderSourcingRemote}
+            />
+          }
+        />
+        <Route
+          path="/shipping-and-tracking/*"
+          element={
+            <RemoteBoundary
+              label="Shipping & Tracking"
+              component={ShippingRemote}
+            />
+          }
+        />
+        <Route
+          path="/seller-inbound/*"
+          element={
+            <RemoteBoundary
+              label="Seller Inbound"
+              component={SellerInboundRemote}
+            />
+          }
+        />
+        <Route
+          path="/vendor-connectivity/*"
+          element={
+            <RemoteBoundary
+              label="Vendor Connectivity"
+              component={VendorConnectivityRemote}
             />
           }
         />

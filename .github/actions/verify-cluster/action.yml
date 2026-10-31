@@ -1,0 +1,76 @@
+name: Verify deployed warehouse console
+
+description: Run production-path browser acceptance against an already-deployed split-edge cluster.
+
+inputs:
+  working-directory:
+    description: Path to the warehouse-console checkout, relative to the caller workspace.
+    required: false
+    default: warehouse-console
+  base-url:
+    description: Nginx web origin serving the shell and MFE assets.
+    required: false
+    default: http://localhost
+  api-origin:
+    description: Kong origin serving all APIs.
+    required: false
+    default: http://localhost:8000
+  artifact-directory:
+    description: Directory for HARs, traces, screenshots, and browser logs.
+    required: false
+    default: artifacts/warehouse-console-cluster-browser
+  artifact-name:
+    description: Uploaded artifact name.
+    required: false
+    default: warehouse-console-cluster-browser
+  max-report-freshness-seconds:
+    description: Maximum accepted analytics projection lag.
+    required: false
+    default: "300"
+  degraded-remote-context:
+    description: Remote whose entry request is blocked to prove RemoteBoundary isolation.
+    required: false
+    default: order-management
+  install-dependencies:
+    description: Run npm ci in the console checkout before verification.
+    required: false
+    default: "true"
+  install-browser:
+    description: Install Playwright Chromium and its operating-system dependencies.
+    required: false
+    default: "true"
+
+runs:
+  using: composite
+  steps:
+    - name: Install console dependencies
+      if: inputs.install-dependencies == 'true'
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: npm ci
+
+    - name: Install Playwright Chromium
+      if: inputs.install-browser == 'true'
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: npx playwright install --with-deps chromium
+
+    - name: Run production-path browser acceptance
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        BASE_URL: ${{ inputs.base-url }}
+        API_ORIGIN: ${{ inputs.api-origin }}
+        ARTIFACT_DIR: ${{ github.workspace }}/${{ inputs.artifact-directory }}
+        MAX_REPORT_FRESHNESS_SECONDS: ${{ inputs.max-report-freshness-seconds }}
+        DEGRADED_REMOTE_CONTEXT: ${{ inputs.degraded-remote-context }}
+      run: node scripts/verify-cluster.cjs
+
+    - name: Upload browser acceptance artifacts
+      if: always()
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ inputs.artifact-directory }}
+        if-no-files-found: error
+        retention-days: 14

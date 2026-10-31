@@ -56,6 +56,7 @@ describe("productmaster_mfe registration", () => {
 
   it("is covered by verify:routes", () => {
     expect(read("scripts/verify-all-routes.cjs")).toContain('path: "/product-master"');
+    expect(read("scripts/verify-all-routes.cjs")).toContain('path: "/product-master/products/SKU-1/packaging"');
   });
 });
 
@@ -234,7 +235,7 @@ describe("returns_mfe registration", () => {
     const app = read("src/App.tsx");
     expect(app).toMatch(/^const ReturnsRemote = lazy\(\(\) => import\("returns_mfe\/App"\)\);$/m);
     expect(app).toMatch(/path="\/returns-processing\/\*"/);
-    expect(app).toMatch(/"\/returns-processing",\n  "\/exception-management",\n\];/);
+    expect(app).toMatch(/"\/returns-processing",\n  "\/exception-management",\n/);
   });
 
   it("is covered by verify:routes", () => {
@@ -265,7 +266,7 @@ describe("exceptions_mfe registration", () => {
     const app = read("src/App.tsx");
     expect(app).toMatch(/^const ExceptionsRemote = lazy\(\(\) => import\("exceptions_mfe\/App"\)\);$/m);
     expect(app).toMatch(/path="\/exception-management\/\*"/);
-    expect(app).toMatch(/"\/exception-management",\n\];/);
+    expect(app).toMatch(/"\/exception-management",\n  "\/customer-ordering",\n/);
   });
 
   it("is covered by verify:routes", () => {
@@ -273,17 +274,327 @@ describe("exceptions_mfe registration", () => {
   });
 });
 
+describe("customer_ordering_mfe registration", () => {
+  // Pinned with IQVO/customer-ordering web/vite.config.ts: federation name
+  // customer_ordering_mfe, gateway path /mfes/customer-ordering/, dev port 4012
+  // (off the fully-taken 51xx ladder, 40xx series).
+  it("is a federation remote named customer_ordering_mfe served from /mfes/customer-ordering/ (dev :4012)", () => {
+    const vite = read("vite.config.ts");
+    expect(vite).toMatch(
+      /customer_ordering_mfe:\s*\{\s*type:\s*"module",\s*name:\s*"customer_ordering_mfe",\s*entry:\s*remoteEntry\("customer-ordering",\s*4012\),\s*\}/,
+    );
+  });
+
+  it("does not reuse another remote's container name or dev port", () => {
+    const vite = read("vite.config.ts");
+    expect(vite.match(/name:\s*"customer_ordering_mfe"/g)).toHaveLength(1);
+    expect(vite.match(/remoteEntry\("[^"]+",\s*4012\)/g)).toHaveLength(1);
+    const ports = [...vite.matchAll(/remoteEntry\("[^"]+",\s*(\d+)\)/g)].map((m) => m[1]);
+    expect(new Set(ports).size).toBe(ports.length);
+  });
+
+  it("is imported lazily at module scope as customer_ordering_mfe/App and mounted on a splat route", () => {
+    const app = read("src/App.tsx");
+    expect(app).toMatch(/^const CustomerOrderingRemote = lazy\(\(\) => import\("customer_ordering_mfe\/App"\)\);$/m);
+    expect(app).toMatch(/path="\/customer-ordering\/\*"/);
+    expect(app).toMatch(/"\/customer-ordering",\n  "\/delivery-promise",\n/);
+  });
+
+  it("is covered by verify:routes", () => {
+    expect(read("scripts/verify-all-routes.cjs")).toContain('path: "/customer-ordering"');
+  });
+});
+
+describe("delivery_promise_mfe registration", () => {
+  // Pinned with IQVO/delivery-promise web/vite.config.ts: federation name
+  // delivery_promise_mfe, gateway path /mfes/delivery-promise/, dev port 4013
+  // (off the fully-taken 51xx ladder, 40xx series).
+  it("is a federation remote named delivery_promise_mfe served from /mfes/delivery-promise/ (dev :4013)", () => {
+    const vite = read("vite.config.ts");
+    expect(vite).toMatch(
+      /delivery_promise_mfe:\s*\{\s*type:\s*"module",\s*name:\s*"delivery_promise_mfe",\s*entry:\s*remoteEntry\("delivery-promise",\s*4013\),\s*\}/,
+    );
+  });
+
+  it("does not reuse another remote's container name or dev port", () => {
+    const vite = read("vite.config.ts");
+    expect(vite.match(/name:\s*"delivery_promise_mfe"/g)).toHaveLength(1);
+    expect(vite.match(/remoteEntry\("[^"]+",\s*4013\)/g)).toHaveLength(1);
+    const ports = [...vite.matchAll(/remoteEntry\("[^"]+",\s*(\d+)\)/g)].map((m) => m[1]);
+    expect(new Set(ports).size).toBe(ports.length);
+  });
+
+  it("is imported lazily at module scope as delivery_promise_mfe/App and mounted on a splat route", () => {
+    const app = read("src/App.tsx");
+    expect(app).toMatch(/^const DeliveryPromiseRemote = lazy\(\(\) => import\("delivery_promise_mfe\/App"\)\);$/m);
+    expect(app).toMatch(/path="\/delivery-promise\/\*"/);
+    expect(app).toMatch(/"\/delivery-promise",\n  "\/last-mile-delivery",\n/);
+  });
+
+  it("is covered by verify:routes", () => {
+    expect(read("scripts/verify-all-routes.cjs")).toContain('path: "/delivery-promise"');
+  });
+});
+
+describe("last_mile_mfe registration", () => {
+  // Pinned with IQVO/last-mile-delivery web/vite.config.ts: federation name
+  // last_mile_mfe, gateway path /mfes/last-mile-delivery/, dev port 4014
+  // (off the fully-taken 51xx ladder, 40xx series).
+  it("is a federation remote named last_mile_mfe served from /mfes/last-mile-delivery/ (dev :4014)", () => {
+    const vite = read("vite.config.ts");
+    expect(vite).toMatch(
+      /last_mile_mfe:\s*\{\s*type:\s*"module",\s*name:\s*"last_mile_mfe",\s*entry:\s*remoteEntry\("last-mile-delivery",\s*4014\),\s*\}/,
+    );
+  });
+
+  it("does not reuse another remote's container name or dev port", () => {
+    const vite = read("vite.config.ts");
+    expect(vite.match(/name:\s*"last_mile_mfe"/g)).toHaveLength(1);
+    expect(vite.match(/remoteEntry\("[^"]+",\s*4014\)/g)).toHaveLength(1);
+    const ports = [...vite.matchAll(/remoteEntry\("[^"]+",\s*(\d+)\)/g)].map((m) => m[1]);
+    expect(new Set(ports).size).toBe(ports.length);
+  });
+
+  it("is imported lazily at module scope as last_mile_mfe/App and mounted on a splat route", () => {
+    const app = read("src/App.tsx");
+    expect(app).toMatch(/^const LastMileRemote = lazy\(\(\) => import\("last_mile_mfe\/App"\)\);$/m);
+    expect(app).toMatch(/path="\/last-mile-delivery\/\*"/);
+    expect(app).toMatch(/"\/last-mile-delivery",\n  "\/linehaul-transportation",\n/);
+  });
+
+  it("is covered by verify:routes", () => {
+    expect(read("scripts/verify-all-routes.cjs")).toContain('path: "/last-mile-delivery"');
+  });
+});
+
+describe("linehaul_mfe registration", () => {
+  // Pinned with IQVO/linehaul-transportation web/vite.config.ts: federation name
+  // linehaul_mfe, gateway path /mfes/linehaul-transportation/, dev port 4015
+  // (off the fully-taken 51xx ladder, 40xx series).
+  it("is a federation remote named linehaul_mfe served from /mfes/linehaul-transportation/ (dev :4015)", () => {
+    const vite = read("vite.config.ts");
+    expect(vite).toMatch(
+      /linehaul_mfe:\s*\{\s*type:\s*"module",\s*name:\s*"linehaul_mfe",\s*entry:\s*remoteEntry\("linehaul-transportation",\s*4015\),\s*\}/,
+    );
+  });
+
+  it("does not reuse another remote's container name or dev port", () => {
+    const vite = read("vite.config.ts");
+    expect(vite.match(/name:\s*"linehaul_mfe"/g)).toHaveLength(1);
+    expect(vite.match(/remoteEntry\("[^"]+",\s*4015\)/g)).toHaveLength(1);
+    const ports = [...vite.matchAll(/remoteEntry\("[^"]+",\s*(\d+)\)/g)].map((m) => m[1]);
+    expect(new Set(ports).size).toBe(ports.length);
+  });
+
+  it("is imported lazily at module scope as linehaul_mfe/App and mounted on a splat route", () => {
+    const app = read("src/App.tsx");
+    expect(app).toMatch(/^const LinehaulRemote = lazy\(\(\) => import\("linehaul_mfe\/App"\)\);$/m);
+    expect(app).toMatch(/path="\/linehaul-transportation\/\*"/);
+    expect(app).toMatch(/"\/linehaul-transportation",\n  "\/node-performance",\n/);
+  });
+
+  it("is covered by verify:routes", () => {
+    expect(read("scripts/verify-all-routes.cjs")).toContain('path: "/linehaul-transportation"');
+  });
+});
+
+describe("node_performance_mfe registration", () => {
+  // Pinned with IQVO/node-performance web/vite.config.ts: federation name
+  // node_performance_mfe, gateway path /mfes/node-performance/, dev port 4016
+  // (off the fully-taken 51xx ladder, 40xx series).
+  it("is a federation remote named node_performance_mfe served from /mfes/node-performance/ (dev :4016)", () => {
+    const vite = read("vite.config.ts");
+    expect(vite).toMatch(
+      /node_performance_mfe:\s*\{\s*type:\s*"module",\s*name:\s*"node_performance_mfe",\s*entry:\s*remoteEntry\("node-performance",\s*4016\),\s*\}/,
+    );
+  });
+
+  it("does not reuse another remote's container name or dev port", () => {
+    const vite = read("vite.config.ts");
+    expect(vite.match(/name:\s*"node_performance_mfe"/g)).toHaveLength(1);
+    expect(vite.match(/remoteEntry\("[^"]+",\s*4016\)/g)).toHaveLength(1);
+    const ports = [...vite.matchAll(/remoteEntry\("[^"]+",\s*(\d+)\)/g)].map((m) => m[1]);
+    expect(new Set(ports).size).toBe(ports.length);
+  });
+
+  it("is imported lazily at module scope as node_performance_mfe/App and mounted on a splat route", () => {
+    const app = read("src/App.tsx");
+    expect(app).toMatch(/^const NodePerformanceRemote = lazy\(\(\) => import\("node_performance_mfe\/App"\)\);$/m);
+    expect(app).toMatch(/path="\/node-performance\/\*"/);
+    expect(app).toMatch(/"\/node-performance",\n  "\/node-topology",\n/);
+  });
+
+  it("is covered by verify:routes", () => {
+    expect(read("scripts/verify-all-routes.cjs")).toContain('path: "/node-performance"');
+  });
+});
+
+describe("node_topology_mfe registration", () => {
+  // Pinned with IQVO/node-topology web/vite.config.ts: federation name
+  // node_topology_mfe, gateway path /mfes/node-topology/, dev port 4017
+  // (off the fully-taken 51xx ladder, 40xx series).
+  it("is a federation remote named node_topology_mfe served from /mfes/node-topology/ (dev :4017)", () => {
+    const vite = read("vite.config.ts");
+    expect(vite).toMatch(
+      /node_topology_mfe:\s*\{\s*type:\s*"module",\s*name:\s*"node_topology_mfe",\s*entry:\s*remoteEntry\("node-topology",\s*4017\),\s*\}/,
+    );
+  });
+
+  it("does not reuse another remote's container name or dev port", () => {
+    const vite = read("vite.config.ts");
+    expect(vite.match(/name:\s*"node_topology_mfe"/g)).toHaveLength(1);
+    expect(vite.match(/remoteEntry\("[^"]+",\s*4017\)/g)).toHaveLength(1);
+    const ports = [...vite.matchAll(/remoteEntry\("[^"]+",\s*(\d+)\)/g)].map((m) => m[1]);
+    expect(new Set(ports).size).toBe(ports.length);
+  });
+
+  it("is imported lazily at module scope as node_topology_mfe/App and mounted on a splat route", () => {
+    const app = read("src/App.tsx");
+    expect(app).toMatch(/^const NodeTopologyRemote = lazy\(\(\) => import\("node_topology_mfe\/App"\)\);$/m);
+    expect(app).toMatch(/path="\/node-topology\/\*"/);
+    expect(app).toMatch(/"\/node-topology",\n  "\/offer-availability",\n/);
+  });
+
+  it("is covered by verify:routes", () => {
+    expect(read("scripts/verify-all-routes.cjs")).toContain('path: "/node-topology"');
+  });
+});
+
+describe("offer_availability_mfe registration", () => {
+  // Pinned with IQVO/offer-availability web/vite.config.ts: federation name
+  // offer_availability_mfe, gateway path /mfes/offer-availability/, dev port 4018
+  // (off the fully-taken 51xx ladder, 40xx series).
+  it("is a federation remote named offer_availability_mfe served from /mfes/offer-availability/ (dev :4018)", () => {
+    const vite = read("vite.config.ts");
+    expect(vite).toMatch(
+      /offer_availability_mfe:\s*\{\s*type:\s*"module",\s*name:\s*"offer_availability_mfe",\s*entry:\s*remoteEntry\("offer-availability",\s*4018\),\s*\}/,
+    );
+  });
+
+  it("does not reuse another remote's container name or dev port", () => {
+    const vite = read("vite.config.ts");
+    expect(vite.match(/name:\s*"offer_availability_mfe"/g)).toHaveLength(1);
+    expect(vite.match(/remoteEntry\("[^"]+",\s*4018\)/g)).toHaveLength(1);
+    const ports = [...vite.matchAll(/remoteEntry\("[^"]+",\s*(\d+)\)/g)].map((m) => m[1]);
+    expect(new Set(ports).size).toBe(ports.length);
+  });
+
+  it("is imported lazily at module scope as offer_availability_mfe/App and mounted on a splat route", () => {
+    const app = read("src/App.tsx");
+    expect(app).toMatch(/^const OfferAvailabilityRemote = lazy\(\(\) => import\("offer_availability_mfe\/App"\)\);$/m);
+    expect(app).toMatch(/path="\/offer-availability\/\*"/);
+    expect(app).toMatch(/"\/offer-availability",\n  "\/order-sourcing",\n/);
+  });
+
+  it("is covered by verify:routes", () => {
+    expect(read("scripts/verify-all-routes.cjs")).toContain('path: "/offer-availability"');
+  });
+});
+
+describe("order_sourcing_mfe registration", () => {
+  // Pinned with IQVO/order-sourcing web/vite.config.ts: federation name
+  // order_sourcing_mfe, gateway path /mfes/order-sourcing/, dev port 4019
+  // (off the fully-taken 51xx ladder, 40xx series).
+  it("is a federation remote named order_sourcing_mfe served from /mfes/order-sourcing/ (dev :4019)", () => {
+    const vite = read("vite.config.ts");
+    expect(vite).toMatch(
+      /order_sourcing_mfe:\s*\{\s*type:\s*"module",\s*name:\s*"order_sourcing_mfe",\s*entry:\s*remoteEntry\("order-sourcing",\s*4019\),\s*\}/,
+    );
+  });
+
+  it("does not reuse another remote's container name or dev port", () => {
+    const vite = read("vite.config.ts");
+    expect(vite.match(/name:\s*"order_sourcing_mfe"/g)).toHaveLength(1);
+    expect(vite.match(/remoteEntry\("[^"]+",\s*4019\)/g)).toHaveLength(1);
+    const ports = [...vite.matchAll(/remoteEntry\("[^"]+",\s*(\d+)\)/g)].map((m) => m[1]);
+    expect(new Set(ports).size).toBe(ports.length);
+  });
+
+  it("is imported lazily at module scope as order_sourcing_mfe/App and mounted on a splat route", () => {
+    const app = read("src/App.tsx");
+    expect(app).toMatch(/^const OrderSourcingRemote = lazy\(\(\) => import\("order_sourcing_mfe\/App"\)\);$/m);
+    expect(app).toMatch(/path="\/order-sourcing\/\*"/);
+    expect(app).toMatch(/"\/order-sourcing",\n  "\/shipping-and-tracking",\n/);
+  });
+
+  it("is covered by verify:routes", () => {
+    expect(read("scripts/verify-all-routes.cjs")).toContain('path: "/order-sourcing"');
+  });
+});
+
+describe("shipping_mfe registration", () => {
+  // Pinned with IQVO/shipping-and-tracking web/vite.config.ts: federation name
+  // shipping_mfe, gateway path /mfes/shipping-and-tracking/, dev port 4020
+  // (off the fully-taken 51xx ladder, 40xx series).
+  it("is a federation remote named shipping_mfe served from /mfes/shipping-and-tracking/ (dev :4020)", () => {
+    const vite = read("vite.config.ts");
+    expect(vite).toMatch(
+      /shipping_mfe:\s*\{\s*type:\s*"module",\s*name:\s*"shipping_mfe",\s*entry:\s*remoteEntry\("shipping-and-tracking",\s*4020\),\s*\}/,
+    );
+  });
+
+  it("does not reuse another remote's container name or dev port", () => {
+    const vite = read("vite.config.ts");
+    expect(vite.match(/name:\s*"shipping_mfe"/g)).toHaveLength(1);
+    expect(vite.match(/remoteEntry\("[^"]+",\s*4020\)/g)).toHaveLength(1);
+    const ports = [...vite.matchAll(/remoteEntry\("[^"]+",\s*(\d+)\)/g)].map((m) => m[1]);
+    expect(new Set(ports).size).toBe(ports.length);
+  });
+
+  it("is imported lazily at module scope as shipping_mfe/App and mounted on a splat route", () => {
+    const app = read("src/App.tsx");
+    expect(app).toMatch(/^const ShippingRemote = lazy\(\(\) => import\("shipping_mfe\/App"\)\);$/m);
+    expect(app).toMatch(/path="\/shipping-and-tracking\/\*"/);
+    expect(app).toMatch(/"\/shipping-and-tracking",\n  "\/seller-inbound",\n  "\/vendor-connectivity",\n/);
+  });
+
+  it("is covered by verify:routes", () => {
+    expect(read("scripts/verify-all-routes.cjs")).toContain('path: "/shipping-and-tracking"');
+  });
+});
+
+describe("vendor_connectivity_mfe registration", () => {
+  // Pinned with IQVO/vendor-connectivity web/vite.config.ts: federation name
+  // vendor_connectivity_mfe, gateway path /mfes/vendor-connectivity/, dev port 4021
+  // (off the fully-taken 51xx ladder, 40xx series).
+  it("is a federation remote named vendor_connectivity_mfe served from /mfes/vendor-connectivity/ (dev :4021)", () => {
+    const vite = read("vite.config.ts");
+    expect(vite).toMatch(
+      /vendor_connectivity_mfe:\s*\{\s*type:\s*"module",\s*name:\s*"vendor_connectivity_mfe",\s*entry:\s*remoteEntry\("vendor-connectivity",\s*4021\),\s*\}/,
+    );
+  });
+
+  it("does not reuse another remote's container name or dev port", () => {
+    const vite = read("vite.config.ts");
+    expect(vite.match(/name:\s*"vendor_connectivity_mfe"/g)).toHaveLength(1);
+    expect(vite.match(/remoteEntry\("[^"]+",\s*4021\)/g)).toHaveLength(1);
+    const ports = [...vite.matchAll(/remoteEntry\("[^"]+",\s*(\d+)\)/g)].map((m) => m[1]);
+    expect(new Set(ports).size).toBe(ports.length);
+  });
+
+  it("is imported lazily at module scope as vendor_connectivity_mfe/App and mounted on a splat route", () => {
+    const app = read("src/App.tsx");
+    expect(app).toMatch(/^const VendorConnectivityRemote = lazy\(\(\) => import\("vendor_connectivity_mfe\/App"\)\);$/m);
+    expect(app).toMatch(/path="\/vendor-connectivity\/\*"/);
+    expect(app).toMatch(/"\/seller-inbound",\n  "\/vendor-connectivity",\n\];/);
+  });
+
+  it("is covered by verify:routes", () => {
+    expect(read("scripts/verify-all-routes.cjs")).toContain('path: "/vendor-connectivity"');
+  });
+});
+
 describe("remote registry totals", () => {
-  // The fleet has eighteen remotes; a hand-edited list that drops or doubles
+  // The fleet has twenty-nine remotes; a hand-edited list that drops or doubles
   // one breaks this before it breaks a route.
-  it("registers eighteen remotes with unique keys, container names and ports", () => {
+  it("registers twenty-nine remotes with unique keys, container names and ports", () => {
     const vite = read("vite.config.ts");
     const entries = [
       ...vite.matchAll(
         /(\w+_mfe):\s*\{\s*type:\s*"module",\s*name:\s*"([^"]+)",\s*entry:\s*remoteEntry\("([^"]+)",\s*(\d+)\)/g,
       ),
     ];
-    expect(entries).toHaveLength(18);
+    expect(entries).toHaveLength(29);
     for (const col of [1, 2, 3, 4]) {
       const values = entries.map((m) => m[col]);
       expect(new Set(values).size).toBe(values.length);
@@ -296,7 +607,7 @@ describe("remote registry totals", () => {
       ...app.match(/const REMOTE_PREFIXES = \[([^\]]*)\]/)![1].matchAll(/"(\/[^"]+)"/g),
     ].map((m) => m[1]);
     const routes = [...app.matchAll(/path="(\/[^"/]+)\/\*"/g)].map((m) => m[1]);
-    expect(prefixes).toHaveLength(18);
+    expect(prefixes).toHaveLength(29);
     expect([...prefixes].sort()).toEqual([...routes].sort());
   });
 });
@@ -315,5 +626,36 @@ describe("verify:routes coverage of the router", () => {
       expect(script).toContain(`path: "/reports/${path}"`);
     }
     expect(script).toMatch(/path: "\/reports\/no-such-context",[^}]*expect: \/Page not found\/i/);
+  });
+});
+
+describe("seller_inbound_mfe registration", () => {
+  // Pinned with IQVO/seller-inbound web/vite.config.ts: federation name
+  // seller_inbound_mfe, gateway path /mfes/seller-inbound/, dev port 4022
+  // (off the fully-taken 51xx ladder, 40xx series).
+  it("is a federation remote named seller_inbound_mfe served from /mfes/seller-inbound/ (dev :4022)", () => {
+    const vite = read("vite.config.ts");
+    expect(vite).toMatch(
+      /seller_inbound_mfe:\s*\{\s*type:\s*"module",\s*name:\s*"seller_inbound_mfe",\s*entry:\s*remoteEntry\("seller-inbound",\s*4022\),\s*\}/,
+    );
+  });
+
+  it("does not reuse another remote's container name or dev port", () => {
+    const vite = read("vite.config.ts");
+    expect(vite.match(/name:\s*"seller_inbound_mfe"/g)).toHaveLength(1);
+    expect(vite.match(/remoteEntry\("[^"]+",\s*4022\)/g)).toHaveLength(1);
+    const ports = [...vite.matchAll(/remoteEntry\("[^"]+",\s*(\d+)\)/g)].map((m) => m[1]);
+    expect(new Set(ports).size).toBe(ports.length);
+  });
+
+  it("is imported lazily at module scope as seller_inbound_mfe/App and mounted on a splat route", () => {
+    const app = read("src/App.tsx");
+    expect(app).toMatch(/^const SellerInboundRemote = lazy\(\(\) => import\("seller_inbound_mfe\/App"\)\);$/m);
+    expect(app).toMatch(/path="\/seller-inbound\/\*"/);
+    expect(app).toMatch(/"\/seller-inbound",\n  "\/vendor-connectivity",\n\];/);
+  });
+
+  it("is covered by verify:routes", () => {
+    expect(read("scripts/verify-all-routes.cjs")).toContain('path: "/seller-inbound"');
   });
 });

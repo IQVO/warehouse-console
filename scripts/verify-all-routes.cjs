@@ -1,9 +1,10 @@
 /**
- * Dev-only smoke check: loads every route in a real headless browser and
+ * Browser route smoke check: loads every route in a real headless browser and
  * confirms each one renders without page errors or failed requests.
- * Requires the shell (npm run dev, :5173), every remote's dev server and the
- * APIs at config.json's apiOrigin (including each <context>-reports reader)
- * to already be running -- this does not start them for you.
+ * Defaults to the dev shell (:5173) and accepts BASE_URL/API_ORIGIN overrides.
+ * The selected shell, every remote's dev server and the APIs at the resolved
+ * apiOrigin (including each <context>-reports reader) must already be
+ * running -- this does not start them for you.
  *
  * Usage: npm run verify:routes
  *        VERIFY_STUB_API=1 npm run verify:routes   (no backends, see below)
@@ -21,6 +22,13 @@
  * actually be on screen.
  */
 const { chromium } = require("playwright");
+const {
+  isDocumentRequest,
+  runtimeConfig,
+  urlAt,
+} = require("./browser-verify-common.cjs");
+
+const { baseUrl, apiOrigin } = runtimeConfig();
 
 const STUB_API = process.env.VERIFY_STUB_API === "1";
 
@@ -42,6 +50,8 @@ const routes = [
   { path: "/network-fulfillment", label: "network-fulfillment", expect: /\S/ },
   { path: "/capacity", label: "capacity", expect: /\S/ },
   { path: "/product-master", label: "product-master", expect: /\S/ },
+  // Packaging screen of the same remote (product-master web/, products/:sku/packaging): a deep link under the splat route.
+  { path: "/product-master/products/SKU-1/packaging", label: "product-master-packaging", expect: /\S/ },
   { path: "/network-inventory", label: "network-inventory", expect: /\S/ },
   { path: "/inbound-receiving", label: "inbound-receiving", expect: /\S/ },
   // slotting-optimization's remote (connect-all 2.2b): container
@@ -58,6 +68,22 @@ const routes = [
   // fully-taken 51xx MFE ladder.
   { path: "/returns-processing", label: "returns-processing", expect: /\S/ },
   { path: "/exception-management", label: "exception-management", expect: /\S/ },
+  // The retail-network fleet's ten remotes (customer-ordering through
+  // vendor-connectivity): containers customer_ordering_mfe ..
+  // vendor_connectivity_mfe, gateway path /mfes/<repo>/, dev ports
+  // 4012..4021 -- off the fully-taken 51xx MFE ladder like returns_mfe's
+  // 4010 and exceptions_mfe's 4011.
+  { path: "/customer-ordering", label: "customer-ordering", expect: /\S/ },
+  { path: "/delivery-promise", label: "delivery-promise", expect: /\S/ },
+  { path: "/last-mile-delivery", label: "last-mile-delivery", expect: /\S/ },
+  { path: "/linehaul-transportation", label: "linehaul-transportation", expect: /\S/ },
+  { path: "/node-performance", label: "node-performance", expect: /\S/ },
+  { path: "/node-topology", label: "node-topology", expect: /\S/ },
+  { path: "/offer-availability", label: "offer-availability", expect: /\S/ },
+  { path: "/order-sourcing", label: "order-sourcing", expect: /\S/ },
+  { path: "/shipping-and-tracking", label: "shipping-and-tracking", expect: /\S/ },
+  { path: "/seller-inbound", label: "seller-inbound", expect: /\S/ },
+  { path: "/vendor-connectivity", label: "vendor-connectivity", expect: /\S/ },
   // /reports/:context -- one Bounded Context Report screen per slug in
   // src/features/context-reports/registry.ts (src/remotes-registration.test.ts
   // fails when a registered slug is missing here). Each must render its own
@@ -118,9 +144,11 @@ const routes = [
     }
   });
 
+  console.log(`web: ${baseUrl}`);
+  console.log(`expected API origin: ${apiOrigin}`);
   for (const route of routes) {
     console.log(`=== ${route.label} (${route.path}) ===`);
-    await page.goto(`http://localhost:5173${route.path}`, {
+    await page.goto(urlAt(baseUrl, route.path), {
       waitUntil: "networkidle",
       timeout: 20000,
     });
@@ -155,21 +183,23 @@ const routes = [
   // the ui-kit is emitting plain <a href> again, which tears down and
   // re-downloads every Module Federation remote on every click.
   console.log("=== client-side navigation ===");
-  await page.goto(`http://localhost:5173${STUB_API ? "/order-lifecycle" : "/"}`, { waitUntil: "networkidle" });
-  // Playwright's framenavigated also fires for history.pushState (client-side)
-  // navigations, so it cannot tell them from reloads (it flagged every healthy
-  // click). A window flag set before the click survives only a same-document one.
-  await page.evaluate(() => {
-    window.__spaNavMarker = true;
-  });
+  await page.goto(urlAt(baseUrl, STUB_API ? "/order-lifecycle" : "/"), { waitUntil: "networkidle" });
+  const documentRequests = [];
+  const documentRequestListener = (request) => {
+    if (isDocumentRequest(request)) documentRequests.push(request.url());
+  };
+  page.on("request", documentRequestListener);
   const navLink = page.locator('nav a[href="/contexts"]').first();
   if ((await navLink.count()) > 0) {
     await navLink.click();
-    await page.waitForTimeout(500);
-    if (await page.evaluate(() => window.__spaNavMarker === true)) {
-      console.log("ok: nav click routed client-side");
+    await page.waitForURL(urlAt(baseUrl, "/contexts"), { timeout: 20000 });
+    page.off("request", documentRequestListener);
+    if (documentRequests.length > 0) {
+      errors.push(
+        `FULL PAGE RELOAD on nav click (${documentRequests.join(", ")}); expected client-side routing`,
+      );
     } else {
-      errors.push("FULL PAGE RELOAD on nav click; expected client-side routing");
+      console.log("ok: nav click routed client-side");
     }
   } else {
     errors.push("SHELL MISSING: no /contexts nav link to click");

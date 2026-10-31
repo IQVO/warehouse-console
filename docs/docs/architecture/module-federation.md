@@ -81,10 +81,10 @@ cross-origin to `<apiOrigin>/api/warehouse-planning` on Kong, so Kong's CORS
 policy for the console origin must allow `PUT`.
 
 `productmaster_mfe` (product-master) follows the same shape: no props,
-relative routes (product list, `register`, `products/:sku`), mounted on the
-splat route `/product-master/*`. Every write it makes is a `PUT` with a JSON
-`Content-Type` to `<apiOrigin>/api/product-master`, so the same Kong CORS
-requirement applies.
+relative routes (product list, `register`, `products/:sku`, `products/:sku/packaging`), mounted on the
+splat route `/product-master/*`. Its writes are `PUT` (register, classify, dimensions, declare a pack level) and `POST .../pack-levels/{level}:retire`, each with a JSON
+`Content-Type` to `<apiOrigin>/api/product-master`, so Kong's CORS policy for the
+console origin must allow `PUT` and `POST` (product-master's chart already lists both).
 
 `nip_mfe` (network-inventory-planning) also exposes `./App` with no props and
 relative routes (transfers, `transfers/:id`, `simulation`, `rebalance-runs`),
