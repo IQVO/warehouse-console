@@ -222,6 +222,6 @@ a mistyped deep link shows.
 | `RouterLink.tsx` | adapts react-router's `Link` to the ui-kit `LinkComponent` contract (installed via `NavigationProvider` in `App.tsx`); absolute and protocol-relative URLs fall through to a plain `<a>` |
 | `useDocumentTitle.ts` | sets `document.title` to `<title> · Warehouse Console` (or just `Warehouse Console`) |
 
-Navigation (`src/App.tsx`): the top bar has five items — Floor, Order
+Navigation (the items in `src/shell/useShellNav.ts`, rendered by the shell in `src/App.tsx`): the top bar has five items — Floor, Order
 Lifecycle, WMS Dashboard, WES Dashboard, Contexts. "Contexts" is also
 highlighted on `/reports/...` and on every remote prefix.
