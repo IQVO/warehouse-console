@@ -89,7 +89,7 @@ console origin must allow `PUT` and `POST` (product-master's chart already lists
 `nip_mfe` (network-inventory-planning) also exposes `./App` with no props and
 relative routes (transfers, `transfers/:id`, `simulation`, `rebalance-runs`),
 mounted on the splat route `/network-inventory/*`. Its only write is
-`POST /v1/transfers:approve` with a JSON `Content-Type` **and an
+`POST /v1/transfer-approvals` with a JSON `Content-Type` **and an
 `Idempotency-Key` header** to `<apiOrigin>/api/network-inventory-planning`, so
 Kong's CORS policy for the console origin must also allow the
 `Idempotency-Key` request header; warehouse-infra's `warehouse-cors` plugin
