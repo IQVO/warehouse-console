@@ -13,7 +13,7 @@
     "verify:dashboards": "node scripts/verify-dashboards.cjs",
     "verify:cluster": "BASE_URL=http://localhost API_ORIGIN=http://localhost:8000 node scripts/verify-cluster.cjs",
     "test": "vitest run && npm run test:browser-scripts",
-    "test:browser-scripts": "node --test scripts/browser-verify-common.test.cjs scripts/verify-cluster.test.cjs",
+    "test:browser-scripts": "node --test scripts/browser-verify-common.test.cjs scripts/verify-cluster.test.cjs scripts/verify-all-routes.test.cjs",
     "test:watch": "vitest"
   },
   "dependencies": {

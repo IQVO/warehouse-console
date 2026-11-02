@@ -7,6 +7,7 @@
        Vite's client types as well as node's. */
     "types": ["node", "vite/client"],
     "skipLibCheck": true,
+    "resolveJsonModule": true,
 
     /* Bundler mode */
     "moduleResolution": "bundler",
