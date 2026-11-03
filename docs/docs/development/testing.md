@@ -63,7 +63,8 @@ resolve to the developer-port fallbacks, since no `config.json` is loaded.
 |---|---|---|
 | `src/runtime-config.test.ts` | 15 | `validateRuntimeConfig` accepts http/https origins and rejects non-objects, missing/blank/non-string/relative origins, non-HTTP schemes, paths, credentials and queries; `loadRuntimeConfig` fetches with `no-store`, and never publishes a non-2xx or non-JSON response |
 | `src/config.test.ts` | 5 | URL resolution under an `apiOrigin`, the production "missing origin" error, developer-port fallbacks |
-| `src/remotes-registration.test.ts` | 17 | static checks on `vite.config.ts`, `src/App.tsx` and `scripts/verify-all-routes.cjs` for `capacity_mfe`, `productmaster_mfe`, `nip_mfe`, `inbound_mfe`: container name, gateway path, dev port uniqueness, module-scope `lazy()`, splat route, verify:routes coverage; plus verify:routes covers `/network-fulfillment`, every `REPORT_ROUTES` slug and an unknown report slug |
+| `src/remotes-manifest.test.tsx` | 39 | the remotes manifest (29 remotes, unique name/container/path/port/route, capacity vs planning distinct, `netfulfil_mfe` override), the derived `federationRemotes()` dev/build entry URLs, `REMOTE_COMPONENTS` parity, every manifest route rendering the "unavailable" card with its label, and verify:routes covering every `REPORT_ROUTES` slug plus an unknown slug |
+| `scripts/verify-all-routes.test.cjs` (node --test) | 4 | the verify:routes list covers every manifest remote, the product-master packaging deep link, unique paths, and the 404 checks |
 | `src/packaging.test.ts` | 4 | chart `image.repository` equals what `ci.yml` publishes, the Dockerfile's builder-base comment names the `FROM node:` image it uses, `.gitignore` lists `public/config.json`, `src/config.ts` no longer claims Kong lacks a reports route |
 | `src/App.test.tsx` | 22 | the `/capacity/*`, `/product-master/*`, `/network-inventory/*`, `/inbound-receiving/*` routes render the "unavailable" card when the remote is down, keep "Contexts" active, and do not capture look-alike prefixes |
 | `src/shell/RouterLink.test.tsx` | 5 | client-side navigation for nav items and launch tiles, the skip link, external URLs left to the browser |
@@ -110,10 +111,12 @@ Both exit `1` on any collected error.
   listed remote's dev server and the APIs (including each `<context>-reports`
   reader) at `apiOrigin`, unless `VERIFY_STUB_API=1`: then the browser answers
   every `apiOrigin` call with a 503 and no backend (or Kong CORS) is needed;
-  the `verify-routes` workflow runs it that way against all 18 remotes'
-  `develop`. Any route showing the remote error card ("This module is
-  unavailable right now") fails. `src/remotes-registration.test.ts` fails when a
-  registered report slug or `/network-fulfillment` is missing from its list.
+  the `verify-routes` workflow runs it that way against every remote's
+  `develop` (list from `src/remotes-manifest.json`). Any route showing the
+  remote error card ("This module is unavailable right now") fails.
+  `scripts/verify-all-routes.test.cjs` fails when a manifest remote is
+  missing from the list; `src/remotes-manifest.test.tsx` covers the
+  `REPORT_ROUTES` slugs.
 - **`npm run verify:dashboards`** needs only the shell's dev server: it
   intercepts `**/console/reports/wms*` and `**/console/reports/wes*` and
   checks three states — all sections available (charts draw real geometry),

@@ -2,7 +2,9 @@ name: verify-routes
 
 # Advisory, NOT a required check (gap UX-1). Loads every console route in headless
 # Chromium against the shell and the DEV servers of all remotes (develop of each
-# repo), API answered 503 in the browser. Remote list and ports come from vite.config.ts.
+# repo), API answered 503 in the browser. Remote list and ports come from
+# src/remotes-manifest.json (the single source of truth vite.config.ts,
+# src/App.tsx and scripts/verify-routes-list.cjs also derive from).
 on:
   workflow_dispatch: {}
   schedule:
@@ -11,7 +13,9 @@ on:
     paths:
       - vite.config.ts
       - src/App.tsx
+      - src/remotes-manifest.json
       - scripts/verify-all-routes.cjs
+      - scripts/verify-routes-list.cjs
       - .github/workflows/verify-routes.yml
 
 permissions:
@@ -40,7 +44,7 @@ jobs:
       - name: Start every remote's dev server
         run: |
           set -euo pipefail
-          sed -nE 's/.*remoteEntry\("([a-z-]+)", ([0-9]+)\).*/\1 \2/p' warehouse-console/vite.config.ts > remotes.txt
+          node -e 'const m = require("./warehouse-console/src/remotes-manifest.json"); process.stdout.write(m.map((r) => `${r.path} ${r.port}`).join("\n") + "\n")' > remotes.txt
           while read -r repo port; do
             git clone -q --depth 1 -b develop "https://github.com/IQVO/${repo}.git"
             (cd "${repo}/web" && npm ci --silent && nohup node node_modules/vite/bin/vite.js --port "${port}" > "../../${repo}.log" 2>&1 &)

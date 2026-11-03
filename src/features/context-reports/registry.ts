@@ -27,9 +27,8 @@ import { warehousePlanningPlanThroughputConfig } from "./warehousePlanningPlanTh
  * rather than risking the two ever drifting out of sync.
  *
  * `path` is the route slug used at `/reports/<path>` -- matches the
- * context's own repo/directory name, mirroring the convention
- * REPORT_PREFIXES/REMOTE_PREFIXES already use in App.tsx for the remote
- * routes.
+ * context's own repo/directory name, mirroring the convention the
+ * remotes manifest (src/remotes-manifest.json) uses for the remote routes.
  */
 export interface ReportRouteEntry {
   path: string;
