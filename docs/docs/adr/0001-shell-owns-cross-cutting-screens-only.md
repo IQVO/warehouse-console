@@ -74,6 +74,6 @@ bookmarks keep working exactly as before.
   tile) instead of a single click, which trades discoverability for a
   calmer top-level bar.
 - The "Contexts is active" check has to enumerate every remote prefix
-  (`REMOTE_PREFIXES` in `App.tsx`) and stay in sync if a remote's route
-  changes — a small but real piece of bookkeeping the flatter nav didn't
-  need.
+  (`REMOTE_ROUTE_PREFIXES`, derived from `src/remotes-manifest.json`) and
+  stay in sync if a remote's route changes — a small but real piece of
+  bookkeeping the flatter nav didn't need.

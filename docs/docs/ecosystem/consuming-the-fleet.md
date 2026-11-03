@@ -26,10 +26,14 @@ one is hosted, here is what this shell expects from a bounded-context repo.
    `window.__WAREHOUSE_CONFIG__.apiOrigin` + `/api/<context>`. It must not
    bake an API URL into its build.
 
-Once those are in place, this shell adds one entry to `remotes` in
-`vite.config.ts` (dev port + `/mfes/<context>/` path), one `lazy()` import at
-module scope in `App.tsx`, a route, its prefix in `REMOTE_PREFIXES` (so the
-Contexts nav item stays active), and a `LaunchTile` on the Contexts screen.
+Once those are in place, this shell adds one entry to
+`src/remotes-manifest.json` (name/container, `/mfes/<context>/` path, dev
+port, route prefix, label). The federation remotes map in `vite.config.ts`,
+the route and its nav prefix in `App.tsx`, and the `verify:routes` entry are
+all DERIVED from that one manifest, so they cannot drift. Only two more
+things are hand-added: one static `lazy()` import in
+`src/shell/remoteComponents.ts` (Vite resolves `import()` at build time, so
+the specifier must be a literal), and a `LaunchTile` on the Contexts screen.
 The remote also has to be added to `warehouse-infra`'s `frontend_remotes`
 map, or the web gateway will never serve it. See
 [Module Federation](../architecture/module-federation.md) for the exact rule
