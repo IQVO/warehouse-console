@@ -23,7 +23,7 @@ describe("capacity_mfe route (/capacity/*)", () => {
       http.get(`${SERVICE_BASE_URL.fulfillmentExecution}/queues/PICK/depth`, () =>
         HttpResponse.json({ taskType: "PICK", depth: 0 }),
       ),
-      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json([])),
+      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json({ items: [] })),
     );
   }
 
@@ -68,7 +68,7 @@ describe("productmaster_mfe route (/product-master/*)", () => {
       http.get(`${SERVICE_BASE_URL.fulfillmentExecution}/queues/PICK/depth`, () =>
         HttpResponse.json({ taskType: "PICK", depth: 0 }),
       ),
-      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json([])),
+      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json({ items: [] })),
     );
   }
 
@@ -118,7 +118,7 @@ describe("nip_mfe route (/network-inventory/*)", () => {
       http.get(`${SERVICE_BASE_URL.fulfillmentExecution}/queues/PICK/depth`, () =>
         HttpResponse.json({ taskType: "PICK", depth: 0 }),
       ),
-      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json([])),
+      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json({ items: [] })),
     );
   }
 
@@ -165,7 +165,7 @@ describe("inbound_mfe route (/inbound-receiving/*)", () => {
       http.get(`${SERVICE_BASE_URL.fulfillmentExecution}/queues/PICK/depth`, () =>
         HttpResponse.json({ taskType: "PICK", depth: 0 }),
       ),
-      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json([])),
+      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json({ items: [] })),
     );
   }
 

@@ -18,7 +18,7 @@ describe("ContextsScreen launchpad", () => {
       http.get(`${SERVICE_BASE_URL.fulfillmentExecution}/queues/PICK/depth`, () =>
         HttpResponse.json({ taskType: "PICK", depth: 3 }),
       ),
-      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json([])),
+      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json({ items: [] })),
     );
     render(
       <MemoryRouter>
@@ -35,7 +35,7 @@ describe("ContextsScreen launchpad", () => {
       http.get(`${SERVICE_BASE_URL.fulfillmentExecution}/queues/PICK/depth`, () =>
         HttpResponse.json({ taskType: "PICK", depth: 3 }),
       ),
-      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json([])),
+      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json({ items: [] })),
     );
     render(
       <MemoryRouter>
@@ -53,7 +53,7 @@ describe("ContextsScreen launchpad", () => {
       http.get(`${SERVICE_BASE_URL.fulfillmentExecution}/queues/PICK/depth`, () =>
         HttpResponse.json({ taskType: "PICK", depth: 3 }),
       ),
-      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json([])),
+      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json({ items: [] })),
     );
     render(
       <MemoryRouter>
@@ -71,7 +71,7 @@ describe("ContextsScreen launchpad", () => {
       http.get(`${SERVICE_BASE_URL.fulfillmentExecution}/queues/PICK/depth`, () =>
         HttpResponse.json({ taskType: "PICK", depth: 3 }),
       ),
-      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json([])),
+      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json({ items: [] })),
     );
     render(
       <MemoryRouter>
@@ -89,7 +89,7 @@ describe("ContextsScreen launchpad", () => {
       http.get(`${SERVICE_BASE_URL.fulfillmentExecution}/queues/PICK/depth`, () =>
         HttpResponse.json({ taskType: "PICK", depth: 3 }),
       ),
-      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json([])),
+      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json({ items: [] })),
     );
     render(
       <MemoryRouter>
@@ -107,7 +107,7 @@ describe("ContextsScreen launchpad", () => {
       http.get(`${SERVICE_BASE_URL.fulfillmentExecution}/queues/PICK/depth`, () =>
         HttpResponse.json({ taskType: "PICK", depth: 3 }),
       ),
-      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json([])),
+      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json({ items: [] })),
     );
     render(
       <MemoryRouter>
@@ -125,7 +125,7 @@ describe("ContextsScreen launchpad", () => {
       http.get(`${SERVICE_BASE_URL.fulfillmentExecution}/queues/PICK/depth`, () =>
         HttpResponse.json({ taskType: "PICK", depth: 3 }),
       ),
-      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json([])),
+      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json({ items: [] })),
     );
     render(
       <MemoryRouter>
@@ -143,7 +143,7 @@ describe("ContextsScreen launchpad", () => {
       http.get(`${SERVICE_BASE_URL.fulfillmentExecution}/queues/PICK/depth`, () =>
         HttpResponse.json({ taskType: "PICK", depth: 3 }),
       ),
-      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json([])),
+      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json({ items: [] })),
     );
     render(
       <MemoryRouter>
@@ -161,7 +161,7 @@ describe("ContextsScreen launchpad", () => {
       http.get(`${SERVICE_BASE_URL.fulfillmentExecution}/queues/PICK/depth`, () =>
         HttpResponse.json({ taskType: "PICK", depth: 3 }),
       ),
-      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json([])),
+      http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json({ items: [] })),
     );
     render(
       <MemoryRouter>

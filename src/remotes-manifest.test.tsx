@@ -103,7 +103,7 @@ describe("every manifest route renders through RemoteBoundary", () => {
         http.get(`${SERVICE_BASE_URL.fulfillmentExecution}/queues/PICK/depth`, () =>
           HttpResponse.json({ taskType: "PICK", depth: 0 }),
         ),
-        http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json([])),
+        http.get(`${SERVICE_BASE_URL.facilityLayout}/sites`, () => HttpResponse.json({ items: [] })),
       );
       window.history.pushState({}, "", route);
       render(<App />);
