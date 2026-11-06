@@ -5,6 +5,7 @@ import type { LaunchTileProps } from "@warehouse/ui-kit";
 import { SERVICE_BASE_URL } from "../../config";
 import { useDocumentTitle } from "../../shell/useDocumentTitle";
 import { REPORT_ROUTES } from "../context-reports/registry";
+import { useFetchAllPages } from "../../lib/useFetchAllPages";
 
 interface QueueDepth {
   taskType: string;
@@ -73,7 +74,7 @@ export function ContextsScreen(): ReactElement {
     `${SERVICE_BASE_URL.fulfillmentExecution}/queues/PICK/depth`,
     { pollMs: POLL_MS },
   );
-  const sites = useFetch<Site[]>(`${SERVICE_BASE_URL.facilityLayout}/sites`, {
+  const sites = useFetchAllPages<Site>(`${SERVICE_BASE_URL.facilityLayout}/sites`, {
     pollMs: POLL_MS,
   });
 

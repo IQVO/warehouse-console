@@ -124,7 +124,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `warehouse-systems · warehouse-console — the fleet's SPA shell. Built ${new Date().getFullYear()}.`,
+      copyright: `warehouse-systems · warehouse-console — the fleet's SPA shell. Built ${new Date().getFullYear()}. This project is a domain-driven design study. It is not associated with, endorsed by or affiliated with any company, and it uses no company's code, data, logos or trademarks. All names, figures and examples are illustrative or synthetic.`,
     },
     prism: {
       theme: prismThemes.github,
