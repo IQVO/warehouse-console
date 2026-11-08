@@ -63,3 +63,7 @@ software and has no support guarantees.
 - [Testing](../development/testing.md) — Vitest, the Playwright smoke
   scripts and every CI job.
 - [Context map](../ecosystem/context-map.md) — how this shell fits among the bounded-context services and `warehouse-ops-agent`.
+
+:::note[Disclaimer]
+This project is a domain-driven design study. It is not associated with, endorsed by or affiliated with any company, and it uses no company's code, data, logos or trademarks. All names, figures and examples are illustrative or synthetic.
+:::
